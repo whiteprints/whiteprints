@@ -8,6 +8,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 Is is possible to install the [package] in the following ways.
 
+## Using uv
+
+You can install the [package] with [uv].
+
+```
+uv tool install whiteprints
+```
+
+If you don't have uv install, you can have a look at the uv
+[installation guide](https://docs.astral.sh/uv/getting-started/installation/).
+
 ## From PyPI
 
 To install the [package] from [PyPI] run
