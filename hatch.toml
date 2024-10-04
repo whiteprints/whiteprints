@@ -12,6 +12,10 @@ fragments = [
 ]
 
 [[metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = "\\[INSTALL.md\\]\\((?!https?://)\\S+?\\)"
+replacement = "[INSTALL.md](https://github.com/whiteprints/whiteprints/blob/main/INSTALL.md)"
+
+[[metadata.hooks.fancy-pypi-readme.substitutions]]
 pattern = "\\[CONTRIBUTING.md\\]\\((?!https?://)\\S+?\\)"
 replacement = "[CONTRIBUTING.md](https://github.com/whiteprints/whiteprints/blob/main/CONTRIBUTING.md)"
 
@@ -20,8 +24,8 @@ pattern = "\\[MAINTAINERS.md\\]\\((?!https?://)\\S+?\\)"
 replacement = "[MAINTAINERS.md](https://github.com/whiteprints/whiteprints/blob/main/MAINTAINERS.md)"
 
 [[metadata.hooks.fancy-pypi-readme.substitutions]]
-pattern = "src=\"docs/images/banner.svg\""
-replacement = "src=\"https://raw.githubusercontent.com/whiteprints/whiteprints/refs/heads/main/docs/images/banner.svg\""
+pattern = "src=\"docs/_static/banner.svg\""
+replacement = "src=\"https://raw.githubusercontent.com/whiteprints/whiteprints/refs/heads/main/docs/_static/banner.svg\""
 
 [build.targets.sdist]
 only-include = [
