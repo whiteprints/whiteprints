@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: © 2024 Romain Brault <mail@romainbrault.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# All files are by default owned by this user, unless a more specific ownership
+# rule is set below.
+* @RomainBrault

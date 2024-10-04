@@ -1,0 +1,171 @@
+# SPDX-FileCopyrightText: © 2024 Romain Brault <mail@romainbrault.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name-template: 'v$RESOLVED_VERSION 🌈'
+tag-template: 'v$RESOLVED_VERSION'
+tag-prefix: 'v'
+categories:
+  - title: '⚖️ License'
+    labels:
+      - license
+  - title: '💥 Removals & Breaking Changes'
+    labels:
+      - 'breaking'
+      - 'removal'
+  - title: '🚀 Features'
+    labels:
+      - 'feature'
+      - 'enhancement'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+  - title: '📖 Documentation'
+    labels:
+      - 'documentation'
+  - title: '⚡ Performances'
+    labels:
+      - 'performance'
+  - title: '🧰 Maintenance'
+    labels:
+      - 'build'
+      - 'actions'
+      - 'ci'
+      - 'configuration'
+      - 'container'
+      - 'dependencies'
+      - 'metadata'
+      - 'refactoring'
+      - 'tasks'
+      - 'testing'
+      - 'style'
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: patch
+exclude-labels:
+  - "skip-changelog"
+template: |
+  ## Changes
+  $CHANGES
+
+autolabeler:
+  - label: 'ci'
+    files:
+      - '.github/**'
+
+  - label: 'actions'
+    files:
+      - '.github/workflows/*'
+
+  - label: 'documentation'
+    files:
+      - '*.md'
+      - '*.rst'
+      - 'docs/**'
+
+  - label: 'python'
+    files:
+      - '**/*.py'
+
+  - label: 'testing'
+    files:
+      - 'tests/**'
+      - 'pytest.ini'
+
+  - label: 'dependencies'
+    files:
+      - 'uv.lock'
+
+  - label: 'workflows'
+    files:
+      - 'tox.ini'
+
+  - label: 'tasks'
+    files:
+      - 'hatch_build.py'
+      - 'scripts/**'
+
+  - label: 'metadata'
+    files:
+      - 'hatch.toml'
+      - 'pyproject.toml'
+
+  - label: 'container'
+    files:
+      - 'Containerfile'
+      - 'Containerfile.containerignore'
+
+  - label: 'configuration'
+    files:
+      - 'bandit.yaml'
+      - 'pyrightconfig.json'
+      - 'pytest.ini'
+      - '.coveragerc'
+      - '.editorconfig'
+      - '.gitignore'
+      - '.gitattributes'
+      - '.pylintrc'
+      - '.pyrightconfig_tox.json'
+      - '.ruff.toml'
+
+  - label: 'license'
+    files:
+      - '**/*.license'
+      - 'LICENSES/**'
+      - 'REUSE.toml'
+
+  # Autolabeler rules based on PR title following Angular commit convention
+  - label: 'fix'
+    title:
+      - '/^fix:/i'
+
+  - label: 'enhancement'
+    title:
+      - '/^feat:/i'
+
+  - label: 'style'
+    title:
+      - '/^style:/i'
+
+  - label: 'refactoring'
+    title:
+      - '/^refactor:/i'
+
+  - label: 'performance'
+    title:
+      - '/^perf:/i'
+
+  - label: 'testing'
+    title:
+      - '/^test:/i'
+
+  - label: 'build'
+    title:
+      - '/^build:/i'
+
+  - label: 'ci'
+    title:
+      - '/^ci:/i'
+
+  - label: 'documentation'
+    title:
+      - '/^docs:/i'
+
+  - label: 'breaking'
+    title:
+      - '/!:/i'
+    body:
+      - '/BREAKING CHANGE/i'
+

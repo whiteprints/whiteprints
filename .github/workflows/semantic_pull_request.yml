@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: © 2024 Romain Brault <mail@romainbrault.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: "Lint Pull Request"
+
+on:
+  workflow_dispatch:
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize]
+
+jobs:
+  main:
+    name: Validate PR title
+    runs-on: ubuntu-latest
+    environment:
+      name: tests
+    permissions:
+      pull-requests: read
+      statuses: write
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        name: Semantic Pull Request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          wip: true
