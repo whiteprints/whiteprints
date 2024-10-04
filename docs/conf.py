@@ -24,6 +24,7 @@ language = "en"
 myst_heading_anchors = 3
 extensions = [
     "myst_parser",
+    "sphinx_click",
     "sphinx_copybutton",
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",

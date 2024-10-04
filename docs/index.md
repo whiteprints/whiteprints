@@ -16,6 +16,7 @@ hidden:
 
 Home <self>
 Guide <guide>
+Command Line <usage>
 Reference <autoapi/index>
 Licensing <licensing_index>
 Contributing <contributing_index>

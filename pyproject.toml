@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2024 Romain Brault <mail@romainbrault.com>
+# SPDX-FileCopyrightText: © 2024 Romain Brault <mail@romainbrault.com>
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -15,7 +15,6 @@ keywords = [
     "Python",
 ]
 license = "GPL-3.0-or-later"
-
 license-files.paths = [
     "LICENSES/GPL-3.0-or-later.txt",
 ]
@@ -47,7 +46,13 @@ dynamic = [
     "readme",
     "version",
 ]
-dependencies = [  ]
+dependencies = [
+    "python-dotenv>=1.0.1",
+    "rich-click>=1.8.3",
+    "typing-extensions>=4.12.2; python_full_version<'3.12'",
+]
+
+scripts.whiteprints = "whiteprints.cli.entrypoint:whiteprints"
 
 [tool.uv]
 managed = true

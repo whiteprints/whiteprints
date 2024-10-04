@@ -6,8 +6,12 @@
 
 from typing import Final
 
+from whiteprints.environment import ENVIRONMENT_FILE, load_dotenv
 from whiteprints.package_metadata import __version__
 
 
 __all__: Final = ["__version__"]
 """Public module attributes."""
+
+
+load_dotenv(ENVIRONMENT_FILE)
