@@ -182,7 +182,8 @@ class CLIArgsType(TypedDict):
     cls=LazyCommandLoader,
     name=__app_name__,
     help=_(
-        "Thank you for using {}, a tool to generate minimal Python projects."
+        "A Copier-based cookiecutter for creating Python projects "
+        "managed by uv."
     ).format(__app_name__),
     no_args_is_help=True,
 )
