@@ -40,3 +40,4 @@ If you plan to use whiteprints frequently you can have a look at the
 
 [GitHub]: https://github.com
 [Python]: https://www.python.org/
+[uv]: https://docs.astral.sh/uv/
