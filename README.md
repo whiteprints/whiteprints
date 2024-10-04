@@ -6,7 +6,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 # Whiteprints
 
-![Whiteprints](docs/_static/banner.svg)
+![Whiteprints banner](docs/_static/banner.svg)
 <div align="center">
     <p>
         <em>
