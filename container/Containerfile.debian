@@ -138,7 +138,7 @@ ARG REVISION
 ARG TAG
 
 LABEL org.opencontainers.image.authors='Romain Brault <mail@romainbrault.com>' \
-      org.opencontainers.image.documentation='' \
+      org.opencontainers.image.documentation='https://readthedocs.org/projects/whiteprints' \
       org.opencontainers.image.source='https://github.com/whiteprints/whiteprints' \
       org.opencontainers.image.description='A Copier-based cookiecutter for creating Python projects managed by uv.' \
       org.opencontainers.image.vendor='whiteprints' \
