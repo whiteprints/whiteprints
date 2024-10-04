@@ -52,6 +52,14 @@ dependencies = [
     "typing-extensions>=4.12.2; python_full_version<'3.12'",
 ]
 
+urls.changelog = "https://github.com/whiteprints/whiteprints/release"
+urls.discussions = "https://github.com/whiteprints/whiteprints/discussions"
+urls.documentation = "https://github.com/whiteprints/whiteprints"
+urls.download = "https://github.com/whiteprints/whiteprints/release"
+urls.homepage = "https://github.com/whiteprints/whiteprints"
+urls.integration = "https://github.com/whiteprints/whiteprints/actions"
+urls.issues = "https://github.com/whiteprints/whiteprints/issues"
+urls.repository = "https://github.com/whiteprints/whiteprints"
 scripts.whiteprints = "whiteprints.cli.entrypoint:whiteprints"
 
 [tool.uv]

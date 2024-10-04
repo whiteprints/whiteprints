@@ -10,14 +10,14 @@ Is is possible to install the package in the following ways.
 
 ## From source
 
-Once you have obtained a copy of the sources, you can install the package with
-[pip].
-
-To install with [pip] from the source tree:
+To install with [pip] from [GitHub] run the command:
 
 ```console
-pip install .
+pip install git+ssh://git@github.com/whiteprints/whiteprints
 ```
+
+[GitHub]: https://github.com
+[git]: https://git-scm.com/
 
 For additional information see [PyPA]'s guide: [installing Packages](https://packaging.python.org/en/latest/tutorials/installing-packages).
 

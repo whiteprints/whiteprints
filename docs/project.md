@@ -6,7 +6,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 # 🛠️ Codebase Overview
 
-The project is organised as follow.
+The project is hosted on [https://github.com/whiteprints/whiteprints.git](https://github.com/whiteprints/whiteprints.git).
+
+It is organised as follow.
 
 ## Files and directories
 

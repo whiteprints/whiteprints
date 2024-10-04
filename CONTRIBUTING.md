@@ -23,7 +23,7 @@ Refer to [SECURITY.md](SECURITY.md).
 
 ## How to report an identified bug
 
-To report identified bugs, please email any [core member].
+To report identified bugs, please fill a.[GitHub bug report issue](https://github.com/whiteprints/whiteprints/issues/new?template=bug_report.yml).
 
 When filing a bug or issue, make sure to answer the following questions:
 
@@ -39,7 +39,9 @@ your bug more effectively.
 
 ## How to request a feature
 
-To request features, please email any [core members].
+To request features, please [open a discussion](https://github.com/whiteprints/whiteprints/discussions/categories/ideas)
+
+Once the enhancement has been discussed, fill a [GitHub feature issue](https://github.com/whiteprints/whiteprints/issues/new?template=feature_request.yml).
 
 ## How to report a problem
 
@@ -134,12 +136,18 @@ can install [pre-commit] as a [Git hook] by running:
 uvx pre-commit install
 ```
 
-It is recommended to contact [core members] before starting work on any
-changes. This will give you a chance to discuss your ideas with the owners and
-validate your approach.
+Please ensure that your contribution is resolving a known [issue]. If not,
+please create an associated [issue] first.
 
-Once your contribution is ready, ask one of the [core members] to merge it into
-the main branch.
+Once your code and your issue are ready, create a [GitHub] [Pull Request]
+containing your modification and referencing the associated [issue].
+
+If you don't know or are not sure on how to create a Pull Request, follow
+the tutorial [creating a Pull Request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request).
+
+[GitHub]: https://github.com/
+[Pull Request]: https://github.com/whiteprints/whiteprints/pulls
+[issue]: https://github.com/whiteprints/whiteprints/issues
 
 [Git hook]: https://git-scm.com/book/ms/v2/Customizing-Git-Git-Hooks
 [Git]: https://git-scm.com/

@@ -11,4 +11,5 @@ Welcome to the project guide!
 ```{toctree}
 Install <INSTALL>
 Quickstart <quickstart>
+Verifying Artifacts <artifacts_verification>
 ```

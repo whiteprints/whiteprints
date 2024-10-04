@@ -51,3 +51,11 @@ repos:
         description: "[Fix] Lint issues"
         entry: ruff check --preview --config=.ruff.toml
         exclude: ^(gen_ref_pages.py)
+
+ci:
+  autofix_commit_msg: 'refactoring: auto fixes from pre-commit.com hooks'
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: 'ci(dependencies): autoupdate pre-commit hooks'
+  skip: []
+  submodules: false

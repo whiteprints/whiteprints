@@ -55,7 +55,16 @@ html_logo = "_static/logo.svg"
 html_static_path = ["_static"]
 html_extra_path = []
 html_theme = "pydata_sphinx_theme"
-html_theme_options = {}
+html_theme_options = {
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/whiteprints/whiteprints",
+            "icon": "fa-brands fa-square-github",
+            "type": "fontawesome",
+        },
+    ],
+}
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "pip": ("https://pip.pypa.io/en/stable", None),
