@@ -1,0 +1,49 @@
+# SPDX-FileCopyrightText: © 2024 Romain Brault <mail@romainbrault.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# General
+.secrets.*
+
+# Python
+.python-version
+## Cache
+__pycache__
+*.pyc
+## Logs
+*.log
+## Editors
+.idea
+## Build
+site
+dist
+build
+_build
+docs_build
+*.egg-info
+## Localization
+*.mo
+## Tests
+.pytest_cache
+.hypothesis
+## Coverage
+.coverage
+.coverage.*
+profile.*
+coverage.*
+htmlcov
+## Integration
+.nox
+.tox
+
+# Node
+node_modules
+
+# Misc
+*.old*
+
+# Generated files
+BOM/
+
+# Copier
+.copier-answers.yml

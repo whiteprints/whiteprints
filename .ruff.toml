@@ -1,0 +1,193 @@
+# SPDX-FileCopyrightText: © 2024 Romain Brault <mail@romainbrault.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+line-length = 79
+indent-width = 4
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "template",
+    "hatch_build.py",
+    "scripts"
+]
+force-exclude = true
+
+target-version = "py39"
+
+[lint]
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+# See https://docs.astral.sh/ruff/rules
+select = [
+    "F",     # pyflakes
+    "E",     # pycodestyle
+    "W",     # pycodestyle
+    "C90",   # mccabe
+    "I",     # isort
+    "N",     # pep8-naming
+    "D",     # pydocstyle
+    "UP",    # pyupgrade
+    "YTT",   # flake8-2020
+    "ANN",   # flake8-annotations
+    "ASYNC", # flake8-async
+    "S",     # flake8-bandit
+    "BLE",   # flake8-blind-except
+    "FBT",   # flake8-boolean-trap
+    "B",     # flake8-bugbear
+    "A",     # flake8-builtins
+    "COM",   # flake8-commas
+    "C4",    # flake8-comprehensions
+    "DTZ",   # flake8-datetimez
+    "T10",   # flake8-debugger
+    "DJ",    # flake8-django
+    "EM",    # flake8-errmsg
+    "EXE",   # flake8-executable
+    "FA",    # fake8-future-annotation
+    "ISC",   # flake8-implicit-str-concat
+    "ICN",   # flake8-import-conventions
+    "LOG",   # flake8-logging
+    "G",     # flake8-logging-format
+    "INP",   # flake8-no-pep420
+    "PIE",   # flake8-pie
+    "T20",   # flake8-print
+    "PYI",   # flake8-pyi
+    "PT",    # flake8-pytest-style
+    "Q",     # flake8-quotes
+    "RSE",   # flake8-raise
+    "RET",   # flake8-return
+    "SLF",   # flake8-self
+    "SLOT",  # flake8-slot
+    "SIM",   # flake8-simplify
+    "TID",   # flake8-tidy-imports
+    "TCH",   # flake8-type-checking
+    "INT",   # flake8-gettext
+    "ARG",   # flake8-unused-arguments
+    "PTH",   # flake8-use-pathlib
+    "TD",    # flake8-totos
+    "FIX",   # flake8-fixeme
+    "ERA",   # eradicate
+    "PD",    # pandas-vet
+    "PGH",   # pygrep-hooks
+    "PL",    # pylint
+    "TRY",   # tryceratops
+    "FLY",   # flynt
+    "NPY",   # Numpy
+    "FAST",  # FastAPI
+    "AIR",   # Airflow
+    "PERF",  # perflint
+    "FURB",  # refurb
+    "DOC",   # pydoclint
+    "RUF",   # ruff-specific rules
+]
+# We ignore
+#  - ANN101: deprecated
+#  - COM812: conflict when use with the formatter
+#  - CPY: copyright are checked with REUSE
+#  - ISC001: conflict when use with the formatter
+#  - S: safety is checked directly with Bandit
+ignore = ["ANN101", "COM812", "CPY", "ISC001", "S"]
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = [
+    "F",     # pyflakes
+    "E",     # pycodestyle
+    "W",     # pycodestyle
+    "C90",   # mccabe
+    "I",     # isort
+    "N",     # pep8-naming
+    "D",     # pydocstyle
+    "UP",    # pyupgrade
+    "YTT",   # flake8-2020
+    "ANN",   # flake8-annotations
+    "ASYNC", # flake8-async
+    "S",     # flake8-bandit
+    "BLE",   # flake8-blind-except
+    "FBT",   # flake8-boolean-trap
+    "B",     # flake8-bugbear
+    "A",     # flake8-builtins
+    "COM",   # flake8-commas
+    "C4",    # flake8-comprehensions
+    "DTZ",   # flake8-datetimez
+    "T10",   # flake8-debugger
+    "DJ",    # flake8-django
+    "EM",    # flake8-errmsg
+    "EXE",   # flake8-executable
+    "FA",    # fake8-future-annotation
+    "ISC",   # flake8-implicit-str-concat
+    "ICN",   # flake8-import-conventions
+    "LOG",   # flake8-logging
+    "G",     # flake8-logging-format
+    "INP",   # flake8-no-pep420
+    "PIE",   # flake8-pie
+    "T20",   # flake8-print
+    "PYI",   # flake8-pyi
+    "PT",    # flake8-pytest-style
+    "Q",     # flake8-quotes
+    "RSE",   # flake8-raise
+    "RET",   # flake8-return
+    "SLF",   # flake8-self
+    "SLOT",  # flake8-slot
+    "SIM",   # flake8-simplify
+    "TID",   # flake8-tidy-imports
+    "TCH",   # flake8-type-checking
+    "INT",   # flake8-gettext
+    "ARG",   # flake8-unused-arguments
+    "PTH",   # flake8-use-pathlib
+    "TD",    # flake8-totos
+    "FIX",   # flake8-fixeme
+    "ERA",   # eradicate
+    "PD",    # pandas-vet
+    "PGH",   # pygrep-hooks
+    "PL",    # pylint
+    "TRY",   # tryceratops
+    "FLY",   # flynt
+    "NPY",   # Numpy
+    "FAST",  # FastAPI
+    "AIR",   # Airflow
+    "PERF",  # perflint
+    "FURB",  # refurb
+    "DOC",   # pydoclint
+    "RUF",   # ruff-specific rules
+]
+unfixable = []
+
+[lint.mccabe]
+# Unlike Flake8, default to a complexity level of 10.
+max-complexity = 4
+
+[lint.isort]
+known-first-party = ["whiteprints"]
+lines-after-imports = 2
+
+[lint.pydocstyle]
+convention = "google"
+# no-blank-line-before-class = false
+# one-blank-line-before-class = true
+
+[lint.per-file-ignores]
+# pytest require asserts
+"tests/*.py" = ["S101"]
+# gen_ref_pages.py does not need an __init__.py by design
+"gen_ref_pages.py" = ["INP001"]
+# this does not need an __init__.py by design and copyright needs to be
+# shadowed
+"docs/conf.py" = ["INP001", "A001"]

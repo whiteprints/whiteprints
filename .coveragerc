@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: © 2024 Romain Brault <mail@romainbrault.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[run]
+branch = True
+source =
+  tests
+source_pkgs =
+  whiteprints
+omit =
+  # omit main module,
+  **/__main__.py
+  # omit anything in a .local directory anywhere
+  */.local/*
+  # omit everything in /usr
+  /usr/*
+  # omit anything in a temporary directory anywhere
+  /tmp/**
+
+[paths]
+source =
+  src
+  site-packages
+  **/src
+  **/site-packages
+tests =
+  tests
+  **/tests
+
+[html]
+show_contexts = True
+
+[report]
+; Regexes for lines to exclude from consideration
+show_missing = True
+fail_under = 100
+exclude_also =
+  ; Don't complain about missing debug-only code:
+  if __debug__
+  if self\.debug
+  if DEBUG
+
+  ; Don't complain if tests don't hit defensive assertion code:
+  raise NotImplementedError
+
+  ; Don't complain if non-runnable code isn't run:
+  if 0:
+  if False:
+  if __name__ == .__main__.:
+
+  ; Don't complain about abstract methods, they aren't run:
+  @(abc\.)?abstractmethod

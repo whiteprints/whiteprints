@@ -1,0 +1,152 @@
+# SPDX-FileCopyrightText: © 2024 Romain Brault <mail@romainbrault.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+ARG PYTHON_VERSION=3.12.6
+ARG BASE_OS=alpine3.20
+ARG DIGEST="sha256:e0e4d3db19333a970e7acfdcb8863efe065be6c3038ef5018694f98162bffec0"
+
+ARG UV_COMPILE_BYTECODE=1
+ARG PYTHONDONTWRITEBYTECODE=1
+ARG PYTHONBUFFERED=1
+ARG TAG=${PYTHON_VERSION}-${BASE_OS}${DIGEST:+@${DIGEST}}
+
+ARG VIRTUAL_ENV=/opt/venv
+
+# Use a multi-stage build to reduce the size of the final image.
+#   This example is optimized to reduce final image size rather than for
+#   simplicity.
+# Using a -slim image also greatly reduces image size.
+# It is possible to use -alpine images instead to further reduce image size,
+# but this comes with several important caveats.
+#   - Alpine images use MUSL rather than GLIBC (as used in the default
+#   Debian-based images).
+#   - Most Python packages that require C code are tested against GLIBC, so
+#   there could be subtle errors when using MUSL.
+#   - These Python packages usually only provide binary wheels for GLIBC, so
+#   the packages will need to be recompiled fully within the container images,
+#   increasing build times.
+ARG UV_VERSION=0.4.17
+ARG UV_DIGEST="sha256:8485956e62d9eb547b26dd2047e058d5055c96cc47fbb9fba4300054f56bc49e"
+ARG UV_TAG=${UV_VERSION}${UV_DIGEST:+@${UV_DIGEST}}
+ARG UV_BIN="/usr/local/bin"
+
+FROM ghcr.io/astral-sh/uv:${UV_TAG} AS uv_image
+
+ARG TAG
+
+FROM docker.io/python:${TAG} AS python_builder
+
+# Install any system dependencies required to build wheels, such as C
+# compilers or system packages For example:
+RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
+    apk add --update git
+
+ARG UV_BIN
+
+COPY --from=uv_image /uv ${UV_BIN}/uv
+
+ARG UV_COMPILE_BYTECODE
+ARG PYTHONDONTWRITEBYTECODE
+ARG PYTHONBUFFERED
+ARG VIRTUAL_ENV
+
+ENV UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=never \
+    UV_PROJECT_ENVIRONMENT=${VIRTUAL_ENV}
+RUN ${UV_BIN}/uv venv \
+        --python="/usr/local/bin/python" \
+        --relocatable \
+        ${VIRTUAL_ENV}
+
+# Copy in project dependency specification.
+ARG WORKDIR=/src
+WORKDIR ${WORKDIR}
+
+# Install the project dependencies
+COPY pyproject.toml *.lock ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    set -ex && \
+    ${UV_BIN}/uv export \
+        --python="/usr/local/bin/python" \
+        --format="requirements-txt" \
+        --output-file requirements.txt \
+        --all-extras \
+        --frozen \
+        --no-dev \
+        --no-emit-project && \
+    ${UV_BIN}/uv pip install \
+        --python="/usr/local/bin/python" \
+        --require-hashes \
+        --verify-hashes \
+        --no-break-system-packages \
+        --requirement requirements.txt
+
+# Copy in source files.
+COPY README.md hatch.toml hatch_build.py ./
+COPY LICENSES LICENSES/
+COPY src src/
+COPY .git .git/
+
+# Manually build/install the package.
+RUN --mount=type=cache,target=/root/.cache/uv \
+    set -ex && \
+    ${UV_BIN}/uv pip install \
+        --python="/usr/local/bin/python" \
+        --no-cache \
+        --no-break-system-packages \
+        --no-deps \
+        .
+
+## Final Image
+# The image used in the final image MUST match exactly to the python_builder
+# image.
+FROM docker.io/python:${TAG} AS python_runner
+
+# For Python applications that are not installable libraries, you may need to
+# copy in source files here in the final image rather than in the
+# python_builder image.
+
+# Copy and activate pre-built virtual environment.
+ARG VIRTUAL_ENV
+COPY --from=python_builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+
+# Give access to the entire home folder to the new user so that files and
+# folders can be written there. Some packages such as matplotlib, want to write
+# to the home folder.
+USER nobody
+
+ARG HOME="/app"
+ENV HOME=${HOME}
+WORKDIR ${HOME}
+
+ARG PYTHONDONTWRITEBYTECODE
+ARG PYTHONBUFFERED
+ENV PYTHONDONTWRITEBYTECODE=${PYTHONDONTWRITEBYTECODE} \
+    PYTHONBUFFERED=${PYTHONBUFFERED}
+
+ENTRYPOINT ["python"]
+
+ARG PYTHON_VERSION
+ARG BASE_OS
+ARG DIGEST
+ARG BUILD_DATE
+ARG VERSION
+ARG REVISION
+ARG TAG
+
+LABEL org.opencontainers.image.authors='Romain Brault <mail@romainbrault.com>' \
+      org.opencontainers.image.documentation='' \
+      org.opencontainers.image.source='' \
+      org.opencontainers.image.description='A Copier-based cookiecutter for creating Python projects managed by uv.' \
+      org.opencontainers.image.vendor='whiteprints' \
+      org.opencontainers.image.licenses='GPL-3.0-or-later' \
+      org.opencontainers.image.version=${VERSION} \
+      org.opencontainers.image.revision=${REVISION} \
+      org.opencontainers.image.created=${BUILD_DATE} \
+      org.opencontainers.image.title='whiteprints' \
+      org.opencontainers.image.description='A Copier-based cookiecutter for creating Python projects managed by uv.' \
+      org.opencontainers.image.ref.name=${TAG} \
+      org.opencontainers.image.base.name='docker.io/python:'${TAG} \
+      org.opencontainers.image.base.digest=${DIGEST}

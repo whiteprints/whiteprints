@@ -1,0 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Romain Brault <mail@romainbrault.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Instruct type checkers to look for inline type annotations in this package.
+# See PEP 561.

@@ -1,0 +1,26 @@
+{
+  "strict": ["**"],
+  "include": ["src", "tests", "docs"],
+
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "src/experimental",
+    "src/typestubs",
+    "hatch_build.py"
+  ],
+
+  "ignore": [],
+
+  "defineConstant": {
+    "DEBUG": true
+  },
+
+  "stubPath": "./src/stubs",
+
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": true,
+
+  "pythonVersion": "3.9",
+  "pythonPlatform": "All"
+}
