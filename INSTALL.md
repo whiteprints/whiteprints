@@ -45,3 +45,4 @@ For additional information see [PyPA]'s guide: [installing Packages](https://pac
 [PyPA]: https://www.pypa.io/en/latest/
 [pip]: https://pip.pypa.io/en/stable
 [package]: https://pypi.org/project/whiteprints
+[uv]: https://docs.astral.sh/uv/
