@@ -104,7 +104,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Licensing
 
-The _[Python]_ **code** of this project is distributed under license .
+The _[Python]_ **code** of this project is distributed under license [GPL-3.0-or-later].
 
 In case of doubt, please check the [SPDX] header of each individual source code file.
 
