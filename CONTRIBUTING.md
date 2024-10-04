@@ -124,7 +124,7 @@ Then commit and push your modifications on your branch.
 Your contribution needs to meet the following guidelines for acceptance:
 
   - The [Tox] test suite must pass without errors and warnings.
-  - Include unit tests; this project maintains 100% code coverage.
+  - Include unit tests; this project maintains [100% code coverage](https://codecov.io/gh/whiteprints/whiteprints).
   - If your changes add functionality, update the documentation accordingly.
 
 Feel free to submit early, though we can always iterate on this.
