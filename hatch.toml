@@ -12,6 +12,10 @@ fragments = [
 ]
 
 [[metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = "\\[INSTALL.md\\]\\((?!https?://)\\S+?\\)"
+replacement = "[INSTALL.md](https://github.com/whiteprints/whiteprints/blob/main/INSTALL.md)"
+
+[[metadata.hooks.fancy-pypi-readme.substitutions]]
 pattern = "\\[CONTRIBUTING.md\\]\\((?!https?://)\\S+?\\)"
 replacement = "[CONTRIBUTING.md](https://github.com/whiteprints/whiteprints/blob/main/CONTRIBUTING.md)"
 
