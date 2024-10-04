@@ -23,7 +23,7 @@ $ pip install uv
 Then just run whiteprints with uvx:
 
 ```
-$ uvx whiteprints init my_awesome_project
+uvx whiteprints init my_awesome_project
 ```
 Answer a few questions and you're ready to go 🚀.
 
@@ -32,7 +32,7 @@ This will create a directory named `my_awesome_project` containing your [Python]
 To generate a [GitHub] template please look at the command line help
 
 ```
-$ uvx whiteprints init --help
+uvx whiteprints init --help
 ```
 
 If you plan to use whiteprints frequently you can have a look at the
