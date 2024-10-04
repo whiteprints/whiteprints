@@ -24,8 +24,8 @@ pattern = "\\[MAINTAINERS.md\\]\\((?!https?://)\\S+?\\)"
 replacement = "[MAINTAINERS.md](https://github.com/whiteprints/whiteprints/blob/main/MAINTAINERS.md)"
 
 [[metadata.hooks.fancy-pypi-readme.substitutions]]
-pattern = "](\"docs/_static/banner.svg\")"
-replacement = "](\"https://raw.githubusercontent.com/whiteprints/whiteprints/refs/heads/main/docs/_static/banner.svg\")"
+pattern = "\\]\\(\"docs/_static/banner.svg\"\\)"
+replacement = "\\]\\(\"https://raw.githubusercontent.com/whiteprints/whiteprints/refs/heads/main/docs/_static/banner.svg\"\\)"
 
 [build.targets.sdist]
 only-include = [
