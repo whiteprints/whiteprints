@@ -50,6 +50,7 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "rich-click>=1.8.3",
     "typing-extensions>=4.12.2; python_full_version<'3.12'",
+    "uv>=0.4.18",
 ]
 
 urls.changelog = "https://github.com/whiteprints/whiteprints/release"
