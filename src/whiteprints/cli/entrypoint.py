@@ -147,6 +147,12 @@ def print_license(ctx: Context, _param: Option, value: bool) -> None:
     console = importlib.import_module("whiteprints.console")
     package_metadata = importlib.import_module("whiteprints.package_metadata")
     console.STDOUT.print(
+        _(
+            "Copyright © 2024 The Whiteprints authors and contributors"
+            " <whiteprints@pm.me>.\n"
+        )
+    )
+    console.STDOUT.print(
         _("Code released under license '{}'.").format(
             package_metadata.__license__
         )
