@@ -1,7 +1,7 @@
 <!--
 SPDX-FileCopyrightText: © 2024 The Whiteprints authors and contributors <whiteprints@pm.me>
 
-SPDX-License-Identifier: GPL-3.0-or-later
+SPDX-License-Identifier: CC-BY-NC-SA-4.0
 -->
 
 # 📖 How-to guide
@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 Thank you for your interest in improving this project.
 
 
-The code is open-source under the license [GPL-3.0-or-later](../LICENSES/GPL-3.0-or-later.txt) and we
+The code is open-source under the license [CC-BY-NC-SA-4.0](../LICENSES/CC-BY-NC-SA-4.0.txt) and we
 welcome contributions in any form.
 
 
@@ -172,9 +172,9 @@ Before submitting changes:
       or otherwise as the agent of a legal entity, that they have the right and
       authority to make their contribution under these terms.
     - The contribution was created in whole or in part by me and I have the
-      right to submit it under license [GPL-3.0-or-later](../LICENSES/GPL-3.0-or-later.txt) license; __or__
+      right to submit it under license [CC-BY-NC-SA-4.0](../LICENSES/CC-BY-NC-SA-4.0.txt) license; __or__
     - the contribution is based upon previous work that, to the best of my
       knowledge, is covered under an appropriate open source license and I have
       the right under that license to submit that work with modifications,
-      whether created in whole or in part by me, under the [GPL-3.0-or-later](../LICENSES/GPL-3.0-or-later.txt)
+      whether created in whole or in part by me, under the [CC-BY-NC-SA-4.0](../LICENSES/CC-BY-NC-SA-4.0.txt)
       license.
