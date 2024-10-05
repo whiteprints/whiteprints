@@ -300,7 +300,7 @@ invocation.
     is_flag=True,
 )
 @click.option(
-    "-p",
+    "-pr",
     "--protect-repository",
     help=_(
         "Configure GitHub to protect branches and tags."
