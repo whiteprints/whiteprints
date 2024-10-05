@@ -117,7 +117,4 @@ myst_substitutions = {
 exclude_patterns = [
     "_autoapi_templates/**",
 ]
-linkcheck_ignore = [
-    r"https://pypi\.org/project/.*",
-    r"https://.*\.readthedocs\.io/en/stable/",
-]
+linkcheck_ignore = []
