@@ -14,8 +14,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </em>
     </p>
     <p>
-        <a href="https://pypi.org/project/whiteprints"><img alt="PyPI - Project Version" src="https://img.shields.io/pypi/v/whiteprints.svg?logo=PyPI&logoColor=ffd43b"/></a>
         <a href="https://www.python.org"><img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/whiteprints.svg?logo=Python&logoColor=ffd43b"/></a>
+        <a href="https://pypi.org/project/whiteprints"><img alt="PyPI - Project Version" src="https://img.shields.io/pypi/v/whiteprints.svg?logo=PyPI&logoColor=ffd43b"/></a>
         <a href="https://spdx.org/licenses/GPL-3.0-or-later"><img alt="license badge" src="https://img.shields.io/badge/📝_License-GPL--3.0--or--later-4CAF50.svg"/></a>
         <a href="https://github.com/whiteprints/whiteprints/discussions"><img alt="GitHub Discussions" src="https://img.shields.io/github/discussions/whiteprints/whiteprints.svg?logo=GitHub"></a>
         <a href="https://spdx.dev/learn/areas-of-interest/licensing/"><img alt="SPDX Licensing" src="https://img.shields.io/badge/SPDX-licensing-0080FF.svg?logo=SPDX"/></a>
