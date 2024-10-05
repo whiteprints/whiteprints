@@ -15,6 +15,6 @@ please see [Contributing].
 
 ## Current Maintainers
 
-| Maintainer    | Email                    | GPG Public key                         |
-| ------------- | ------------------------ | -------------------------------------- |
-| Romain Brault | <mail@romainbrault.com>  | [Encryption key](gpg-romainbrault.pub) |
+| Maintainer    | Email                    | GPG Public key                                       |
+| ------------- | ------------------------ | ---------------------------------------------------- |
+| Romain Brault | <mail@romainbrault.com>  | [Encryption key](docs/_static/gpg-romainbrault.pub)  |
