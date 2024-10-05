@@ -1,5 +1,5 @@
 .. SPDX-FileCopyrightText: © 2015 Read the Docs, Inc
-.. SPDX-FileCopyrightText: © 2024 Romain Brault <mail@romainbrault.com>
+.. SPDX-FileCopyrightText: © 2024 The Whiteprints authors and contributors <whiteprints@pm.me>
 ..
 .. SPDX-License-Identifier: MIT
 
