@@ -20,6 +20,9 @@ __license__: Final = metadata.metadata(__package__ or "")["License-Expression"]
 __license_file__: Final = [
     license_path
     for license_path in metadata.files(__package__ or "") or ()
-    if license_path.match("LICENSES/*.txt")
+    if (
+        license_path.match("LICENSES/*.txt")
+        and license_path.stem in "GPL-3.0-or-later"
+    )
 ]
 """The package code license file as found by importlib metadata."""
