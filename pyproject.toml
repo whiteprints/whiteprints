@@ -53,10 +53,10 @@ dependencies = [
     "uv>=0.4.18",
 ]
 
-urls.changelog = "https://github.com/whiteprints/whiteprints/release"
+urls.changelog = "https://github.com/whiteprints/whiteprints/releases"
 urls.discussions = "https://github.com/whiteprints/whiteprints/discussions"
 urls.documentation = "https://github.com/whiteprints/whiteprints"
-urls.download = "https://github.com/whiteprints/whiteprints/release"
+urls.download = "https://github.com/whiteprints/whiteprints/releases"
 urls.homepage = "https://github.com/whiteprints/whiteprints"
 urls.integration = "https://github.com/whiteprints/whiteprints/actions"
 urls.issues = "https://github.com/whiteprints/whiteprints/issues"
