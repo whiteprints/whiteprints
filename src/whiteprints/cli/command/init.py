@@ -300,8 +300,8 @@ invocation.
     is_flag=True,
 )
 @click.option(
-    "-p/-P",
-    "--protect-repository/--no-protect-repository",
+    "-p",
+    "--protect-repository",
     help=_(
         "Configure GitHub to protect branches and tags."
         " This imply `--github`."
