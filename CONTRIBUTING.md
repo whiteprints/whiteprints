@@ -172,9 +172,10 @@ Before submitting changes:
       or otherwise as the agent of a legal entity, that they have the right and
       authority to make their contribution under these terms.
     - The contribution was created in whole or in part by me and I have the
-      right to submit it under license [CC-BY-NC-SA-4.0](../LICENSES/CC-BY-NC-SA-4.0.txt) license; __or__
+      right to submit it under the license of the file(s) modified or created;
+      **or**
     - the contribution is based upon previous work that, to the best of my
       knowledge, is covered under an appropriate open source license and I have
       the right under that license to submit that work with modifications,
-      whether created in whole or in part by me, under the [CC-BY-NC-SA-4.0](../LICENSES/CC-BY-NC-SA-4.0.txt)
-      license.
+      whether created in whole or in part by me, under the license of the
+      file(s) modified of created.
