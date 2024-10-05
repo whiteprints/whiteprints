@@ -1,7 +1,7 @@
 <!--
 SPDX-FileCopyrightText: © 2024 The Whiteprints authors and contributors <whiteprints@pm.me>
 
-SPDX-License-Identifier: GPL-3.0-or-later
+SPDX-License-Identifier: CC-BY-NC-SA-4.0
 -->
 
 # Whiteprints
@@ -16,7 +16,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <p>
         <a href="https://www.python.org"><img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/whiteprints.svg?logo=Python&logoColor=ffd43b"/></a>
         <a href="https://pypi.org/project/whiteprints"><img alt="PyPI - Project Version" src="https://img.shields.io/pypi/v/whiteprints.svg?logo=PyPI&logoColor=ffd43b"/></a>
-        <a href="https://spdx.org/licenses/GPL-3.0-or-later"><img alt="license badge" src="https://img.shields.io/badge/📝_License-GPL--3.0--or--later-4CAF50.svg"/></a>
+        <a href="https://spdx.org/licenses/CC-BY-NC-SA-4.0"><img alt="license badge" src="https://img.shields.io/badge/📝_License-GPL--3.0--or--later-4CAF50.svg"/></a>
         <a href="https://github.com/whiteprints/whiteprints/discussions"><img alt="GitHub Discussions" src="https://img.shields.io/github/discussions/whiteprints/whiteprints.svg?logo=GitHub"></a>
         <a href="https://spdx.dev/learn/areas-of-interest/licensing/"><img alt="SPDX Licensing" src="https://img.shields.io/badge/SPDX-licensing-0080FF.svg?logo=SPDX"/></a>
         <a href='https://readthedocs.org/projects/whiteprints/'><img src='https://readthedocs.org/projects/whiteprints/badge/?version=latest' alt='Documentation Status' /></a>
@@ -49,7 +49,7 @@ and even contribute 😊.
 - Template for [GitHub] with actions to publish to [PyPI], [ReadTheDocs] and
   [CodeCov]
 
-The whiteprint command line is under [GPL-3.0-or-later] license, however the
+The whiteprint command line is under [CC-BY-NC-SA-4.0] license, however the
 code templates used to generate the code are under [MIT-0] license.
 
 
@@ -106,7 +106,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Licensing
 
-The _[Python]_ **code** of this project is distributed under license [GPL-3.0-or-later].
+The _[Python]_ **code** of this project is distributed under license [CC-BY-NC-SA-4.0].
 
 In case of doubt, please check the [SPDX] header of each individual source code file.
 
@@ -120,6 +120,6 @@ In case of doubt, please check the [SPDX] header of each individual source code 
 [PyPI]: https://pypi.org/
 [ReadTheDocs]: https://about.readthedocs.com/
 [CodeCov]: https://about.codecov.io/
-[GPL-3.0-or-later]: https://spdx.org/licenses/GPL-3.0-or-later
+[CC-BY-NC-SA-4.0]: https://spdx.org/licenses/CC-BY-NC-SA-4.0
 [MIT-0]: https://spdx.org/licenses/MIT-0
 [GitHub]:https://github.com/

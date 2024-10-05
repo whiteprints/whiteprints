@@ -1,7 +1,7 @@
 <!--
 SPDX-FileCopyrightText: © 2024 The Whiteprints authors and contributors <whiteprints@pm.me>
 
-SPDX-License-Identifier: GPL-3.0-or-later
+SPDX-License-Identifier: CC-BY-NC-SA-4.0
 -->
 
 # 🛈 Information
@@ -13,7 +13,7 @@ files. Each file contains licensing information.
 
 :::{attention}
 :name: Whiteprints's Code License
-The _[Python] code_ of this project is distributed under license [GPL-3.0-or-later](../LICENSES/GPL-3.0-or-later.txt).
+The _[Python] code_ of this project is distributed under license [CC-BY-NC-SA-4.0](../LICENSES/CC-BY-NC-SA-4.0.txt).
 :::
 
 In case of doubt, please check the [SPDX] header of each individual source code

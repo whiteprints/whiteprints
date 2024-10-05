@@ -36,9 +36,9 @@ Fixes # (issue)
       or otherwise as the agent of a legal entity, that they have the right and
       authority to make their contribution under these terms.
     - The contribution was created in whole or in part by me and I have the
-      right to submit it under license [GPL-3.0-or-later](https://spdx.org/licenses/GPL-3.0-or-later) license;
+      right to submit it under license [CC-BY-NC-SA-4.0](https://spdx.org/licenses/CC-BY-NC-SA-4.0) license;
       **or**
     - the contribution is based upon previous work that, to the best of my
       knowledge, is covered under an appropriate open source license and I have
       the right under that license to submit that work with modifications,
-      whether created in whole or in part by me, under license [GPL-3.0-or-later](https://spdx.org/licenses/GPL-3.0-or-later).
+      whether created in whole or in part by me, under license [CC-BY-NC-SA-4.0](https://spdx.org/licenses/CC-BY-NC-SA-4.0).
