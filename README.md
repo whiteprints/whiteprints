@@ -1,4 +1,7 @@
 <!--
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
 
 SPDX-License-Identifier: CC-BY-NC-SA-4.0
@@ -113,6 +116,21 @@ In case of doubt, please check the [SPDX] header of each individual source code 
 ## Contributors
 
 <!-- readme: collaborators,contributors -start -->
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/RomainBrault"><img src="https://avatars.githubusercontent.com/u/1455095?v=4?s=100" width="100px;" alt="Romain Brault"/><br /><sub><b>Romain Brault</b></sub></a><br /><a href="#infra-RomainBrault" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/whiteprints/whiteprints/commits?author=RomainBrault" title="Tests">⚠️</a> <a href="https://github.com/whiteprints/whiteprints/commits?author=RomainBrault" title="Code">💻</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 <!-- readme: collaborators,contributors -end -->
 
 [Python]: https://www.python.org/
