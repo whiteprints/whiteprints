@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: © 2024 The Whiteprints authors and contributors <whiteprints@pm.me>
+# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -148,7 +148,7 @@ def print_license(ctx: Context, _param: Option, value: bool) -> None:
     package_metadata = importlib.import_module("whiteprints.package_metadata")
     console.STDOUT.print(
         _(
-            "Copyright © 2024 The Whiteprints authors and contributors"
+            'Copyright © 2024 The "Whiteprints" contributors'
             " <whiteprints@pm.me>.\n"
         )
     )

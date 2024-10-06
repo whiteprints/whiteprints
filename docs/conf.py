@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: © 2024 The Whiteprints authors and contributors <whiteprints@pm.me>
+# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -14,7 +14,7 @@ from pathlib import Path
 project = "Whiteprints"
 author = "Romain Brault"
 project_copyright = (
-    "2024 The Whiteprints authors and contributors <whiteprints@pm.me> - {}"
+    '2024 The "Whiteprints" contributors <whiteprints@pm.me> - {}'
 )
 project_copyright = project_copyright.format(
     "Distributed under license CC-BY-NC-SA-4.0"
