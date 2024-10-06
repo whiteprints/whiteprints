@@ -4,9 +4,7 @@
 
 on:
   workflow_dispatch:
-  pull_request_target:
-    types:
-      - opened
+  pull_request:
 
 jobs:
   contrib-readme-job:
@@ -22,14 +20,3 @@ jobs:
         uses: akhilmhdh/contributors-readme-action@v2.3.10
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Ensure only README.md is modified
-        run: |
-          # Get a list of all modified files
-          MODIFIED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-
-          # Allow only README.md changes
-          if [[ "$MODIFIED_FILES" != "README.md" ]]; then
-            echo "Unauthorized file changes detected:"
-            echo "$MODIFIED_FILES"
-            exit 1  # Fail the workflow if non-README.md files are modified
-          fi
