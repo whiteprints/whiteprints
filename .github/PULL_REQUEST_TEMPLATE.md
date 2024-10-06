@@ -8,6 +8,12 @@
 
     We follow (and lint) Pull Requests names according to
     [Angular commit format](https://gist.github.com/brianclements/841ea7bffdb01346392c#file-commit-formatting-md)
+
+    If this is your first contribution, feel free to add yourself as a
+    contributor. To do so comment the pull request with:
+    @all-contributors please add @<username> for <contributions>.
+    Please refer to the documentation of allcontributors to see the list of
+    [contribution types](https://allcontributors.org/docs/en/emoji-key#docsNav)
 -->
 
 # Description
@@ -31,15 +37,6 @@ Fixes # (issue)
 
   - By making a contribution to this project, I certify that:
 
-    - The contributor represents and warrants, on behalf of their employer or
-      other principal if they are acting within the scope of their employment
-      or otherwise as the agent of a legal entity, that they have the right and
-      authority to make their contribution under these terms.
-    - The contribution was created in whole or in part by me and I have the
-      right to submit it under the license of the file(s) modified or created;
-      **or**
-    - the contribution is based upon previous work that, to the best of my
-      knowledge, is covered under an appropriate open source license and I have
-      the right under that license to submit that work with modifications,
-      whether created in whole or in part by me, under the license of the
-      file(s) modified or created.
+    - The contributor represents and warrants, on behalf of their employer or other principal if they are acting within the scope of their employment or otherwise as the agent of a legal entity, that they have the right and authority to make their contribution under these terms.
+    - The contribution was created in whole or in part by me and I have the right to submit it under the license of the file(s) modified or created; **or**
+    - the contribution is based upon previous work that, to the best of my knowledge, is covered under an appropriate open source license and I have the right under that license to submit that work with modifications, whether created in whole or in part by me, under the license of the file(s) modified or created.
