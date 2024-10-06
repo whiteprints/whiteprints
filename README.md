@@ -113,6 +113,19 @@ In case of doubt, please check the [SPDX] header of each individual source code 
 ## Contributors
 
 <!-- readme: collaborators,contributors -start -->
+<table>
+	<tbody>
+		<tr>
+            <td align="center">
+                <a href="https://github.com/RomainBrault">
+                    <img src="https://avatars.githubusercontent.com/u/1455095?v=4" width="100;" alt="RomainBrault"/>
+                    <br />
+                    <sub><b>Romain Brault</b></sub>
+                </a>
+            </td>
+		</tr>
+	<tbody>
+</table>
 <!-- readme: collaborators,contributors -end -->
 
 [Python]: https://www.python.org/
