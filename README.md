@@ -24,6 +24,7 @@ SPDX-License-Identifier: CC-BY-NC-SA-4.0
         <a href="https://www.contributor-covenant.org/version/2/1/code_of_conduct/"><img alt="contributor covenant badge" src="https://img.shields.io/badge/Contributor_Covenant-2.1-4BAAAA.svg?logo=contributorcovenant"/></a>
         <a href="https://codecov.io/gh/whiteprints/whiteprints" ><img alt="CodeCov code coverage" src="https://codecov.io/gh/whiteprints/whiteprints/graph/badge.svg?token=YrFGtQ5D5F"/></a>
         <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+        <a href="https://github.com/whiteprints/whiteprints?tab=readme-ov-file#contributors" ><img alt="All Contributors" src="https://img.shields.io/github/all-contributors/whiteprints/whiteprints?color=ee8449\"/></a>
         <!-- ALL-CONTRIBUTORS-BADGE:END -->
     </p>
 </div>
@@ -107,12 +108,6 @@ See [MAINTAINERS.md](MAINTAINERS.md).
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Licensing
-
-The _[Python]_ **code** of this project is distributed under license [CC-BY-NC-SA-4.0].
-
-In case of doubt, please check the [SPDX] header of each individual source code file.
-
 ## Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
@@ -130,6 +125,12 @@ In case of doubt, please check the [SPDX] header of each individual source code 
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
+
+## Licensing
+
+The _[Python]_ **code** of this project is distributed under license [CC-BY-NC-SA-4.0].
+
+In case of doubt, please check the [SPDX] header of each individual source code file.
 
 [Python]: https://www.python.org/
 [SPDX]: https://spdx.dev/
