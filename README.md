@@ -88,13 +88,13 @@ uvx whiteprints init --help
 
 You may also have a look at the [Documentation](https://whiteprints.readthedocs.io/en/stable/)
 
-## Install
-
-See [INSTALL.md](INSTALL.md).
-
 ## Documentation
 
 See: https://whiteprints.readthedocs.io/en/stable/.
+
+## Install
+
+See [INSTALL.md](INSTALL.md).
 
 ## Maintainers
 
