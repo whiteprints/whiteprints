@@ -128,7 +128,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Licensing
 
-The _[Python]_ **code** of this project is distributed under license [CC-BY-NC-SA-4.0].
+The _[Python]_ **code** of this project is distributed under license [GPL-3.0-or-later].
 
 In case of doubt, please check the [SPDX] header of each individual source code file.
 
@@ -142,6 +142,6 @@ In case of doubt, please check the [SPDX] header of each individual source code 
 [PyPI]: https://pypi.org/
 [ReadTheDocs]: https://about.readthedocs.com/
 [CodeCov]: https://about.codecov.io/
-[CC-BY-NC-SA-4.0]: https://spdx.org/licenses/CC-BY-NC-SA-4.0
+[GPL-3.0-or-later]: https://spdx.org/licenses/GPL-3.0-or-later
 [MIT-0]: https://spdx.org/licenses/MIT-0
 [GitHub]:https://github.com/
