@@ -22,7 +22,7 @@ SPDX-License-Identifier: CC-BY-NC-SA-4.0
         <a href="https://spdx.dev/learn/areas-of-interest/licensing/"><img alt="SPDX Licensing" src="https://img.shields.io/badge/SPDX-licensing-0080FF.svg?logo=SPDX"/></a>
         <a href='https://readthedocs.org/projects/whiteprints/'><img src='https://readthedocs.org/projects/whiteprints/badge/?version=latest' alt='Documentation Status' /></a>
         <a href="https://www.contributor-covenant.org/version/2/1/code_of_conduct/"><img alt="contributor covenant badge" src="https://img.shields.io/badge/Contributor_Covenant-2.1-4BAAAA.svg?logo=contributorcovenant"/></a>
-        <a href="https://codecov.io/gh/whiteprints/whiteprints" ><img src="https://codecov.io/gh/whiteprints/whiteprints/graph/badge.svg?token=YrFGtQ5D5F"/></a>
+        <a href="https://codecov.io/gh/whiteprints/whiteprints" ><img alt="CodeCov code coverage" src="https://codecov.io/gh/whiteprints/whiteprints/graph/badge.svg?token=YrFGtQ5D5F"/></a>
         <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
         <!-- ALL-CONTRIBUTORS-BADGE:END -->
     </p>
