@@ -88,13 +88,13 @@ uvx whiteprints init --help
 
 You may also have a look at the [Documentation](https://whiteprints.readthedocs.io/en/stable/)
 
-## Documentation
-
-See: https://whiteprints.readthedocs.io/en/stable/.
-
 ## Install
 
 See [INSTALL.md](INSTALL.md).
+
+## Documentation
+
+See: https://whiteprints.readthedocs.io/en/stable/.
 
 ## Maintainers
 
@@ -109,6 +109,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 The _[Python]_ **code** of this project is distributed under license [CC-BY-NC-SA-4.0].
 
 In case of doubt, please check the [SPDX] header of each individual source code file.
+
+## Contributors
+
+<!-- readme: collaborators,contributors -start -->
+<!-- readme: collaborators,contributors -end -->
 
 [Python]: https://www.python.org/
 [SPDX]: https://spdx.dev/
