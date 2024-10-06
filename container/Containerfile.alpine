@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: © 2024 The Whiteprints authors and contributors <whiteprints@pm.me>
+# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -136,7 +136,7 @@ ARG VERSION
 ARG REVISION
 ARG TAG
 
-LABEL org.opencontainers.image.authors='The Whiteprints authors and contributors <whiteprints@pm.me>' \
+LABEL org.opencontainers.image.authors='The "Whiteprints" contributors <whiteprints@pm.me>' \
       org.opencontainers.image.documentation='https://readthedocs.org/projects/whiteprints' \
       org.opencontainers.image.source='https://github.com/whiteprints/whiteprints' \
       org.opencontainers.image.description='A Copier-based cookiecutter for creating Python projects managed by uv.' \
