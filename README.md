@@ -106,7 +106,7 @@ See [MAINTAINERS.md](MAINTAINERS.md).
 
 ## Contributing
 
-:ee [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Contributors
 
