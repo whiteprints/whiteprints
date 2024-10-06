@@ -115,7 +115,6 @@ In case of doubt, please check the [SPDX] header of each individual source code 
 
 ## Contributors
 
-<!-- readme: collaborators,contributors -start -->
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
@@ -131,7 +130,6 @@ In case of doubt, please check the [SPDX] header of each individual source code 
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
-<!-- readme: collaborators,contributors -end -->
 
 [Python]: https://www.python.org/
 [SPDX]: https://spdx.dev/
