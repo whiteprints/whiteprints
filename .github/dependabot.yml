@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "ci(dependencies): ⬆️"
+      prefix-development: "ci(dev-dependencies): ⬆️"
+    labels:
+      - "dependencies"
+      - "ci"
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+    versioning-strategy: increase-if-necessary
+    open-pull-requests-limit: 99
+    commit-message:
+      prefix: "build(dependencies): ⬆️"
+      prefix-development: "build(dev-dependencies): ⬆️"
+    allow:
+      - dependency-type: "all"
+    labels:
+      - "dependencies"

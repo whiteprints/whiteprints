@@ -1,0 +1,73 @@
+# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: Release Drafter
+
+on:
+  push:
+    # branches to consider in the event; optional, defaults to all
+    branches:
+      - main
+    tags:
+      - "v*.*.*"
+  # pull_request_target event is required for autolabeler to support PRs from forks
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  labeler:
+    name: Label the Pull Request size
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    environment:
+      name: release-drafter
+    steps:
+      - uses: codelytv/pr-size-labeler@v1
+        if: ${{ github.event_name == 'pull_request_target' }}
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          xs_label: 'size/xs'
+          xs_max_size: '10'
+          s_label: 'size/s'
+          s_max_size: '100'
+          m_label: 'size/m'
+          m_max_size: '500'
+          l_label: 'size/l'
+          l_max_size: '1000'
+          xl_label: 'size/xl'
+          fail_if_xl: 'false'
+          message_if_xl: >
+            This PR exceeds the recommended size of 1000 lines.
+            Please make sure you are NOT addressing multiple issues with one PR.
+            Note this PR might be rejected due to its size.
+          github_api_url: 'https://api.github.com'
+          files_to_ignore: |
+            "*.lock"
+            "docs/*"
+  update_release_draft:
+    name: Update Release Draft
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    environment:
+      name: release-drafter
+    steps:
+      # (Optional) GitHub Enterprise requires GHE_HOST variable set
+      #- name: Set GHE_HOST
+      #  run: |
+      #    echo "GHE_HOST=${GITHUB_SERVER_URL##https:\/\/}" >> $GITHUB_ENV
+
+      # Drafts your next Release notes as Pull Requests are merged into "master"
+      - uses: release-drafter/release-drafter@v6
+        id: release_drafter
+        # (Optional) specify config name to use, relative to .github/. Default: release-drafter.yml
+        # with:
+        #   config-name: my-config.yml
+        #   disable-autolabeler: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

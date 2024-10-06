@@ -1,0 +1,262 @@
+# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: Tests
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    tags-ignore: ["**"]
+  pull_request:
+  schedule:
+    - cron: "0 8 * * *"
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: tox env ${{ matrix.tox_env }}
+    runs-on: ubuntu-latest
+    environment:
+      name: tests
+    strategy:
+      matrix:
+        tox_env:
+          - pre-commit
+          - lint
+          - check-types
+          - check-vulnerabilities
+          - check-exceptions
+          - check-code-maintainability
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Run the test suite
+        run: |
+          uvx --quiet --no-progress --with tox-uv tox run -e ${{ matrix.tox_env }}
+  distribute:
+    name: tox env ${{ matrix.tox_env }}
+    runs-on: ubuntu-latest
+    environment:
+      name: tests
+    strategy:
+      matrix:
+        tox_env:
+          - distribute
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Run the test suite
+        run: |
+          uvx --quiet --no-progress --with tox-uv tox run -e ${{ matrix.tox_env }}
+      - name: Upload documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.tox_env }}
+          path: dist/
+          overwrite: true
+  documentation:
+    name: tox env ${{ matrix.tox_env }}
+    runs-on: ubuntu-latest
+    environment:
+      name: tests
+    strategy:
+      matrix:
+        tox_env:
+          - check-documentation-links
+          - build-documentation
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Run the test suite
+        run: |
+          uvx --quiet --no-progress --with tox-uv tox run -e ${{ matrix.tox_env }}
+      - name: Upload documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.tox_env }}
+          path: docs_build/
+          overwrite: true
+  test:
+    name: Run tests under Python ${{ matrix.python }} on ${{ matrix.os }}
+    needs: check
+    runs-on: ${{ matrix.os }}
+    environment:
+      name: tests
+    strategy:
+      matrix:
+        python:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Pick environment to run
+        run: |
+          import os;
+          env = "TOXENV=py{}{}-test\n".format(*"${{ matrix.python }}".split("."))
+          with open(os.environ["GITHUB_ENV"], mode="a", encoding="utf-8") as file_handler:
+              file_handler.write(env)
+        shell: python
+      - name: Run the test suite
+        shell: bash
+        run: |
+          echo "REPORT_FILE=.tox/test_report.md" >> "$GITHUB_ENV"
+          uvx --quiet --no-progress --with tox-uv tox run
+      - name: Output reports to the job summary when tests fail
+        if: failure()
+        shell: bash
+        run: |
+          if [ -f "$REPORT_FILE" ]; then
+            echo "<details><summary>Failed Test Report</summary>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            cat "$REPORT_FILE" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "</details>" >> $GITHUB_STEP_SUMMARY
+          fi
+      - name: Upload coverage data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-data-${{ matrix.os }}-${{ matrix.python }}
+          path: .tox/.coverage.*
+          overwrite: true
+          include-hidden-files: true
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.python }}
+          path: .tox/junit.*
+          overwrite: true
+          include-hidden-files: true
+  container-deploy:
+    name: Build Container
+    runs-on: ubuntu-latest
+    environment:
+      name: tests
+    env:
+      REGISTRY: ghcr.io
+    strategy:
+      matrix:
+        image:
+          - name: alpine
+            python: 3.13.0rc2
+            base: alpine3.20
+            digest: ""
+          - name: debian
+            python: 3.13.0rc2
+            base: slim-bookworm
+            digest: ""
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}
+          tags: |
+            type=pep440,pattern={{version}},event=tag
+            type=ref,event=branch,prefix=latest-
+            type=sha
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set BUILD_DATE
+        run: echo "BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./container/Containerfile.${{ matrix.image.name }}
+          tags: |
+            ${{ steps.meta.outputs.tags }}-${{ matrix.image.base }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          build-args: |
+            PYTHON_VERSION=${{ matrix.image.python }}
+            BASE_OS=${{ matrix.image.base }}
+            DIGEST=${{ matrix.image.digest }}
+            VERSION=${{ steps.meta.outputs.version }}
+            REVISION=${{ github.sha }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
+          cache-from: type=local,src=~/.docker/buildx-cache
+          cache-to: type=local,dest=~/.docker/buildx-cache
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    environment:
+      name: coverage
+    needs:
+      - test
+      - container-deploy
+      - documentation
+      - distribute
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Download coverage data
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-data-*
+          merge-multiple: true
+          path: .tox/
+      - name: Run coverage
+        run: |
+          uvx --quiet --no-progress --with tox-uv tox run -e coverage-combine
+          uvx --quiet --no-progress --with tox-uv tox run -e coverage-report
+          uvx --quiet --no-progress --with tox-uv tox run -e coverage
+          uvx --quiet --no-progress --with tox-uv tox run --quiet --quiet -e coverage -- --format=markdown >> $GITHUB_STEP_SUMMARY
+      - name: Upload coverage report to CodeCov
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          name: codecov-umbrella
+          verbose: true
+          flags: pytest
+          file: .tox/.coverage.xml
+          use_oidc: true

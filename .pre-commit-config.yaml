@@ -1,0 +1,61 @@
+# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+fail_fast: true
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-yaml
+        entry: check-yaml --unsafe
+      - id: check-json
+      - id: check-toml
+      - id: detect-private-key
+      - id: trailing-whitespace
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      - id: python-check-blanket-noqa
+      - id: python-check-blanket-type-ignore
+  - repo: https://github.com/tox-dev/pyproject-fmt
+    rev: 2.2.4
+    hooks:
+      - id: pyproject-fmt
+        args: ["--column-width", "79", "--indent", "4", "--no-print-diff"]
+  - repo: https://github.com/fsfe/reuse-tool
+    rev: v4.0.3
+    hooks:
+      - id: reuse
+        name: reuse
+        entry: reuse
+        description: "[License] Lint the project directory for compliance with the REUSE Specification"
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.5
+    hooks:
+      - id: ruff-format
+        name: "ruff format"
+        description: "[Fix] Reformat the code"
+        entry: ruff format --preview --config=.ruff.toml
+        exclude: ^(gen_ref_pages.py)
+      - id: ruff
+        name: "ruff fix"
+        description: "[Fix] Reformat the code"
+        entry: ruff check --preview --config .ruff.toml --fix-only
+        exclude: ^(gen_ref_pages.py)
+      - id: ruff
+        name: "ruff check"
+        description: "[Fix] Lint issues"
+        entry: ruff check --preview --config=.ruff.toml
+        exclude: ^(gen_ref_pages.py)
+
+ci:
+  autofix_commit_msg: 'refactoring: auto fixes from pre-commit.com hooks'
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: 'ci(dependencies): autoupdate pre-commit hooks'
+  skip: []
+  submodules: false

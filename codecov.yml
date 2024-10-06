@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 0
+        flags:
+          - unit
+        paths:
+          - "src"
+          - "tests"

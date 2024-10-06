@@ -1,0 +1,206 @@
+# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: Upload Release Artifacts
+
+on:
+  push:
+    # branches to consider in the event; optional, defaults to all
+    tags:
+      - "v*.*.*"
+
+jobs:
+  dist_generation:
+    name: Upload wheel and sdist
+    runs-on: ubuntu-latest
+    environment:
+      name: artifacts
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Set TAG
+        id: vars
+        shell: python
+        run: |
+          import os
+          ref = os.getenv('GITHUB_REF', '')
+          tag = ref.split('/')[-1] if ref else ''
+          with open(os.getenv('GITHUB_OUTPUT'), 'a') as file:
+              file.write(f'tag={tag}\n')
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Build sdist and wheel
+        run: |
+          uvx --quiet --no-progress --with tox-uv tox run -e distribute
+      - name: Sign the dists with Sigstore
+        uses: sigstore/gh-action-sigstore-python@v3.0.0
+        with:
+          inputs: >-
+            ./dist/*.tar.gz
+            ./dist/*.whl
+      - name: Upload dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ steps.vars.outputs.tag }} dist/** --clobber
+  docs_generation:
+    name: Upload documentation
+    runs-on: ubuntu-latest
+    environment:
+      name: artifacts
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Set TAG
+        id: vars
+        shell: python
+        run: |
+          import os
+          ref = os.getenv('GITHUB_REF', '')
+          tag = ref.split('/')[-1] if ref else ''
+          with open(os.getenv('GITHUB_OUTPUT'), 'a') as file:
+              file.write(f'tag={tag}\n')
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Build docs
+        run: |
+          uvx --quiet --no-progress --with tox-uv tox run -e build-documentation
+          zip -r documentation.zip docs_build
+      - name: Sign the docs with Sigstore
+        uses: sigstore/gh-action-sigstore-python@v3.0.0
+        with:
+          inputs: >-
+            ./documentation.zip
+      - name: Upload docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ steps.vars.outputs.tag }} documentation.zip* --clobber
+  sbom_vulnerabilities_generation:
+    name: Generate SBOM under Python ${{ matrix.python }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    environment:
+      name: artifacts
+    strategy:
+      matrix:
+        python:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Set TAG
+        id: vars
+        shell: python
+        run: |
+          import os
+          ref = os.getenv('GITHUB_REF', '')
+          tag = ref.split('/')[-1] if ref else ''
+          with open(os.getenv('GITHUB_OUTPUT'), 'a') as file:
+              file.write(f'tag={tag}\n')
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Pick environment to run
+        run: |
+          import os
+          python_version = "${{ matrix.python }}".split(".")
+          tox_env = f"TOXENV=py{python_version[0]}{python_version[1]}-BOM-vulnerabilities\n"
+          py_version = f"PYVERSION=py{python_version[0]}{python_version[1]}\n"
+          env_variables = tox_env + py_version
+          with open(os.environ["GITHUB_ENV"], mode="a", encoding="utf-8") as file_handler:
+              file_handler.write(env_variables)
+        shell: python
+      - name: SBOM generation
+        run: |
+          uvx --quiet --no-progress --with tox-uv tox run
+      - name: Upload BOM vulnerabilities
+        uses: actions/upload-artifact@v4
+        with:
+          name: BOM-vulnerabilities-${{ matrix.os }}-${{ matrix.python }}
+          path: BOM/
+          overwrite: true
+  sbom_publication:
+    name: Publish SBOM
+    runs-on: ubuntu-latest
+    environment:
+      name: artifacts
+    needs:
+      - sbom_vulnerabilities_generation
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Set TAG
+        id: vars
+        shell: python
+        run: |
+          import os
+          ref = os.getenv('GITHUB_REF', '')
+          tag = ref.split('/')[-1] if ref else ''
+          with open(os.getenv('GITHUB_OUTPUT'), 'a') as file:
+              file.write(f'tag={tag}\n')
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Download coverage data
+        uses: actions/download-artifact@v4
+        with:
+          pattern: BOM-vulnerabilities-*
+          merge-multiple: true
+          path: BOM/
+      - name: Pick environment to run
+        run: |
+          import os
+          env_variables = f"TOXENV=BOM-licenses\n"
+          with open(os.environ["GITHUB_ENV"], mode="a", encoding="utf-8") as file_handler:
+              file_handler.write(env_variables)
+        shell: python
+      - name: SBOM generation
+        run: |
+          uvx --quiet --no-progress --with tox-uv tox run
+      - name: Create BOM Archive
+        shell: python
+        run: |
+          import zipfile, os
+          from pathlib import Path
+
+          with zipfile.ZipFile('SBOM.zip', 'w') as zipf:
+              for f in Path('BOM').rglob('*'):
+                  zipf.write(f, f.relative_to('BOM'))
+      - name: Sign the SBOM with Sigstore
+        uses: sigstore/gh-action-sigstore-python@v3.0.0
+        with:
+          inputs: >-
+            ./SBOM.zip
+      - name: Upload SBOM as Release Asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ steps.vars.outputs.tag }} SBOM.zip* --clobber

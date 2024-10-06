@@ -1,0 +1,29 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "RomainBrault",
+      "name": "Romain Brault",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1455095?v=4",
+      "profile": "https://github.com/RomainBrault",
+      "contributions": [
+        "infra",
+        "test",
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "badgeTemplate": "<a href=\"https://github.com/whiteprints/whiteprints?tab=readme-ov-file#contributors\" ><img alt=\"All Contributors\" src=\"https://img.shields.io/github/all-contributors/<%= projectOwner %>/<%= projectName %>?color=ee8449\"/></a>",
+  "projectName": "whiteprints",
+  "projectOwner": "whiteprints"
+}
