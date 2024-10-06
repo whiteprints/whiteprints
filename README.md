@@ -110,6 +110,11 @@ The _[Python]_ **code** of this project is distributed under license [CC-BY-NC-S
 
 In case of doubt, please check the [SPDX] header of each individual source code file.
 
+## Contributors
+
+<!-- readme: collaborators,contributors -start -->
+<!-- readme: collaborators,contributors -end -->
+
 [Python]: https://www.python.org/
 [SPDX]: https://spdx.dev/
 [REUSE]: https://reuse.software/
