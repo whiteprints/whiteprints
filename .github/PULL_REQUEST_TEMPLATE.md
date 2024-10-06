@@ -8,6 +8,12 @@
 
     We follow (and lint) Pull Requests names according to
     [Angular commit format](https://gist.github.com/brianclements/841ea7bffdb01346392c#file-commit-formatting-md)
+
+    If this is your first contribution, feel free to add yourself as a
+    contributor. To do so comment the pull request with:
+    @all-contributors please add @<username> for <contributions>.
+    Please refer to the documentation of allcontributors to see the list of
+    [contribution types](https://allcontributors.org/docs/en/emoji-key#docsNav)
 -->
 
 # Description
