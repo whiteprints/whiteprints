@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: tests
-    name: Automate contribor list in README
+    name: Automate contributor list in README
     permissions:
       contents: write
       pull-requests: write
@@ -22,3 +22,14 @@ jobs:
         uses: akhilmhdh/contributors-readme-action@v2.3.10
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Ensure only README.md is modified
+        run: |
+          # Get a list of all modified files
+          MODIFIED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+
+          # Allow only README.md changes
+          if [[ "$MODIFIED_FILES" != "README.md" ]]; then
+            echo "Unauthorized file changes detected:"
+            echo "$MODIFIED_FILES"
+            exit 1  # Fail the workflow if non-README.md files are modified
+          fi
