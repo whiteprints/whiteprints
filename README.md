@@ -1,4 +1,5 @@
 <!--
+
 SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
 
 SPDX-License-Identifier: CC-BY-NC-SA-4.0
@@ -21,7 +22,9 @@ SPDX-License-Identifier: CC-BY-NC-SA-4.0
         <a href="https://spdx.dev/learn/areas-of-interest/licensing/"><img alt="SPDX Licensing" src="https://img.shields.io/badge/SPDX-licensing-0080FF.svg?logo=SPDX"/></a>
         <a href='https://readthedocs.org/projects/whiteprints/'><img src='https://readthedocs.org/projects/whiteprints/badge/?version=latest' alt='Documentation Status' /></a>
         <a href="https://www.contributor-covenant.org/version/2/1/code_of_conduct/"><img alt="contributor covenant badge" src="https://img.shields.io/badge/Contributor_Covenant-2.1-4BAAAA.svg?logo=contributorcovenant"/></a>
-        <a href="https://codecov.io/gh/whiteprints/whiteprints" ><img src="https://codecov.io/gh/whiteprints/whiteprints/graph/badge.svg?token=YrFGtQ5D5F"/></a>
+        <a href="https://codecov.io/gh/whiteprints/whiteprints" ><img alt="CodeCov code coverage" src="https://codecov.io/gh/whiteprints/whiteprints/graph/badge.svg?token=YrFGtQ5D5F"/></a>
+        <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+        <!-- ALL-CONTRIBUTORS-BADGE:END -->
     </p>
 </div>
 
@@ -112,8 +115,21 @@ In case of doubt, please check the [SPDX] header of each individual source code 
 
 ## Contributors
 
-<!-- readme: collaborators,contributors -start -->
-<!-- readme: collaborators,contributors -end -->
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/RomainBrault"><img src="https://avatars.githubusercontent.com/u/1455095?v=4?s=100" width="100px;" alt="Romain Brault"/><br /><sub><b>Romain Brault</b></sub></a><br /><a href="#infra-RomainBrault" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/whiteprints/whiteprints/commits?author=RomainBrault" title="Tests">⚠️</a> <a href="https://github.com/whiteprints/whiteprints/commits?author=RomainBrault" title="Code">💻</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 [Python]: https://www.python.org/
 [SPDX]: https://spdx.dev/
