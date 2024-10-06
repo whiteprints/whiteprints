@@ -37,15 +37,6 @@ Fixes # (issue)
 
   - By making a contribution to this project, I certify that:
 
-    - The contributor represents and warrants, on behalf of their employer or
-      other principal if they are acting within the scope of their employment
-      or otherwise as the agent of a legal entity, that they have the right and
-      authority to make their contribution under these terms.
-    - The contribution was created in whole or in part by me and I have the
-      right to submit it under the license of the file(s) modified or created;
-      **or**
-    - the contribution is based upon previous work that, to the best of my
-      knowledge, is covered under an appropriate open source license and I have
-      the right under that license to submit that work with modifications,
-      whether created in whole or in part by me, under the license of the
-      file(s) modified or created.
+    - The contributor represents and warrants, on behalf of their employer or other principal if they are acting within the scope of their employment or otherwise as the agent of a legal entity, that they have the right and authority to make their contribution under these terms.
+    - The contribution was created in whole or in part by me and I have the right to submit it under the license of the file(s) modified or created; **or**
+    - the contribution is based upon previous work that, to the best of my knowledge, is covered under an appropriate open source license and I have the right under that license to submit that work with modifications, whether created in whole or in part by me, under the license of the file(s) modified or created.
