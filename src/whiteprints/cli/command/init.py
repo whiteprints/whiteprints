@@ -73,7 +73,7 @@ def add_github_functionalities(
                 *copier_args,
             ],
             context=[
-                "jinja2_time",
+                "whiteprints-template-context",
             ],
             trust=True,
         )
@@ -86,7 +86,7 @@ def add_github_functionalities(
                 *copier_args,
             ],
             context=[
-                "jinja2_time",
+                "whiteprints-template-context",
             ],
             trust=True,
         )
@@ -101,7 +101,7 @@ def add_github_functionalities(
                 *copier_args,
             ],
             context=[
-                "jinja2_time",
+                "whiteprints-template-context",
             ],
             trust=True,
         )
@@ -149,9 +149,7 @@ def add_github(
                 *copier_args,
             ],
             context=[
-                "license-expression",
-                "jinja2_time",
-                "copier-templates-extensions",
+                "whiteprints-template-context",
             ],
             trust=True,
         )
@@ -198,7 +196,7 @@ def create_project(
                 *copier_args,
             ],
             context=[
-                "jinja2_time",
+                "whiteprints-template-context",
             ],
             trust=True,
         )
