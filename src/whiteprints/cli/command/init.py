@@ -186,9 +186,7 @@ def create_project(
             *copier_args,
         ],
         context=[
-            "license-expression",
-            "jinja2_time",
-            "copier-templates-extensions",
+            "whiteprints-template-context",
         ],
         trust=True,
     )
