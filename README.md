@@ -53,7 +53,7 @@ and even contribute 😊.
 - Template for [GitHub] with actions to publish to [PyPI], [ReadTheDocs] and
   [CodeCov]
 
-The whiteprint command line is under [CC-BY-NC-SA-4.0] license, however the
+The whiteprint command line is under [GPL-3.0-or-later] license, however the
 code templates used to generate the code are under [MIT-0] license.
 
 
