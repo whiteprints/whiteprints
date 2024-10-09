@@ -40,6 +40,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
 dynamic = [
@@ -50,7 +51,7 @@ dependencies = [
     "python-dotenv==1.0.1",
     "rich-click==1.8.3",
     "typing-extensions==4.12.2; python_full_version<'3.12'",
-    "uv>=0.4.19",
+    "uv>=0.4.20",
 ]
 
 urls.changelog = "https://github.com/whiteprints/whiteprints/releases"
@@ -63,6 +64,12 @@ urls.issues = "https://github.com/whiteprints/whiteprints/issues"
 urls.pypi = "https://pypi.org/project/whiteprints"
 urls.repository = "https://github.com/whiteprints/whiteprints"
 scripts.whiteprints = "whiteprints.cli.entrypoint:whiteprints"
+
+[tool.pyproject-fmt]
+column_width = 79
+indent = 4
+keep_full_version = false
+max_supported_python = "3.13"
 
 [tool.uv]
 managed = true
