@@ -17,7 +17,7 @@ from whiteprints.copier_run import Copier
 from whiteprints.loc import _
 
 
-WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.2.0"
+WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.2.1"
 """The whiteprints-template-context version pin."""
 
 
