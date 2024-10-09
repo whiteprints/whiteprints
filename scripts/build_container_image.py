@@ -22,14 +22,14 @@ from semver import Version
 
 BASE_IMAGE = {
     "alpine": {
-        "PYTHON_VERSION": "3.12.6",
+        "PYTHON_VERSION": "3.13",
         "BASE_OS": "alpine3.20",
-        "DIGEST": "sha256:e0e4d3db19333a970e7acfdcb8863efe065be6c3038ef5018694f98162bffec0"
+        "DIGEST": ""
     },
     "debian": {
-        "PYTHON_VERSION": "3.12.6",
+        "PYTHON_VERSION": "3.13",
         "BASE_OS": "slim-bookworm",
-        "DIGEST": "sha256:8ac54da5710cdd31639bb66f5bc1888948fc2866c0b5b52913b4b33d8252e510",
+        "DIGEST": "",
     },
 }
 

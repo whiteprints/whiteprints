@@ -49,13 +49,13 @@ jobs:
       matrix:
         image:
           - name: alpine
-            python: 3.12
+            python: 3.13
             base: alpine3.20
-            digest: "sha256:aeff64320ffb81056a2afae9d627875c5ba7d303fb40d6c0a43ee49d8f82641c"
+            digest: "sha256:81362dd1ee15848b118895328e56041149e1521310f238ed5b2cdefe674e6dbf"
           - name: debian
-            python: 3.12
+            python: 3.13
             base: slim-bookworm
-            digest: "sha256:c24c34b502635f1f7c4e99dc09a2cbd85d480b7dcfd077198c6b5af138906390"
+            digest: "sha256:2ec5a4a5c3e919570f57675471f081d6299668d909feabd8d4803c6c61af666c"
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4

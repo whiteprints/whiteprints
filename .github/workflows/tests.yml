@@ -171,11 +171,11 @@ jobs:
       matrix:
         image:
           - name: alpine
-            python: 3.13.0rc2
+            python: 3.13
             base: alpine3.20
             digest: ""
           - name: debian
-            python: 3.13.0rc2
+            python: 3.13
             base: slim-bookworm
             digest: ""
     steps:

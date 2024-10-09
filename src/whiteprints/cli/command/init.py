@@ -7,7 +7,7 @@
 from collections.abc import Iterable
 from pathlib import Path
 from subprocess import CalledProcessError  # nosec
-from typing import TypedDict
+from typing import Final, TypedDict
 
 import rich_click as click
 from click import ClickException
@@ -15,6 +15,10 @@ from typing_extensions import Unpack
 
 from whiteprints.copier_run import Copier
 from whiteprints.loc import _
+
+
+WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.2.0"
+"""The whiteprints-template-context version pin."""
 
 
 class CopierCopyError(ClickException):  # pragma: no cover
@@ -73,7 +77,8 @@ def add_github_functionalities(
                 *copier_args,
             ],
             context=[
-                "whiteprints-template-context",
+                "whiteprints-template-context=="
+                + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
             ],
             trust=True,
         )
@@ -86,7 +91,8 @@ def add_github_functionalities(
                 *copier_args,
             ],
             context=[
-                "whiteprints-template-context",
+                "whiteprints-template-context=="
+                + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
             ],
             trust=True,
         )
@@ -101,7 +107,8 @@ def add_github_functionalities(
                 *copier_args,
             ],
             context=[
-                "whiteprints-template-context",
+                "whiteprints-template-context=="
+                + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
             ],
             trust=True,
         )
@@ -149,7 +156,8 @@ def add_github(
                 *copier_args,
             ],
             context=[
-                "whiteprints-template-context",
+                "whiteprints-template-context=="
+                + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
             ],
             trust=True,
         )
@@ -184,7 +192,8 @@ def create_project(
             *copier_args,
         ],
         context=[
-            "whiteprints-template-context",
+            "whiteprints-template-context=="
+            + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
         ],
         trust=True,
     )
@@ -196,7 +205,8 @@ def create_project(
                 *copier_args,
             ],
             context=[
-                "whiteprints-template-context",
+                "whiteprints-template-context=="
+                + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
             ],
             trust=True,
         )
