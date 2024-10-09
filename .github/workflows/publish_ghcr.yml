@@ -49,11 +49,11 @@ jobs:
       matrix:
         image:
           - name: alpine
-            python: 3.13
+            python: 3.13.0
             base: alpine3.20
             digest: "sha256:81362dd1ee15848b118895328e56041149e1521310f238ed5b2cdefe674e6dbf"
           - name: debian
-            python: 3.13
+            python: 3.13.0
             base: slim-bookworm
             digest: "sha256:2ec5a4a5c3e919570f57675471f081d6299668d909feabd8d4803c6c61af666c"
     steps:
