@@ -160,6 +160,15 @@ wheels = [
 ]
 
 [[package]]
+name = "distro"
+version = "1.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/fc/f8/98eea607f65de6527f8a2e8885fc8015d3e6f5775df186e443e0964a11c3/distro-1.9.0.tar.gz", hash = "sha256:2fa77c6fd8940f116ee1d6b94a2f90b13b5ea8d019b98bc8bafdcabcdd9bdbed", size = 60722 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/12/b3/231ffd4ab1fc9d679809f356cebee130ac7daa00d6d6f3206dd4fd137e9e/distro-1.9.0-py3-none-any.whl", hash = "sha256:7bffd925d65168f85027d8da9af6bddab658135b840670a223589bc0c8ef02b2", size = 20277 },
+]
+
+[[package]]
 name = "exceptiongroup"
 version = "1.2.2"
 source = { registry = "https://pypi.org/simple" }
@@ -928,9 +937,11 @@ wheels = [
 
 [[package]]
 name = "whiteprints"
-version = "0.9.1.dev2+g00b43bc.d20241015"
+version = "0.9.1.dev5+g99d9d30.d20241015"
 source = { editable = "." }
 dependencies = [
+    { name = "distro" },
+    { name = "importlib-metadata", marker = "python_full_version < '3.10'" },
     { name = "python-dotenv" },
     { name = "rich-click" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
@@ -955,6 +966,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "distro", specifier = ">=1.9.0" },
+    { name = "importlib-metadata", marker = "python_full_version < '3.10'", specifier = "==8.5.0" },
     { name = "python-dotenv", specifier = "==1.0.1" },
     { name = "rich-click", specifier = "==1.8.3" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'", specifier = "==4.12.2" },

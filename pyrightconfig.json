@@ -21,7 +21,7 @@
   "reportMissingImports": true,
   "reportMissingTypeStubs": true,
 
-  "pythonVersion": "3.9",
+  "pythonVersion": "3.13",
   "pythonPlatform": "All",
 
   "venvPath": ".",
