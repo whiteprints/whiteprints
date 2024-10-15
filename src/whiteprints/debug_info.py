@@ -40,6 +40,24 @@ class PackageInfo(TypedDict):
     origin: NotRequired[Path]
 
 
+class DebugInfo(TypedDict):
+    """Holds runtime debug information."""
+
+    operating_system: InfoDict
+    platform: str
+    python_version: str
+    package_version: str
+    pythonpath: list[Path]
+    dependencies: list[PackageInfo]
+
+
+class _DistributionPackage(TypedDict):
+    """Holds a distribution with its corresponding package name."""
+
+    distribution: Distribution
+    package_name: str
+
+
 def _package_info_from_name(
     distribution: Distribution,
     *,
@@ -56,15 +74,22 @@ def _package_info_from_name(
     return package_info
 
 
-class DebugInfo(TypedDict):
-    """Holds runtime debug information."""
+def _gather_required_packages() -> list[str]:
+    package_name_regex = re.compile("==|===|~=|!=|>=|>|<=|<")
+    return [
+        package_name_regex.split(package, maxsplit=1)[0].replace("-", "_")
+        for package in (
+            metadata.distribution(__package__ or "").requires or []
+        )
+    ]
 
-    operating_system: InfoDict
-    platform: str
-    python_version: str
-    package_version: str
-    pythonpath: list[Path]
-    dependencies: list[PackageInfo]
+
+def _gather_distribution_packages() -> dict[str, str]:
+    return {
+        str(distribution).replace("-", "_"): str(package)
+        for package, distributions in packages_distributions().items()
+        for distribution in distributions
+    }
 
 
 def gather_debug_info() -> DebugInfo:
@@ -77,35 +102,27 @@ def gather_debug_info() -> DebugInfo:
     Returns:
         the global debug information.
     """
-    distributions_packages = {
-        str(distribution).replace("-", "_"): str(package)
-        for package, distributions in packages_distributions().items()
-        for distribution in distributions
-    }
-    package_name_regex = re.compile("==|===|~=|!=|>=|>|<=|<")
-    required = [
-        package_name_regex.split(package, maxsplit=1)[0].replace("-", "_")
-        for package in (
-            metadata.distribution(__package__ or "").requires or []
-        )
-    ]
-    required_distribution: list[tuple[Distribution, str]] = []
+    distributions_packages = _gather_distribution_packages()
+    required = _gather_required_packages()
+    required_distribution: list[_DistributionPackage] = []
     for distribution in required:
-        package = distributions_packages.get(distribution)
-        if package is not None:
-            required_distribution.append((
-                metadata.distribution(distribution),
-                package,
-            ))
+        package_name = distributions_packages.get(distribution)
+        if package_name is not None:
+            required_distribution.append(
+                _DistributionPackage(
+                    distribution=metadata.distribution(distribution),
+                    package_name=package_name,
+                )
+            )
 
     return DebugInfo(
         operating_system=distro.info(),
         platform=platform.platform(),
         python_version=sys.version,
         package_version=__version__,
-        pythonpath=[Path(path) for path in sys.path],
+        pythonpath=list(map(Path, sys.path)),
         dependencies=[
-            _package_info_from_name(distribution, package_name=package_name)
-            for distribution, package_name in required_distribution
+            _package_info_from_name(**distribution_package)
+            for distribution_package in required_distribution
         ],
     )
