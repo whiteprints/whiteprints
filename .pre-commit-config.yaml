@@ -5,7 +5,7 @@
 fail_fast: true
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
       - id: check-merge-conflict
@@ -22,7 +22,7 @@ repos:
       - id: python-check-blanket-noqa
       - id: python-check-blanket-type-ignore
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: 2.2.4
+    rev: 2.3.1
     hooks:
       - id: pyproject-fmt
         args: ["--column-width", "79", "--indent", "4", "--no-print-diff"]
@@ -34,7 +34,7 @@ repos:
         entry: reuse
         description: "[License] Lint the project directory for compliance with the REUSE Specification"
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.5
+    rev: v0.6.9
     hooks:
       - id: ruff-format
         name: "ruff format"
