@@ -11,7 +11,7 @@ from pathlib import Path
 import rich_click as click
 from typing_extensions import Unpack
 
-from whiteprints.cli.init_types import InitKwargs
+from whiteprints.cli.init_interface import InitKwargs
 from whiteprints.loc import _
 
 

@@ -12,11 +12,11 @@ from typing import Final
 from click import ClickException
 from typing_extensions import Unpack
 
-from whiteprints.cli.init_types import InitKwargs
+from whiteprints.cli.init_interface import InitKwargs
 from whiteprints.copier_run import Copier
 
 
-__all__: Final = ["init"]
+__all__: Final = ["CopierCopyError", "init"]
 
 
 WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.2.1"
