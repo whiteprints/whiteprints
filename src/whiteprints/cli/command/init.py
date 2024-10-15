@@ -138,7 +138,7 @@ def init(
         kwargs: the command line flags.
     """
     importlib.import_module(
-        "whiteprints.command.init",
+        "whiteprints.cli.init",
         __package__,
     ).init(
         project_directory=project_directory,
