@@ -133,6 +133,28 @@ class LazyCommandLoader(Group):
 
 
 @override
+def print_copyright(ctx: Context, _param: Option, value: bool) -> None:
+    """Print the code licenses information.
+
+    Args:
+        ctx: the click Context.
+        _param: the click Option.
+        value: the value of the option.
+    """
+    if not value:
+        return
+
+    console = importlib.import_module("whiteprints.console")
+    console.STDOUT.print(
+        _(
+            'Copyright © 2024 The "Whiteprints" contributors'
+            " <whiteprints@pm.me>."
+        )
+    )
+    ctx.exit()
+
+
+@override
 def print_license(ctx: Context, _param: Option, value: bool) -> None:
     """Print the code licenses information.
 
@@ -146,12 +168,6 @@ def print_license(ctx: Context, _param: Option, value: bool) -> None:
 
     console = importlib.import_module("whiteprints.console")
     package_metadata = importlib.import_module("whiteprints.package_metadata")
-    console.STDOUT.print(
-        _(
-            'Copyright © 2024 The "Whiteprints" contributors'
-            " <whiteprints@pm.me>.\n"
-        )
-    )
     console.STDOUT.print(
         _("Code released under license '{}'.").format(
             package_metadata.__license__
@@ -215,6 +231,14 @@ class CLIArgsType(TypedDict):
     help=_("A file in which to write the log."),
     default=os.environ.get(f"{APP_NAME}_LOG_FILE", "-"),
     show_default=True,
+)
+@click.option(
+    "--copyright",
+    is_flag=True,
+    callback=print_copyright,
+    expose_value=False,
+    is_eager=True,
+    help=_("Print the copyright information."),
 )
 @click.option(
     "--license",
