@@ -2,9 +2,25 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""Gather debug information."""
+"""Gather and organize runtime information for the current Python environment.
 
-from __future__ import annotations
+This module provides functionality to collect comprehensive debug details such
+as operating system specifics, Python interpreter information, package
+versioning, and dependency data. It is designed to facilitate troubleshooting
+by generating a structured snapshot of the environment in which the code is
+running.
+
+The collected data includes:
+- OS distribution details (e.g., name, version).
+- Python version and platform information.
+- Package versions, including the version of this module.
+- A list of Python paths where modules are searched.
+- Detailed information about runtime dependencies, including their versions and
+  locations when available.
+
+This is useful for debugging issues related to dependency resolution,
+environment configuration across different systems.
+"""
 
 import platform
 import re
@@ -66,6 +82,21 @@ def _package_info_from_name(
     *,
     package_name: str,
 ) -> PackageInfo:
+    """Construct a package information dictionary for a given distribution.
+
+    Args:
+        distribution: The metadata distribution object representing the
+            package.
+        package_name: The name of the package to find, which may differ from
+            the distribution name.
+
+    Returns:
+        A dictionary containing:
+            - name: The name of the package as provided by the distribution.
+            - version: The version of the package.
+            - origin: The file path where the package is installed, if
+              available.
+    """
     package_info = PackageInfo(
         name=distribution.name,
         version=distribution.version,
@@ -78,6 +109,14 @@ def _package_info_from_name(
 
 
 def _gather_required_packages() -> list[str]:
+    """Gather the list of required packages for the current module.
+
+    Parses the dependencies of the current module to identify required packages
+    and normalizes their names by replacing hyphens with underscores.
+
+    Returns:
+        A list of normalized package names extracted from the requirements.
+    """
     package_name_regex = re.compile("==|===|~=|!=|>=|>|<=|<")
     return [
         package_name_regex.split(package, maxsplit=1)[0].replace("-", "_")
@@ -88,6 +127,16 @@ def _gather_required_packages() -> list[str]:
 
 
 def _gather_distribution_packages() -> dict[str, str]:
+    """Map installed distributions to their corresponding package names.
+
+    Retrieves a mapping of distribution names to the package names that
+    they provide, with distribution names normalized by replacing hyphens
+    with underscores.
+
+    Returns:
+        A dictionary where keys are normalized distribution names and values
+        are package names.
+    """
     return {
         str(distribution).replace("-", "_"): str(package)
         for package, distributions in packages_distributions().items()
@@ -100,6 +149,22 @@ def _find_required_distributions(
     required: list[str],
     distributions_packages: dict[str, str],
 ) -> list[_DistributionPackage]:
+    """Find distribution objects for the required packages.
+
+    Uses a list of required package names and a mapping of distribution
+    packages to identify the corresponding distribution metadata objects.
+
+    Args:
+        required: A list of package names that are required.
+        distributions_packages: A dictionary mapping normalized distribution
+            names to their corresponding package names.
+
+    Returns:
+        A list of dictionaries where each entry contains:
+            - distribution: The metadata distribution object for the package.
+            - package_name: The name of the package that corresponds to the
+              distribution.
+    """
     required_distribution: list[_DistributionPackage] = []
     for distribution in required:
         package_name = distributions_packages.get(distribution)
@@ -115,14 +180,29 @@ def _find_required_distributions(
 
 
 def gather_debug_info() -> DebugInfo:
-    """Gather runtime debug information.
+    """Gather detailed runtime debug information of the current environment.
 
-    Args:
-        tracked_dependencies: the dependencies from which to track debug
-            information.
+    This function collects information about the operating system, the Python
+    environment, package versions, and dependencies. It retrieves details such
+    as the OS distribution, Python version, platform information, and the
+    version of the executing package. Additionally, it includes the Python path
+    and information about runtime dependencies, including their names,
+    versions, and locations (if available).
 
     Returns:
-        the global debug information.
+        DebugInfo: A dictionary containing:
+            - operating_system: Details about the current OS
+              distribution including name, version, and ID.
+            - platform: A string representing the underlying platform,
+              e.g., 'Linux-5.15.0-76-generic-x86_64-with-glibc2.31'.
+            - python_version: The full version string of the Python interpreter
+              being used, e.g., '3.12.0'.
+            - package_version: The version of the `whiteprints` package.
+            - pythonpath: A list of paths where Python searches for
+              modules.
+            - dependencies: A list of dictionaries where each
+              entry represents a runtime dependency with its name, version,
+              and, if available, the path to the module's origin file.
     """
     required_distribution = _find_required_distributions(
         required=_gather_required_packages(),
