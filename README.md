@@ -70,10 +70,6 @@ terminal and run:
   ```console
   powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
   ```
-- With pip:
-  ```console
-  pip install uv
-  ```
 
 Then just run whiteprints with uvx:
 
