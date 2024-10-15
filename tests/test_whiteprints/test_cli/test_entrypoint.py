@@ -32,6 +32,15 @@ class TestCLI:
         )
 
     @staticmethod
+    def test_copyright(cli_runner: testing.CliRunner) -> None:
+        """Check if the copyright flag exists."""
+        result = cli_runner.invoke(
+            entrypoint.whiteprints,
+            ["--copyright"],
+        )
+        assert result.exit_code == 0, "The CLI did not exit properly."
+
+    @staticmethod
     def test_license(cli_runner: testing.CliRunner) -> None:
         """Check if the license flag exists."""
         result = cli_runner.invoke(
