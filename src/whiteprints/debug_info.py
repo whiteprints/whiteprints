@@ -13,12 +13,15 @@ from importlib import metadata
 from importlib.metadata import Distribution
 from importlib.util import find_spec
 from pathlib import Path
-from typing import TypedDict
+from typing import Final, TypedDict
 
 from distro import distro
 from distro.distro import InfoDict
 
 from whiteprints import __version__
+
+
+__all__: Final = ["DebugInfo", "PackageInfo", "gather_debug_info"]
 
 
 if sys.version_info < (3, 11):
