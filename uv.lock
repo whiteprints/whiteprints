@@ -928,7 +928,7 @@ wheels = [
 
 [[package]]
 name = "whiteprints"
-version = "0.7.1.dev0+ge012cd7.d20241009"
+version = "0.9.1.dev2+g00b43bc.d20241015"
 source = { editable = "." }
 dependencies = [
     { name = "python-dotenv" },
@@ -958,7 +958,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = "==1.0.1" },
     { name = "rich-click", specifier = "==1.8.3" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'", specifier = "==4.12.2" },
-    { name = "uv", specifier = ">=0.4.20" },
+    { name = "uv", specifier = "==0.4.20" },
 ]
 
 [package.metadata.requires-dev]
