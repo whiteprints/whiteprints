@@ -32,6 +32,15 @@ class TestCLI:
         )
 
     @staticmethod
+    def test_debug_info(cli_runner: testing.CliRunner) -> None:
+        """Check if the debug-info flag exists."""
+        result = cli_runner.invoke(
+            entrypoint.whiteprints,
+            ["--debug-info"],
+        )
+        assert result.exit_code == 0, "The CLI did not exit properly."
+
+    @staticmethod
     def test_copyright(cli_runner: testing.CliRunner) -> None:
         """Check if the copyright flag exists."""
         result = cli_runner.invoke(
