@@ -134,7 +134,7 @@ class LazyCommandLoader(Group):
 
 @override
 def print_copyright(ctx: Context, _param: Option, value: bool) -> None:
-    """Print the code licenses information.
+    """Print the code copyright information.
 
     Args:
         ctx: the click Context.
