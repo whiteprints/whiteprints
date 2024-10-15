@@ -92,18 +92,11 @@ def _gather_distribution_packages() -> dict[str, str]:
     }
 
 
-def gather_debug_info() -> DebugInfo:
-    """Gather runtime debug information.
-
-    Args:
-        tracked_dependencies: the dependencies from which to track debug
-            information.
-
-    Returns:
-        the global debug information.
-    """
-    distributions_packages = _gather_distribution_packages()
-    required = _gather_required_packages()
+def _find_required_distributions(
+    *,
+    required: list[str],
+    distributions_packages: dict[str, str],
+) -> list[_DistributionPackage]:
     required_distribution: list[_DistributionPackage] = []
     for distribution in required:
         package_name = distributions_packages.get(distribution)
@@ -114,6 +107,24 @@ def gather_debug_info() -> DebugInfo:
                     package_name=package_name,
                 )
             )
+
+    return required_distribution
+
+
+def gather_debug_info() -> DebugInfo:
+    """Gather runtime debug information.
+
+    Args:
+        tracked_dependencies: the dependencies from which to track debug
+            information.
+
+    Returns:
+        the global debug information.
+    """
+    required_distribution = _find_required_distributions(
+        required=_gather_required_packages(),
+        distributions_packages=_gather_distribution_packages(),
+    )
 
     return DebugInfo(
         operating_system=distro.info(),
