@@ -16,7 +16,7 @@ To [package] with [uv] run:
 uv tool install whiteprints
 ```
 
-If you don't have uv install, you can have a look at the uv
+If you don't have uv installed, you can have a look at the uv
 [installation guide](https://docs.astral.sh/uv/getting-started/installation/).
 
 ## Using pipx
