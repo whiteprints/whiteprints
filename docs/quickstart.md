@@ -17,16 +17,13 @@ terminal and run:
   ```console
   powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
   ```
-- With pip:
-  ```console
-  pip install uv
-  ```
 
 Then just run whiteprints with uvx:
 
 ```
 uvx whiteprints init my_awesome_project
 ```
+
 Answer a few questions and you're ready to go 🚀.
 
 This will create a directory named `my_awesome_project` containing your [Python] project.
