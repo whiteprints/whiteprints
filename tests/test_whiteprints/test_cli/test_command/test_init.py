@@ -6,7 +6,6 @@
 
 from pathlib import Path
 from typing import Final
-from uuid import uuid4
 
 from click import testing
 
@@ -63,12 +62,11 @@ class TestCLI:
                 fixture.
             tmp_path: a temporary path in which the project will be created.
         """
-        init_directory = (tmp_path / str(uuid4())).mkdir()
         result = cli_runner.invoke(
             entrypoint.whiteprints,
             [
                 "init",
-                str(init_directory),
+                str(tmp_path),
                 "--force",
                 "--data",
                 "project_name=My Awesome Project",
