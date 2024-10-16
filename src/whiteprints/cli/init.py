@@ -23,7 +23,7 @@ WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.2.1"
 """The whiteprints-template-context version pin."""
 
 
-class CopierCopyError(ClickException):  # pragma: no cover
+class CopierCopyError(ClickException):
     """An error occured while creating the project."""
 
     def __init__(self) -> None:
@@ -234,5 +234,5 @@ def init(
             project_directory=project_directory_str,
             **kwargs,
         )
-    except CalledProcessError as process_error:  # pragma: no cover
+    except CalledProcessError as process_error:
         raise CopierCopyError from process_error
