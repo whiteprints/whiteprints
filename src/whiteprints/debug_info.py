@@ -98,7 +98,7 @@ def _package_info_from_name(
     distribution = distribution_package["distribution"]
     package_name = distribution_package["package_name"]
     package_info = PackageInfo(
-        name=distribution.name,
+        name=distribution.metadata["Name"],
         version=distribution.version,
     )
     spec = find_spec(package_name)
