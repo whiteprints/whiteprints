@@ -126,7 +126,7 @@ jobs:
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
         with:
-          python-version: "${{ matrix.python-version }}"
+          python-version: "${{ matrix.python }}"
       - name: Pick environment to run
         run: |
           import os;
