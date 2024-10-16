@@ -43,8 +43,6 @@ __all__: Final = ["DebugInfo", "PackageInfo", "gather_debug_info"]
 
 if sys.version_info < (3, 11):
     from typing_extensions import NotRequired
-else:
-    from typing import NotRequired
 
 if sys.version_info < (3, 10):
     from importlib_metadata import packages_distributions
