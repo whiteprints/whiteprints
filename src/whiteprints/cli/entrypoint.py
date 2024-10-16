@@ -119,18 +119,14 @@ class LazyCommandLoader(Group):
         if (command := self.command_lookup.get(cmd_name)) is None:
             return None
 
-        command = getattr(
+        return getattr(
             importlib.import_module(
                 command["module"],
                 __package__,
             ),
             command["function_name"],
-            cmd_name,
+            None,
         )
-        if isinstance(command, Command):
-            return command
-
-        return None
 
 
 @override
