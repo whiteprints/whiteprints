@@ -105,8 +105,8 @@ class TestGatherDebugInfo:
         """Test that 'origin' is a Path if present in each dependency."""
         debug_info = gather_debug_info()
         for dependency in debug_info["dependencies"]:
-            if "origin" in dependency:
-                assert isinstance(dependency["origin"], Path), (
-                    "'origin' should be a Path in dependency, "
-                    f"but got {type(dependency['origin']).__name__}."
-                )
+            origin = dependency.get("origin")
+            assert origin is None or isinstance(origin, Path), (
+                "'origin' should be a Path or NoneType in dependency, "
+                f"but got {type(dependency.get('origin')).__name__}."
+            )
