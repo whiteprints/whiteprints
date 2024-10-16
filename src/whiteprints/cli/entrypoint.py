@@ -104,7 +104,7 @@ class LazyCommandLoader(Group):
         return self._list_commands
 
     @override
-    def get_command(self, ctx: Context, cmd_name: str) -> Command | str | None:
+    def get_command(self, ctx: Context, cmd_name: str) -> Command | None:
         """Invoke a command.
 
         The command must have the name of the module.
@@ -119,7 +119,7 @@ class LazyCommandLoader(Group):
         if (command := self.command_lookup.get(cmd_name)) is None:
             return None
 
-        return getattr(
+        command = getattr(
             importlib.import_module(
                 command["module"],
                 __package__,
@@ -127,6 +127,10 @@ class LazyCommandLoader(Group):
             command["function_name"],
             cmd_name,
         )
+        if isinstance(command, Command):
+            return command
+
+        return None
 
 
 @override
