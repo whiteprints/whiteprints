@@ -25,6 +25,7 @@ environment configuration across different systems.
 import platform
 import re
 import sys
+from functools import cache
 from importlib import metadata
 from importlib.metadata import Distribution
 from importlib.util import find_spec
@@ -78,17 +79,14 @@ class _DistributionPackage(TypedDict):
 
 
 def _package_info_from_name(
-    distribution: Distribution,
-    *,
-    package_name: str,
+    distribution_package: _DistributionPackage,
 ) -> PackageInfo:
     """Construct a package information dictionary for a given distribution.
 
     Args:
-        distribution: The metadata distribution object representing the
-            package.
-        package_name: The name of the package to find, which may differ from
-            the distribution name.
+        distribution_package: The metadata distribution object representing the
+            package and name of the package to find, which may differ from the
+            distribution name.
 
     Returns:
         A dictionary containing:
@@ -97,6 +95,8 @@ def _package_info_from_name(
             - origin: The file path where the package is installed, if
               available.
     """
+    distribution = distribution_package["distribution"]
+    package_name = distribution_package["package_name"]
     package_info = PackageInfo(
         name=distribution.name,
         version=distribution.version,
@@ -108,6 +108,7 @@ def _package_info_from_name(
     return package_info
 
 
+@cache
 def _gather_required_packages() -> list[str]:
     """Gather the list of required packages for the current module.
 
@@ -126,6 +127,7 @@ def _gather_required_packages() -> list[str]:
     ]
 
 
+@cache
 def _gather_distribution_packages() -> dict[str, str]:
     """Map installed distributions to their corresponding package names.
 
@@ -179,6 +181,7 @@ def _find_required_distributions(
     return required_distribution
 
 
+@cache
 def gather_debug_info() -> DebugInfo:
     """Gather detailed runtime debug information of the current environment.
 
@@ -216,7 +219,7 @@ def gather_debug_info() -> DebugInfo:
         package_version=__version__,
         pythonpath=list(map(Path, sys.path)),
         dependencies=[
-            _package_info_from_name(**distribution_package)
+            _package_info_from_name(distribution_package)
             for distribution_package in required_distribution
         ],
     )
