@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
+  check-tox:
     name: tox env ${{ matrix.tox_env }}
     runs-on: ubuntu-latest
     environment:
@@ -27,7 +27,6 @@ jobs:
         tox_env:
           - pre-commit
           - lint
-          - check-types
           - check-vulnerabilities
           - check-exceptions
           - check-code-maintainability
@@ -41,7 +40,23 @@ jobs:
           enable-cache: true
       - name: Run the test suite
         run: |
-          uvx --quiet --no-progress --with tox-uv tox run -e ${{ matrix.tox_env }}
+  check-types:
+    name: Pyright type checking
+    runs-on: ubuntu-latest
+    environment:
+      name: tests
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Sync project
+        run: uv sync
+      - name: Run Pyright
+        uses: jakebailey/pyright-action@v2
   distribute:
     name: tox env ${{ matrix.tox_env }}
     runs-on: ubuntu-latest
@@ -97,7 +112,9 @@ jobs:
           overwrite: true
   test:
     name: Run tests under Python ${{ matrix.python }} on ${{ matrix.os }}
-    needs: check
+    needs:
+      - check-tox
+      - check-types
     runs-on: ${{ matrix.os }}
     environment:
       name: tests
