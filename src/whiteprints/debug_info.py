@@ -66,6 +66,7 @@ class DebugInfo(TypedDict):
     operating_system: InfoDict
     platform: str
     python_version: str
+    python_executable: Path
     package_version: str
     pythonpath: list[Path]
     dependencies: list[PackageInfo]
@@ -245,6 +246,7 @@ def gather_debug_info() -> DebugInfo:
     return DebugInfo(
         operating_system=distro.info(),
         platform=platform.platform(),
+        python_executable=Path(sys.executable),
         python_version=sys.version,
         package_version=__version__,
         pythonpath=list(map(Path, sys.path)),
