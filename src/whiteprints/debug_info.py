@@ -11,12 +11,12 @@ by generating a structured snapshot of the environment in which the code is
 running.
 
 The collected data includes:
-- OS distribution details (e.g., name, version).
-- Python version and platform information.
-- Package versions, including the version of this module.
-- A list of Python paths where modules are searched.
-- Detailed information about runtime dependencies, including their versions and
-  locations when available.
+    - OS distribution details (e.g., name, version).
+    - Python version and platform information.
+    - Package versions, including the version of this module.
+    - A list of Python paths where modules are searched.
+    - Detailed information about runtime dependencies, including their versions
+      and locations when available.
 
 This is useful for debugging issues related to dependency resolution,
 environment configuration across different systems.
