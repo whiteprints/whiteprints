@@ -11,7 +11,7 @@ import os
 import sys
 from functools import cached_property
 from pathlib import Path
-from typing import Final, TextIO, TypedDict, cast, get_args
+from typing import Final, TextIO, TypedDict, get_args
 
 import rich_click as click
 from rich_click import Context, File, Option
@@ -104,7 +104,7 @@ class LazyCommandLoader(Group):
         return self._list_commands
 
     @override
-    def get_command(self, ctx: Context, cmd_name: str) -> Command | None:
+    def get_command(self, ctx: Context, cmd_name: str) -> Command | str | None:
         """Invoke a command.
 
         The command must have the name of the module.
@@ -119,16 +119,13 @@ class LazyCommandLoader(Group):
         if (command := self.command_lookup.get(cmd_name)) is None:
             return None
 
-        return cast(
-            Command,
-            getattr(
-                importlib.import_module(
-                    command["module"],
-                    __package__,
-                ),
-                command["function_name"],
-                cmd_name,
+        return getattr(
+            importlib.import_module(
+                command["module"],
+                __package__,
             ),
+            command["function_name"],
+            cmd_name,
         )
 
 
