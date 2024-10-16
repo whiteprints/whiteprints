@@ -13,6 +13,7 @@ from whiteprints.cli import entrypoint
 
 
 MISSING_COMMAND_EXIT_CODE: Final = 2
+CLICK_ERROR: Final = 1
 
 
 class TestCLI:
@@ -92,3 +93,28 @@ class TestCLI:
             ],
         )
         assert result.exit_code == 0, "The CLI did not exit properly."
+
+    @staticmethod
+    def test_init_python_fail_on_unknown_flags(
+        cli_runner: testing.CliRunner,
+        *,
+        tmp_path: Path,
+    ) -> None:
+        """Check if the command called with unkown flags fail.
+
+        Args:
+            cli_runner: the CLI test runner provided by typer.testing or a
+                fixture.
+            tmp_path: a temporary path in which the project will be created.
+        """
+        result = cli_runner.invoke(
+            entrypoint.whiteprints,
+            [
+                "init",
+                str(tmp_path),
+                "--this-flag-should-not-exist",
+            ],
+        )
+        assert (
+            result.exit_code == CLICK_ERROR
+        ), "The CLI did not exit properly."
