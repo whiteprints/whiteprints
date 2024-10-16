@@ -36,7 +36,6 @@ jobs:
         uses: astral-sh/setup-uv@v3
         with:
           version: "latest"
-          enable-cache: true
       - name: Run the test suite
         run: |
   distribute:
