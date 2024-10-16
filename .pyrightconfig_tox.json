@@ -19,8 +19,5 @@
   "stubPath": "./src/stubs",
 
   "reportMissingImports": true,
-  "reportMissingTypeStubs": true,
-
-  "pythonVersion": "3.9",
-  "pythonPlatform": "All"
+  "reportMissingTypeStubs": true
 }

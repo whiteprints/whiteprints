@@ -193,6 +193,28 @@ def print_license(ctx: Context, _param: Option, value: bool) -> None:
     ctx.exit()
 
 
+@override
+def print_debug_info(ctx: Context, _param: Option, value: bool) -> None:
+    """Print system information for debug.
+
+    Args:
+        ctx: the click Context.
+        _param: the click Option.
+        value: the value of the option.
+    """
+    if not value:
+        return
+
+    console = importlib.import_module("whiteprints.console")
+    console.STDOUT.print(
+        importlib.import_module(
+            "whiteprints.debug_info",
+            __package__,
+        ).gather_debug_info()
+    )
+    ctx.exit()
+
+
 class CLIArgsType(TypedDict):
     """The CLI arguments types."""
 
@@ -247,6 +269,14 @@ class CLIArgsType(TypedDict):
     expose_value=False,
     is_eager=True,
     help=_("Print the license information."),
+)
+@click.option(
+    "--debug-info",
+    is_flag=True,
+    callback=print_debug_info,
+    expose_value=False,
+    is_eager=True,
+    help=_("Print system information reporting errors and debugging."),
 )
 @click.version_option(version=__version__, prog_name=__app_name__)
 def whiteprints(**kwargs: Unpack[CLIArgsType]) -> None:
