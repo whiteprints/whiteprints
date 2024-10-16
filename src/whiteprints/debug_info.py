@@ -78,6 +78,36 @@ class _DistributionPackage(TypedDict):
     package_name: str
 
 
+def _add_spec(package_info: PackageInfo, *, package_name: str) -> None:
+    """Add the origin path of a package to its information if available.
+
+    Uses `find_spec` to locate the module specification for the given package
+    name. If a valid origin (file path) is found, it adds this path to the
+    `origin` field of the `package_info` dictionary.
+
+    Args:
+        package_info: A dictionary holding package information, including
+            its name and version.
+        package_name: The name of the package to locate and add the origin
+            path for.
+
+    Example:
+        >>> package_info = {"name": "example", "version": "1.0"}
+        >>> _add_spec(package_info, package_name="os")
+        >>> "origin" in package_info
+        True
+        >>> isinstance(package_info["origin"], Path)
+        True
+        >>> package_info = {"name": "nonexistent-package", "version": "1.0"}
+        >>> _add_spec(package_info, package_name="some_nonexistent_package")
+        >>> "origin" not in package_info
+        True
+    """
+    spec = find_spec(package_name)
+    if spec is not None and spec.origin is not None:
+        package_info["origin"] = Path(spec.origin)
+
+
 def _package_info_from_name(
     distribution_package: _DistributionPackage,
 ) -> PackageInfo:
@@ -96,14 +126,14 @@ def _package_info_from_name(
               available.
     """
     distribution = distribution_package["distribution"]
-    package_name = distribution_package["package_name"]
     package_info = PackageInfo(
         name=distribution.metadata["Name"],
         version=distribution.version,
     )
-    spec = find_spec(package_name)
-    if spec is not None and spec.origin is not None:
-        package_info["origin"] = Path(spec.origin)
+    _add_spec(
+        package_info,
+        package_name=distribution_package["package_name"],
+    )
 
     return package_info
 
