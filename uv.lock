@@ -937,7 +937,7 @@ wheels = [
 
 [[package]]
 name = "whiteprints"
-version = "0.9.1.dev5+g99d9d30.d20241015"
+version = "0.9.1.dev10+gd042f5a.d20241016"
 source = { editable = "." }
 dependencies = [
     { name = "distro" },
@@ -966,8 +966,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "distro", specifier = ">=1.9.0" },
-    { name = "importlib-metadata", marker = "python_full_version < '3.10'", specifier = "==8.5.0" },
+    { name = "distro", specifier = "==1.9" },
+    { name = "importlib-metadata", marker = "python_full_version < '3.10'", specifier = "==8.5" },
     { name = "python-dotenv", specifier = "==1.0.1" },
     { name = "rich-click", specifier = "==1.8.3" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'", specifier = "==4.12.2" },
