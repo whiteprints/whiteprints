@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-name: 🛠️ Feature Request
-description: Suggest an idea to help us improve
+name: ✨ Feature Request
+description: Suggest an idea
 title: "feat: "
 labels:
   - ["enhancement", "triage"]
@@ -15,7 +15,11 @@ body:
 
         We kindly demand that all new features are [discussed](https://github.com/whiteprints/whiteprints/discussions/categories/ideas) before opening a new issue.
 
-        We are also happy to accept contributions from our users 🚀 by means of [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests?platform=linux). For more details see [here](https://github.com/whiteprints/whiteprintst/blob/main/CONTRIBUTING.md).
+        Before submitting an issue, please make sure the issue hasn't been already addressed by searching through the existing and past [issues](https://github.com/whiteprints/whiteprints/issues) and [discussions](https://github.com/whiteprints/whiteprints/discussions/categories/ideas).
+
+        We are also happy to accept contributions from our users by means of [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests?platform=linux). For more details see [here](https://github.com/whiteprints/whiteprintst/blob/main/CONTRIBUTING.md) 🚀.
+
+        By submitting a new issue, you agree with this project's [Code of Conduct].
   - type: input
     id: contact
     attributes:
@@ -27,40 +31,50 @@ body:
   - type: checkboxes
     id: terms
     attributes:
-      label: Code of Conduct
-      description: |
-        By submitting this issue, you agree to follow our [Code of Conduct](https://example.com).
+      label: Before submittig a new issue...
       options:
-        - label: I agree to follow this project's Code of Conduct
+        - label: I have already searched for [relevant issues](https://github.com/whiteprints/whiteprints/issues).
+          required: true
+        - label: I agree to follow this project's [Code of Conduct](https://github.com/whiteprints/whiteprints/blob/main/CODE_OF_CONDUCT.md).
           required: true
   - type: textarea
     id: discussion
     attributes:
       label: |
         I have presented my idea and it has been approved in a new discussion
-      description: The [idea discussion](https://github.com/whiteprints/whiteprints/discussions/categories/ideas)
-        reference number.
+      description: The [idea discussion](https://github.com/whiteprints/whiteprints/discussions/categories/ideas) reference number.
     validations:
       required: true
+    placeholder: #1234
   - type: textarea
     attributes:
       label: Description
       description: |
-        A clear and concise description of the feature you're interested in.
+        Please outline the motivation for the proposal.
+      placeholder: |
+        A clear and concise description of the feature proposal.
+
+        Is your feature request related to a specific problem? e.g., *"I'm working on X and would like Y to be possible"*.
+
+        If this is related to another GitHub issue, please link here too.
     validations:
       required: true
   - type: textarea
     attributes:
       label: Suggested Solution
       description: |
-        Describe the solution you'd like. A clear and concise description of what you want to happen.
+        Describe the solution you'd like.
+      placeholder: |
+        A clear and concise description of what you want to happen.
     validations:
       required: true
   - type: textarea
     attributes:
       label: Alternatives
       description: |
-        Describe alternatives you've considered. A clear and concise description of any alternative solutions or features you've considered.
+        Describe alternatives you've considered.
+      placeholder:  |
+        A clear and concise description of any alternative solutions or features you've considered.
     validations:
       required: false
   - type: textarea

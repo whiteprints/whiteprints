@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 name: 🐛 Bug report
-description: Create a report to help us improve
+description: Create a report
 title: "bug: "
 labels: ["bug", "triage"]
 assignees: []
@@ -31,6 +31,8 @@ body:
       description: |
         By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/whiteprints/whiteprints/blob/main/CODE_OF_CONDUCT.md).
       options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
         - label: I agree to follow this project's Code of Conduct
           required: true
   - type: input
