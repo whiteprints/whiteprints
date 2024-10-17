@@ -3,19 +3,22 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 name: 🐛 Bug report
-description: Create a report
+description: Create a bug report
 title: "bug: :bug: "
-labels: ["bug", "triage"]
+labels:
+  - ["bug", "triage"]
 assignees: []
 body:
   - type: markdown
     attributes:
       value: |
-        **Thanks :heart: for taking the time to fill out this bug report!**
+        # Thanks for taking the time to fill out this bug report!
 
-        This form is for bug report **ONLY**. If you have a problem or a question, we kindly ask that you check the [discussion section](https://github.com/whiteprints/whiteprints/discussions/categories/q-a).
+        Before submitting an issue, please make sure the issue hasn't been already addressed by searching through the existing and past [issues](https://github.com/whiteprints/whiteprints/issues) and [discussions](https://github.com/whiteprints/whiteprints/discussions/categories/ideas).
 
-        We are also happy to accept contributions from our users 🚀 by means of [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests?platform=linux). For more details see [here](https://github.com/whiteprints/whiteprints/blob/main/CONTRIBUTING.md).
+        By submitting a new issue, you agree with this project's [Code of Conduct](https://github.com/whiteprints/whiteprints/blob/main/CODE_OF_CONDUCT.md).
+
+        We are also happy to accept contributions from our users by means of [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) 🚀. For more details see [here](https://github.com/whiteprints/whiteprintst/blob/main/CONTRIBUTING.md).
   - type: input
     id: contact
     attributes:
@@ -27,40 +30,29 @@ body:
   - type: checkboxes
     id: terms
     attributes:
-      label: Code of Conduct
-      description: |
-        By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/whiteprints/whiteprints/blob/main/CODE_OF_CONDUCT.md).
+      label: Before submittig a new issue...
       options:
-        - label: I agree to follow this project's Code of Conduct
+        - label: I have already searched for relevant issues or discussions.
           required: true
-        - label: I agree to follow this project's Code of Conduct
+        - label: I agree to follow this project's Code of Conduct.
           required: true
-  - type: input
-    id: environment-os
+  - type: textarea
     attributes:
-      label: OS
-      description: What is your operating system?
-      placeholder: ex. Ubuntu 24.04
-    validations:
-      required: true
-  - type: input
-    id: environment-python
-    attributes:
-      label: Python
+      label: Your current environment
       description: |
-        What is your python interpreter (run `python --version`)?
-      placeholder: ex. Python 3.13.0
-    validations:
-      required: true
-  - type: input
-    id: environment-project
-    attributes:
-      label: Package
-      description: |
-        What is your package version ?
-      placeholder: ex. 0.6.1
-    validations:
-      required: true
+        Please run the following and paste the output below.
+        ```sh
+        whiteprints --debug-info
+        # For security purposes, please feel free to check the contents of `whiteprints --debug-info` before running it.
+        ```
+      value: |
+        <details>
+        <summary>The output of `whiteprints --debug-info`</summary>
+
+        ```json
+        Your output of `whiteprints --debug-info` here
+        ```
+        </details>
   - type: textarea
     id: what-happened
     attributes:

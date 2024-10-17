@@ -3,10 +3,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 name: ✨ Feature Request
-description: Suggest an idea
+description: Request a new feature
 title: "feat: :sparkles: "
 labels:
   - ["enhancement", "triage"]
+assignees: []
 body:
   - type: markdown
     attributes:
