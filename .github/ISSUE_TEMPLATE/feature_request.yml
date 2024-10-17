@@ -39,7 +39,7 @@ body:
         - label: I agree to follow this project's Code of Conduct.
           required: true
   - type: input
-    id: discussion reference number
+    id: discussion_reference_number
     attributes:
       label: I have presented my idea and it has been approved in a new discussion
       description: The [idea discussion](https://github.com/whiteprints/whiteprints/discussions/categories/ideas) reference number.
