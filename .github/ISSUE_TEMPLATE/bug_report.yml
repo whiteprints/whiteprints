@@ -38,7 +38,7 @@ body:
           required: true
   - type: textarea
     attributes:
-      label: Your current environment
+      label: Your current environment (if you think it is necessary)
       description: |
         Please run the following and paste the output below.
 
@@ -55,6 +55,8 @@ body:
         Your output of `whiteprints --debug-info` here
         ```
         </details>
+    validations:
+      required: false
   - type: textarea
     id: what-happened
     attributes:
