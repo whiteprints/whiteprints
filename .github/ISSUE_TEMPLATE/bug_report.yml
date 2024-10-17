@@ -61,7 +61,8 @@ body:
       label: What happened?
       description: |
         Please provide a clear and concise description of what the bug is.
-      placeholder: A bug happened!
+      placeholder: |
+        A bug happened!
     validations:
       required: true
   - type: textarea
