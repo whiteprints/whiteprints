@@ -1,0 +1,86 @@
+# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: ⚡ Performance report
+description: Create a performance report
+title: "bug: :bug: "
+labels:
+  - ["performance", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Thanks for taking the time to fill out this performance report!
+
+        Before submitting an issue, please make sure the issue hasn't been already addressed by searching through the existing and past [issues](https://github.com/whiteprints/whiteprints/issues).
+
+        By submitting a new issue, you agree with this project's [Code of Conduct](https://github.com/whiteprints/whiteprints/blob/main/CODE_OF_CONDUCT.md).
+
+        We are also happy to accept contributions from our users by means of [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) 🚀. For more details see [here](https://github.com/whiteprints/whiteprintst/blob/main/CONTRIBUTING.md).
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Before submittig a new issue...
+      options:
+        - label: I have already searched for relevant issues.
+          required: true
+        - label: I agree to follow this project's Code of Conduct.
+          required: true
+  - type: textarea
+    attributes:
+      label: Your current environment (if you think it is necessary)
+      description: |
+        Please run the following and paste the output below.
+
+        ```console
+        whiteprints --debug-info
+        ```
+
+        For security purposes, please feel free to check and edit the contents of `whiteprints --debug-info`.
+      value: |
+        <details>
+        <summary>The output of `whiteprints --debug-info`</summary>
+
+        ```python
+        Your output of `whiteprints --debug-info` here
+        ```
+        </details>
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Proposal to improve performance
+      description: |
+        How do you plan to improve the performance?
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Report of performance regression
+      description: |
+        Please provide detailed description of performance comparison to confirm the regression.
+
+        You may use [hyperfine](https://github.com/sharkdp/hyperfine) to run benchmarks and report the results.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Misc discussion on performance
+      description: |
+        Anything about the performance.
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing 🎉!
