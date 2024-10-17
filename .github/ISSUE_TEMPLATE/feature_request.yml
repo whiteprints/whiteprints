@@ -8,10 +8,10 @@ title: "feat: "
 labels:
   - ["enhancement", "triage"]
 body:
-  - type: markdown
+  - type: textarea
     attributes:
       label: Thanks ❤️ for taking the time to fill out this feature request report!
-      value: |
+      description: |
         We kindly demand that all new features are [discussed](https://github.com/whiteprints/whiteprints/discussions/categories/ideas) before opening a new issue.
 
         Before submitting an issue, please make sure the issue hasn't been already addressed by searching through the existing and past [issues](https://github.com/whiteprints/whiteprints/issues) and [discussions](https://github.com/whiteprints/whiteprints/discussions/categories/ideas).
