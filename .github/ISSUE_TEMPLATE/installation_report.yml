@@ -1,0 +1,98 @@
+# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: 🛠️ Installation issue report
+description: Create a bug report
+title: "bug: :hammer_and_wrench: "
+labels:
+  - ["installation", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Thanks for taking the time to fill out this installation issue report!
+
+        Before submitting an issue, please make sure the issue hasn't been already addressed by searching through the existing and past [issues](https://github.com/whiteprints/whiteprints/issues).
+
+        By submitting a new issue, you agree with this project's [Code of Conduct](https://github.com/whiteprints/whiteprints/blob/main/CODE_OF_CONDUCT.md).
+
+        We are also happy to accept contributions from our users by means of [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) 🚀. For more details see [here](https://github.com/whiteprints/whiteprintst/blob/main/CONTRIBUTING.md).
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Before submittig a new issue...
+      options:
+        - label: I have already searched for relevant issues.
+          required: true
+        - label: I agree to follow this project's Code of Conduct.
+          required: true
+  - type: textarea
+    attributes:
+      label: Your current environment (if you think it is necessary)
+      description: |
+        Please run the following and paste the output below.
+
+        ```console
+        whiteprints --debug-info
+        ```
+
+        For security purposes, please feel free to check and edit the contents of `whiteprints --debug-info`.
+      value: |
+        <details>
+        <summary>The output of `whiteprints --debug-info`</summary>
+
+        ```python
+        Your output of `whiteprints --debug-info` here
+        ```
+        </details>
+    validations:
+      required: false
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: How are you installing the package?
+      description: |
+        Paste the full commands you are trying to execute.
+      value: |
+        ```sh
+        pip install -vvv whiteprints
+        ```
+        or
+        ```sh
+        uv tool install -vvv whiteprints
+        ```
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: |
+        Please copy and paste any relevant log output.
+      value: |
+        <details>
+        <summary>Log output</summary>
+
+        ```sh
+        Your log output
+        ```
+        </details>
+  - type: textarea
+    attributes:
+      label: Suggest a potential fix
+      description: |
+        Tell us if you have an idea on what cause this installation problem or how to fix it.
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing 🎉!
