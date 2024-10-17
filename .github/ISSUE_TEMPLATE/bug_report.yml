@@ -3,19 +3,22 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 name: 🐛 Bug report
-description: Create a report to help us improve
-title: "bug: "
-labels: ["bug", "triage"]
+description: Create a bug report
+title: "bug: :bug: "
+labels:
+  - ["bug", "triage"]
 assignees: []
 body:
   - type: markdown
     attributes:
       value: |
-        **Thanks :heart: for taking the time to fill out this bug report!**
+        # Thanks for taking the time to fill out this bug report!
 
-        This form is for bug report **ONLY**. If you have a problem or a question, we kindly ask that you check the [discussion section](https://github.com/whiteprints/whiteprints/discussions/categories/q-a).
+        Before submitting an issue, please make sure the issue hasn't been already addressed by searching through the existing and past [issues](https://github.com/whiteprints/whiteprints/issues) and [discussions](https://github.com/whiteprints/whiteprints/discussions/categories/ideas).
 
-        We are also happy to accept contributions from our users 🚀 by means of [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests?platform=linux). For more details see [here](https://github.com/whiteprints/whiteprints/blob/main/CONTRIBUTING.md).
+        By submitting a new issue, you agree with this project's [Code of Conduct](https://github.com/whiteprints/whiteprints/blob/main/CODE_OF_CONDUCT.md).
+
+        We are also happy to accept contributions from our users by means of [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) 🚀. For more details see [here](https://github.com/whiteprints/whiteprintst/blob/main/CONTRIBUTING.md).
   - type: input
     id: contact
     attributes:
@@ -27,45 +30,64 @@ body:
   - type: checkboxes
     id: terms
     attributes:
-      label: Code of Conduct
-      description: |
-        By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/whiteprints/whiteprints/blob/main/CODE_OF_CONDUCT.md).
+      label: Before submittig a new issue...
       options:
-        - label: I agree to follow this project's Code of Conduct
+        - label: I have already searched for relevant issues or discussions.
           required: true
-  - type: input
-    id: environment-os
+        - label: I agree to follow this project's Code of Conduct.
+          required: true
+  - type: textarea
     attributes:
-      label: OS
-      description: What is your operating system?
-      placeholder: ex. Ubuntu 24.04
-    validations:
-      required: true
-  - type: input
-    id: environment-python
-    attributes:
-      label: Python
+      label: Your current environment
       description: |
-        What is your python interpreter (run `python --version`)?
-      placeholder: ex. Python 3.13.0
-    validations:
-      required: true
-  - type: input
-    id: environment-project
-    attributes:
-      label: Package
-      description: |
-        What is your package version ?
-      placeholder: ex. 0.6.1
-    validations:
-      required: true
+        Please run the following and paste the output below.
+
+        ```console
+        whiteprints --debug-info
+        ```
+
+        For security purposes, please feel free to check and edit the contents of `whiteprints --debug-info`.
+      value: |
+        <details>
+        <summary>The output of `whiteprints --debug-info`</summary>
+
+        ```json
+        Your output of `whiteprints --debug-info` here
+        ```
+        </details>
   - type: textarea
     id: what-happened
     attributes:
       label: What happened?
-      description: Also tell us, what did you expect to happen?
-      placeholder: Tell us what you see!
-      value: "A bug happened!"
+      description: |
+        Please provide a clear and concise description of what the bug is.
+      placeholder: |
+        A bug happened!
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: What is the code or steps to reproduce the behavior?
+      description: |
+        If relevant, add a minimal example so that we can reproduce the error by running the code. It is very important for the snippet to be as succinct (minimal) as possible, so please take time to trim down any irrelevant code to help us debug efficiently. We are going to copy-paste your code and we expect to get the same result as you did: avoid any external data, and include the relevant imports, etc.
+
+        You can place your example in triple quotes for better formatting. For example for a shell script:
+
+        ```sh
+        whiteprints init my_awesome_project
+        ```
+        Or for Python script:
+
+        ```python
+        from whiteprints import __version__
+
+        print(__version__)
+        ```
+
+        You can use the preview button to visualize the code before submitting the issue.
+      placeholder: |
+        Place your reproducing example in triple quotes.
     validations:
       required: true
   - type: textarea
@@ -73,12 +95,12 @@ body:
     attributes:
       label: Relevant log output
       description: |
-        Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
-      render: shell
-  - type: textarea
-    id: reproduce
-    attributes:
-      label: What is the code or steps to reproduce the behavior?
-      description: Try to give us a minimal reproducible example of code.
-    validations:
-      required: true
+        Please copy and paste any relevant log output.
+      value: |
+        <details>
+        <summary>Log output</summary>
+
+        ```sh
+        Your log output
+        ```
+        </details>
