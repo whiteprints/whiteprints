@@ -84,3 +84,7 @@ body:
         Add any other context or references about the feature here.
     validations:
       required: false
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing 🎉!
