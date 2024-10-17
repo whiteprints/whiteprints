@@ -33,15 +33,14 @@ body:
     attributes:
       label: Before submittig a new issue...
       options:
-        - label: I have already searched for [relevant issues](https://github.com/whiteprints/whiteprints/issues).
+        - label: I have already searched for relevant issues.
           required: true
-        - label: I agree to follow this project's [Code of Conduct](https://github.com/whiteprints/whiteprints/blob/main/CODE_OF_CONDUCT.md).
+        - label: I agree to follow this project's Code of Conduct.
           required: true
-  - type: textarea
+  - type: input
     id: discussion
     attributes:
-      label: |
-        I have presented my idea and it has been approved in a new discussion
+      label: I have presented my idea and it has been approved in a new discussion
       description: The [idea discussion](https://github.com/whiteprints/whiteprints/discussions/categories/ideas) reference number.
       placeholder: #1234
     validations:
