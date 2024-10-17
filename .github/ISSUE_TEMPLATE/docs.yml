@@ -24,7 +24,7 @@ body:
     attributes:
       label: Before submittig a new issue...
       options:
-        - label: I have already searched for relevant issues or discussions.
+        - label: I have already searched for relevant issues.
           required: true
         - label: I agree to follow this project's Code of Conduct.
           required: true
