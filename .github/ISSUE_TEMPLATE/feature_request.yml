@@ -4,7 +4,7 @@
 
 name: ✨ Feature Request
 description: Suggest an idea
-title: "feat: "
+title: "feat: :sparkles: "
 labels:
   - ["enhancement", "triage"]
 body:
@@ -17,9 +17,9 @@ body:
 
         Before submitting an issue, please make sure the issue hasn't been already addressed by searching through the existing and past [issues](https://github.com/whiteprints/whiteprints/issues) and [discussions](https://github.com/whiteprints/whiteprints/discussions/categories/ideas).
 
-        We are also happy to accept contributions from our users by means of [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) 🚀. For more details see [here](https://github.com/whiteprints/whiteprintst/blob/main/CONTRIBUTING.md).
-
         By submitting a new issue, you agree with this project's [Code of Conduct](https://github.com/whiteprints/whiteprints/blob/main/CODE_OF_CONDUCT.md).
+
+        We are also happy to accept contributions from our users by means of [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) 🚀. For more details see [here](https://github.com/whiteprints/whiteprintst/blob/main/CONTRIBUTING.md).
   - type: input
     id: contact
     attributes:
@@ -34,11 +34,9 @@ body:
       label: Before submittig a new issue...
       options:
         - label: I have already searched for relevant issues or discussions.
-          description: The new feature might have been already [discussed](https://github.com/whiteprints/whiteprints/discussions/categories/ideas) or [addressed](https://github.com/whiteprints/whiteprints/issues).
           required: true
         - label: I agree to follow this project's Code of Conduct.
           required: true
-          description: Respecting the [Code of Conduct](https://github.com/whiteprints/whiteprints/blob/main/CODE_OF_CONDUCT.md) helps us in fostering and enforcing a friendly inclusive community.
   - type: input
     id: discussion reference number
     attributes:
