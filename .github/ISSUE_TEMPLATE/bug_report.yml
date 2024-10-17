@@ -46,7 +46,7 @@ body:
         whiteprints --debug-info
         ```
 
-        For security purposes, please feel free to check the contents of `whiteprints --debug-info` before running it.
+        For security purposes, please feel free to check and edit the contents of `whiteprints --debug-info`.
       value: |
         <details>
         <summary>The output of `whiteprints --debug-info`</summary>
@@ -59,9 +59,18 @@ body:
     id: what-happened
     attributes:
       label: What happened?
-      description: Also tell us, what did you expect to happen?
-      placeholder: Tell us what you see!
+      description: |
+        Please provide a clear and concise description of what the bug is.
+      placeholder:
       value: "A bug happened!"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: What is the code or steps to reproduce the behavior?
+      description: |
+        If relevant, add a minimal example so that we can reproduce the error by running the code. It is very important for the snippet to be as succinct (minimal) as possible, so please take time to trim down any irrelevant code to help us debug efficiently. We are going to copy-paste your code and we expect to get the same result as you did: avoid any external data, and include the relevant imports, etc.
     validations:
       required: true
   - type: textarea
@@ -70,11 +79,11 @@ body:
       label: Relevant log output
       description: |
         Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
-      render: shell
-  - type: textarea
-    id: reproduce
-    attributes:
-      label: What is the code or steps to reproduce the behavior?
-      description: Try to give us a minimal reproducible example of code.
-    validations:
-      required: true
+      value: |
+        <details>
+        <summary>Log output</summary>
+
+        ```sh
+        Your log output
+        ```
+        </details>
