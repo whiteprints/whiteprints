@@ -41,10 +41,12 @@ body:
       label: Your current environment
       description: |
         Please run the following and paste the output below.
-        ```sh
+
+        ```console
         whiteprints --debug-info
-        # For security purposes, please feel free to check the contents of `whiteprints --debug-info` before running it.
         ```
+
+        For security purposes, please feel free to check the contents of `whiteprints --debug-info` before running it.
       value: |
         <details>
         <summary>The output of `whiteprints --debug-info`</summary>
