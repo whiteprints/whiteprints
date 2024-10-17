@@ -101,6 +101,11 @@ body:
         Your log output
         ```
         </details>
+  - type: textarea
+    attributes:
+      label: Suggest a potential fix
+      description: |
+        Tell us if you have an idea on what cause this bug or how to fix it.
   - type: markdown
     attributes:
       value: |
