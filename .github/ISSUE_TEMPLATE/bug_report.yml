@@ -85,10 +85,10 @@ body:
         ```
 
         You can use the preview button to visualize the code before submitting the issue.
+      placeholder: |
+        Place your reproducing example in triple quotes.
     validations:
       required: true
-    placeholder: |
-      Place your reproducing example in triple quotes.
   - type: textarea
     id: logs
     attributes:
