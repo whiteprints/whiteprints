@@ -33,12 +33,14 @@ body:
     attributes:
       label: Before submittig a new issue...
       options:
-        - label: I have already searched for relevant issues.
+        - label: I have already searched for relevant issues or discussions.
+          description: The new feature might have been already [discussed](https://github.com/whiteprints/whiteprints/discussions/categories/ideas) or [addressed](https://github.com/whiteprints/whiteprints/issues).
           required: true
         - label: I agree to follow this project's Code of Conduct.
           required: true
+          description: Respecting the [Code of Conduct](https://github.com/whiteprints/whiteprints/blob/main/CODE_OF_CONDUCT.md) helps us in fostering and enforcing a friendly inclusive community.
   - type: input
-    id: discussion
+    id: discussion reference number
     attributes:
       label: I have presented my idea and it has been approved in a new discussion
       description: The [idea discussion](https://github.com/whiteprints/whiteprints/discussions/categories/ideas) reference number.
