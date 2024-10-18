@@ -75,6 +75,12 @@ max_supported_python = "3.13"
 
 [tool.uv]
 managed = true
+cache-keys = [
+    { git = { commit = true, tag = true } },
+    { file = "pyproject.toml" },
+    { file = "hatch.toml" },
+    { file = "hatch_build.py" },
+]
 dev-dependencies = [
     "scalene>=1.5.19",
     "pynvim>=0.4.3",
