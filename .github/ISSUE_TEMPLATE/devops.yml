@@ -12,9 +12,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        # Thanks for taking the time to fill out this refactoring suggestion !
+        # Thanks for taking the time to fill out this devops suggestion !
 
-        Suggest here any change to the repository administration, CI/CD or developer tools and workflow.
+        Suggest here any change to the repository administration, CI/CD, developer tools and workflow or containers.
 
         Before submitting an issue, please make sure the issue hasn't been already addressed by searching through the existing and past [issues](https://github.com/whiteprints/whiteprints/issues) and [discussions](https://github.com/whiteprints/whiteprints/discussions/categories/ideas).
 
