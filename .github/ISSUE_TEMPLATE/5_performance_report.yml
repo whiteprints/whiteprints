@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-name: ⚡ Performance report
-description: Create a performance report
+name: ⚡ Performance issue or improvement
+description: Report a performance issue or suggest an improvement
 title: "bug: :bug: "
 labels:
   - ["performance", "triage"]

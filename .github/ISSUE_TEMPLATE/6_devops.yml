@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 name: 🧑‍💻 Devops
-description: Suggest a developer experience improvement
+description: Report a CI bug, unexpected behaviour or suggest a developer experience improvement
 title: "ci: :technologist: "
 labels:
   - ["ci", "triage"]

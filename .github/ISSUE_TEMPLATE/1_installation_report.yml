@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-name: 🛠️ Installation issue report
-description: Create a bug report
+name: 🛠️ Installation issue
+description: Report an installation issue
 title: "bug: :hammer_and_wrench: "
 labels:
   - ["installation", "triage"]

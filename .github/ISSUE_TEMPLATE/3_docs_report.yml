@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-name: 📚 Bug report
+name: 📚 Documentation issue or improvement
 description: Report a documentation issue or suggest an improvement
 title: "docs: :books: "
 labels:

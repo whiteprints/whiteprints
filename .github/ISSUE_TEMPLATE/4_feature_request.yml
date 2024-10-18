@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-name: ✨ Feature Request
+name: ✨ Feature request
 description: Request a new feature
 title: "feat: :sparkles: "
 labels:
