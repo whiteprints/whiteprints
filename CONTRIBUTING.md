@@ -157,25 +157,16 @@ the tutorial [creating a Pull Request](https://docs.github.com/en/pull-requests/
 
 Before submitting changes:
 
-  - Quality check
+  - I agree to follow this project's [Code of Conduct](CODE_OF_CONDUCT.md)
+  - I have performed a self-review of my own code
+  - I have included relevant tests
+  - I have commented my code, particularly in hard-to-understand areas
+  - I have made corresponding changes to the documentation
 
-    - I agree to follow this project's [Code of Conduct](CODE_OF_CONDUCT.md)
-    - I have performed a self-review of my own code
-    - I have included relevant tests
-    - I have commented my code, particularly in hard-to-understand areas
-    - I have made corresponding changes to the documentation
+### Contributor License Agreement
 
-  - By making a contribution to this project, I certify that:
+By making a contribution to this project, I (the contributor) hereby certify that
 
-    - The contributor represents and warrants, on behalf of their employer or
-      other principal if they are acting within the scope of their employment
-      or otherwise as the agent of a legal entity, that they have the right and
-      authority to make their contribution under these terms.
-    - The contribution was created in whole or in part by me and I have the
-      right to submit it under the license of the file(s) modified or created;
-      **or**
-    - the contribution is based upon previous work that, to the best of my
-      knowledge, is covered under an appropriate open source license and I have
-      the right under that license to submit that work with modifications,
-      whether created in whole or in part by me, under the license of the
-      file(s) modified of created.
+- The contributor represents and warrants, on behalf of their employer or other principal **if** they are acting within the scope of their employment or otherwise as the agent of a legal entity, that they have the right and authority to make their contribution under these terms.
+- The contribution was created in whole or in part by me and I have the right to submit it under the license of the file(s) modified or created; **or**
+- the contribution is based upon previous work that, to the best of my knowledge, is covered under an appropriate open source license and I have the right under that license to submit that work with modifications, whether created in whole or in part by me, under the license of the file(s) modified or created.
