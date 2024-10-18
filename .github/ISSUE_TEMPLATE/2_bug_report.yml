@@ -38,8 +38,10 @@ body:
           required: true
   - type: textarea
     attributes:
-      label: Your current environment (if you think it is necessary)
+      label: My current environment
       description: |
+        Fill if you think it is necessary. It may help us to solve the issue more quickly!
+
         Please run the following and paste the output below.
 
         ```console
@@ -103,7 +105,7 @@ body:
         </details>
   - type: textarea
     attributes:
-      label: Suggest a potential fix
+      label: Potential fix
       description: |
         Tell us if you have an idea on what cause this bug or how to fix it.
   - type: markdown

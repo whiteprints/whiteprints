@@ -38,8 +38,10 @@ body:
           required: true
   - type: textarea
     attributes:
-      label: Your current environment (if you think it is necessary)
+      label: My current environment
       description: |
+        Fill if you think it is necessary. It may help us to solve the issue more quickly!
+
         Please run the following and paste the output below.
 
         ```console
@@ -60,7 +62,7 @@ body:
   - type: textarea
     id: what-happened
     attributes:
-      label: How are you installing the package?
+      label: How I am installing the package
       description: |
         Paste the full commands you are trying to execute.
       value: |
@@ -89,7 +91,7 @@ body:
         </details>
   - type: textarea
     attributes:
-      label: Suggest a potential fix
+      label: Potential fix
       description: |
         Tell us if you have an idea on what cause this installation problem or how to fix it.
   - type: markdown
