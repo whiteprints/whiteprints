@@ -2,19 +2,17 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-name: ♻️ Codebase refactoring
-description: Suggest a restructuration of the codebase
-title: "refacto: :recycle: "
+name: 🏗️ Architectural change
+description: Suggest a breaking change, redesign or architectural change
+title: "feat: :building_construction: "
 labels:
-  - ["refactoring", "triage"]
+  - ["architecture", "breaking", "triage"]
 assignees: []
 body:
   - type: markdown
     attributes:
       value: |
-        # Thanks for taking the time to fill out this refactoring suggestion !
-
-        Refactoring the codebase consists in chaging the code without modifying its external behaviour.
+        # Thanks for taking the time to suggest an architectural change !
 
         Before submitting an issue, please make sure the issue hasn't been already addressed by searching through the existing and past [issues](https://github.com/whiteprints/whiteprints/issues) and [discussions](https://github.com/whiteprints/whiteprints/discussions/categories/ideas).
 
@@ -42,9 +40,9 @@ body:
     attributes:
       label: Motivation(s)
       description: |
-        Please outline the motivation for the proposal. How would it improve or simplify the existing codebase?
+        Please outline the motivation for the proposal.
       placeholder: |
-        A clear and concise description of the refactoring proposal.
+        A clear and concise description of the motivation(s) for the change.
 
         If this is related to another GitHub issue, please link here too.
     validations:
@@ -72,6 +70,13 @@ body:
       label: Additional Context and References
       description: |
         Add any other context or references about the feature here.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: CC list
+      description: |
+        The list of people you want to CC.
     validations:
       required: false
   - type: markdown
