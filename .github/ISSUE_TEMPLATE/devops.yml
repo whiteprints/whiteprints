@@ -2,19 +2,19 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-name: ✨ Feature Request
-description: Request a new feature
-title: "feat: :sparkles: "
+name: 🧑‍💻 Devops
+description: Suggest a developer experience improvement
+title: "ci: :technologist: "
 labels:
-  - ["enhancement", "triage"]
+  - ["ci", "triage"]
 assignees: []
 body:
   - type: markdown
     attributes:
       value: |
-        # Thanks for taking the time to fill out this feature request report!
+        # Thanks for taking the time to fill out this devops suggestion !
 
-        We kindly demand that all new features are [discussed](https://github.com/whiteprints/whiteprints/discussions/categories/ideas) before opening a new issue ❤️.
+        Suggest here any change to the repository administration, CI/CD, developer tools and workflow or containers.
 
         Before submitting an issue, please make sure the issue hasn't been already addressed by searching through the existing and past [issues](https://github.com/whiteprints/whiteprints/issues) and [discussions](https://github.com/whiteprints/whiteprints/discussions/categories/ideas).
 
@@ -38,23 +38,13 @@ body:
           required: true
         - label: I agree to follow this project's Code of Conduct.
           required: true
-  - type: input
-    id: discussion_reference_number
-    attributes:
-      label: I have presented my idea and it has been approved in a new discussion
-      description: The [idea discussion](https://github.com/whiteprints/whiteprints/discussions/categories/ideas) reference number.
-      placeholder: #1234
-    validations:
-      required: true
   - type: textarea
     attributes:
-      label: Motivation(s)
+      label: Pain point(s)
       description: |
-        Please outline the motivation for the proposal.
+        Please outline the motivation for the proposal. How would it improve or simplify the existing codebase?
       placeholder: |
-        A clear and concise description of the feature proposal.
-
-        Is your feature request related to a specific problem? e.g., *"I'm working on X and would like Y to be possible"*.
+        A clear and concise description of the current pain point(s) when developing or testing.
 
         If this is related to another GitHub issue, please link here too.
     validations:

@@ -2,17 +2,17 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-name: 🐛 Bug report
-description: Report a bug or misbehaviour
+name: ⚡ Performance report
+description: Create a performance report
 title: "bug: :bug: "
 labels:
-  - ["bug", "triage"]
+  - ["performance", "triage"]
 assignees: []
 body:
   - type: markdown
     attributes:
       value: |
-        # Thanks for taking the time to fill out this bug report!
+        # Thanks for taking the time to fill out this performance report!
 
         Before submitting an issue, please make sure the issue hasn't been already addressed by searching through the existing and past [issues](https://github.com/whiteprints/whiteprints/issues).
 
@@ -58,54 +58,28 @@ body:
     validations:
       required: false
   - type: textarea
-    id: what-happened
     attributes:
-      label: What happened?
+      label: Proposal to improve performance
       description: |
-        Please provide a clear and concise description of what the bug is.
-      placeholder: |
-        A bug happened!
+        How do you plan to improve the performance?
     validations:
-      required: true
+      required: false
   - type: textarea
-    id: reproduce
     attributes:
-      label: What is the code or steps to reproduce the behavior?
+      label: Report of performance regression
       description: |
-        If relevant, add a minimal example so that we can reproduce the error by running the code. It is very important for the snippet to be as succinct (minimal) as possible, so please take time to trim down any irrelevant code to help us debug efficiently. We are going to copy-paste your code and we expect to get the same result as you did: avoid any external data, and include the relevant imports, etc.
+        Please provide detailed description of performance comparison to confirm the regression.
 
-        You can place your example in triple quotes for better formatting.
-      placeholder: |
-        Place your minimal reproducing example in triple quotes.
-
-        Python:
-        ```python
-        ```
-
-        Shell:
-        ```sh
-        ```
+        You may use [hyperfine](https://github.com/sharkdp/hyperfine) to run benchmarks and report the results.
     validations:
-      required: true
-  - type: textarea
-    id: logs
-    attributes:
-      label: Relevant log output
-      description: |
-        Please copy and paste any relevant log output.
-      value: |
-        <details>
-        <summary>Log output</summary>
-
-        ```sh
-        Your log output
-        ```
-        </details>
+      required: false
   - type: textarea
     attributes:
-      label: Suggest a potential fix
+      label: Misc discussion on performance
       description: |
-        Tell us if you have an idea on what cause this bug or how to fix it.
+        Anything about the performance.
+    validations:
+      required: false
   - type: markdown
     attributes:
       value: |
