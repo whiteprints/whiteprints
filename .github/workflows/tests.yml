@@ -119,6 +119,7 @@ jobs:
         with:
           version: "latest"
           enable-cache: true
+          cache-local-path: "${{ runner.temp }}/uv-cache-${{ github.run_id }}-${{ github.job }}"
       - name: Install project
         run: |
           uv sync --python ${{ matrix.python }}
