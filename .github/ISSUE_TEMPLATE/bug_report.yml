@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 name: 🐛 Bug report
-description: Create a bug report
+description: Report a bug or misbehaviour
 title: "bug: :bug: "
 labels:
   - ["bug", "triage"]
