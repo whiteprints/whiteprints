@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-name: ♻️ Codebase refactoring suggestion
+name: ♻️ Codebase refactoring
 description: Suggest a restructuration of the codebase
 title: "refacto: :recycle: "
 labels:
