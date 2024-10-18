@@ -40,16 +40,10 @@ jobs:
       - name: Build sdist and wheel
         run: |
           uvx --quiet --no-progress --with tox-uv tox run -e distribute
-      - name: Sign the dists with Sigstore
-        uses: sigstore/gh-action-sigstore-python@v3.0.0
-        with:
-          inputs: >-
-            ./dist/*.tar.gz
-            ./dist/*.whl
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: ./dist/*
+          subject-path: ./dist/*whiteprints*
       - name: Upload dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -84,11 +78,10 @@ jobs:
         run: |
           uvx --quiet --no-progress --with tox-uv tox run -e build-documentation
           zip -r documentation.zip docs_build
-      - name: Sign the docs with Sigstore
-        uses: sigstore/gh-action-sigstore-python@v3.0.0
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
         with:
-          inputs: >-
-            ./documentation.zip
+          subject-path: ./documentation.zip
       - name: Upload docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -199,11 +192,10 @@ jobs:
           with zipfile.ZipFile('SBOM.zip', 'w') as zipf:
               for f in Path('BOM').rglob('*'):
                   zipf.write(f, f.relative_to('BOM'))
-      - name: Sign the SBOM with Sigstore
-        uses: sigstore/gh-action-sigstore-python@v3.0.0
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
         with:
-          inputs: >-
-            ./SBOM.zip
+          subject-path: ./SBOM.zip
       - name: Upload SBOM as Release Asset
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
