@@ -62,7 +62,7 @@ body:
   - type: textarea
     id: what-happened
     attributes:
-      label: What happened?
+      label: What happened
       description: |
         Please provide a clear and concise description of what the bug is.
       placeholder: |
@@ -103,11 +103,15 @@ body:
         Your log output
         ```
         </details>
+    validations:
+      required: false
   - type: textarea
     attributes:
       label: Potential fix
       description: |
         Tell us if you have an idea on what cause this bug or how to fix it.
+    validations:
+      required: false
   - type: markdown
     attributes:
       value: |

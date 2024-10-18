@@ -89,11 +89,15 @@ body:
         Your log output
         ```
         </details>
+    validations:
+      required: false
   - type: textarea
     attributes:
       label: Potential fix
       description: |
         Tell us if you have an idea on what cause this installation problem or how to fix it.
+    validations:
+      required: false
   - type: markdown
     attributes:
       value: |
