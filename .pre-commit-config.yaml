@@ -34,7 +34,7 @@ repos:
         entry: reuse
         description: "[License] Lint the project directory for compliance with the REUSE Specification"
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.9
+    rev: v0.7.0
     hooks:
       - id: ruff-format
         name: "ruff format"
