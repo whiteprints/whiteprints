@@ -40,6 +40,7 @@ jobs:
       contents: read
       packages: write
       id-token: write
+      attestations: write
     runs-on: ubuntu-latest
     environment:
       name: "${{ (contains(github.ref, '-alpha') || contains(github.ref, '-beta') || contains(github.ref, '-pre-alpha') || contains(github.ref, '-planning')) && 'publish_testghcr' || 'publish_ghcr' }}"
