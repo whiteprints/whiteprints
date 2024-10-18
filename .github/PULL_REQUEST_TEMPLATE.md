@@ -5,6 +5,7 @@
     <p>We are happy to accept contributions from our users 🚀.</p>
     <p>Before submitting the pull request, please ensure the PR follows the <a href="https://github.com/whiteprints/whiteprints/blob/main/CONTRIBUTING.md">Contributing Guide</a>.</p>
     <p>We follow (and lint) Pull Requests names according to <a href="https://gist.github.com/brianclements/841ea7bffdb01346392c#file-commit-formatting-md">Angular commit format</a>.</p>
+    <p>You can choose an emoji for your pull request title. Have a look to <a href="https://gitmoji.dev/">gitmoji</a> to guide you in the choice.</p>
     <p>If this is your first contribution, feel free to add yourself as a contributor. To do so comment the pull request with: <code>@all-contributors please add @<username> for <contributions></code>. Please refer to the documentation of allcontributors to see the list of <a href="https://allcontributors.org/docs/en/emoji-key#docsNav">contribution types</a>.</p>
 </details>
 

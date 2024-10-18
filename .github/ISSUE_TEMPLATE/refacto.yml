@@ -40,7 +40,7 @@ body:
           required: true
   - type: textarea
     attributes:
-      label: Description
+      label: Motivation(s)
       description: |
         Please outline the motivation for the proposal. How would it improve or simplify the existing codebase?
       placeholder: |
