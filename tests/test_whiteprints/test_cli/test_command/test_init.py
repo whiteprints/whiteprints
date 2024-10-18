@@ -10,6 +10,7 @@ from typing import Final
 from click import testing
 
 from whiteprints.cli import entrypoint
+from whiteprints.debug_info import gather_debug_info
 
 
 MISSING_COMMAND_EXIT_CODE: Final = 2
@@ -62,11 +63,20 @@ class TestCLI:
                 fixture.
             tmp_path: a temporary path in which the project will be created.
         """
+        debug_info = gather_debug_info()
+        platform = (
+            debug_info["platform"]
+            .split(" ", maxsplit=1)[0]
+            .split("-", maxsplit=1)[0]
+        )
+        version = debug_info["python_version"].split(" ", maxsplit=1)[0]
+        init_path = tmp_path / f"{platform}-{version}"
+        init_path.mkdir()
         result = cli_runner.invoke(
             entrypoint.whiteprints,
             [
                 "init",
-                str(tmp_path),
+                str(init_path),
                 "--force",
                 "--data",
                 "project_name=My Awesome Project",
@@ -91,6 +101,7 @@ class TestCLI:
                 "--data",
                 "target_python_version=py39",
             ],
+            env={"UV_NO_CACHE": "true"},
         )
         assert result.exit_code == 0, "The CLI did not exit properly."
 
