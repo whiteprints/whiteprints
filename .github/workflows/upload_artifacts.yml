@@ -19,6 +19,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
+      attestations: write
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -45,6 +46,10 @@ jobs:
           inputs: >-
             ./dist/*.tar.gz
             ./dist/*.whl
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: ./dist/*
       - name: Upload dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -152,6 +157,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
+      attestations: write
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
