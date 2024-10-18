@@ -18,7 +18,7 @@ omit =
   # omit anything in a temporary directory anywhere
   /tmp/**
   # omit anything related to tox
-  .tox/**
+  **/.tox/**
 
 [paths]
 source =

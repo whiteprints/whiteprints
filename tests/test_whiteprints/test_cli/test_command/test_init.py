@@ -64,7 +64,11 @@ class TestCLI:
             tmp_path: a temporary path in which the project will be created.
         """
         debug_info = gather_debug_info()
-        platform = debug_info["platform"].split(" ", maxsplit=1)[0]
+        platform = (
+            debug_info["platform"]
+            .split(" ", maxsplit=1)[0]
+            .split("-", maxsplit=1)[0]
+        )
         version = debug_info["python_version"].split(" ", maxsplit=1)[0]
         init_path = tmp_path / f"{platform}-{version}"
         init_path.mkdir()
