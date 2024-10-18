@@ -2,17 +2,17 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-name: 🛠️ Installation issue report
-description: Create a bug report
-title: "bug: :hammer_and_wrench: "
+name: 🐛 Bug report
+description: Report a bug or unexpected behaviour
+title: "bug: :bug: "
 labels:
-  - ["installation", "triage"]
+  - ["bug", "triage"]
 assignees: []
 body:
   - type: markdown
     attributes:
       value: |
-        # Thanks for taking the time to fill out this installation issue report!
+        # Thanks for taking the time to fill out this bug report!
 
         Before submitting an issue, please make sure the issue hasn't been already addressed by searching through the existing and past [issues](https://github.com/whiteprints/whiteprints/issues).
 
@@ -60,16 +60,30 @@ body:
   - type: textarea
     id: what-happened
     attributes:
-      label: How are you installing the package?
+      label: What happened?
       description: |
-        Paste the full commands you are trying to execute.
-      value: |
-        ```sh
-        pip install -vvv whiteprints
+        Please provide a clear and concise description of what the bug is.
+      placeholder: |
+        A bug happened!
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: What is the code or steps to reproduce the behavior?
+      description: |
+        If relevant, add a minimal example so that we can reproduce the error by running the code. It is very important for the snippet to be as succinct (minimal) as possible, so please take time to trim down any irrelevant code to help us debug efficiently. We are going to copy-paste your code and we expect to get the same result as you did: avoid any external data, and include the relevant imports, etc.
+
+        You can place your example in triple quotes for better formatting.
+      placeholder: |
+        Place your minimal reproducing example in triple quotes.
+
+        Python:
+        ```python
         ```
-        or
+
+        Shell:
         ```sh
-        uv tool install -vvv whiteprints
         ```
     validations:
       required: true
@@ -91,7 +105,7 @@ body:
     attributes:
       label: Suggest a potential fix
       description: |
-        Tell us if you have an idea on what cause this installation problem or how to fix it.
+        Tell us if you have an idea on what cause this bug or how to fix it.
   - type: markdown
     attributes:
       value: |

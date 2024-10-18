@@ -2,19 +2,21 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-name: ⚡ Performance report
-description: Create a performance report
-title: "bug: :bug: "
+name: 🧑‍💻 Devops
+description: Report a CI bug, unexpected behaviour or suggest a developer experience improvement
+title: "ci: :technologist: "
 labels:
-  - ["performance", "triage"]
+  - ["ci", "triage"]
 assignees: []
 body:
   - type: markdown
     attributes:
       value: |
-        # Thanks for taking the time to fill out this performance report!
+        # Thanks for taking the time to fill out this devops suggestion !
 
-        Before submitting an issue, please make sure the issue hasn't been already addressed by searching through the existing and past [issues](https://github.com/whiteprints/whiteprints/issues).
+        Suggest here any change to the repository administration, CI/CD, developer tools and workflow or containers.
+
+        Before submitting an issue, please make sure the issue hasn't been already addressed by searching through the existing and past [issues](https://github.com/whiteprints/whiteprints/issues) and [discussions](https://github.com/whiteprints/whiteprints/discussions/categories/ideas).
 
         By submitting a new issue, you agree with this project's [Code of Conduct](https://github.com/whiteprints/whiteprints/blob/main/CODE_OF_CONDUCT.md).
 
@@ -32,52 +34,44 @@ body:
     attributes:
       label: Before submittig a new issue...
       options:
-        - label: I have already searched for relevant issues.
+        - label: I have already searched for relevant issues or discussions.
           required: true
         - label: I agree to follow this project's Code of Conduct.
           required: true
   - type: textarea
     attributes:
-      label: Your current environment (if you think it is necessary)
+      label: Pain point(s)
       description: |
-        Please run the following and paste the output below.
+        Please outline the motivation for the proposal. How would it improve or simplify the existing codebase?
+      placeholder: |
+        A clear and concise description of the current pain point(s) when developing or testing.
 
-        ```console
-        whiteprints --debug-info
-        ```
-
-        For security purposes, please feel free to check and edit the contents of `whiteprints --debug-info`.
-      value: |
-        <details>
-        <summary>The output of `whiteprints --debug-info`</summary>
-
-        ```python
-        Your output of `whiteprints --debug-info` here
-        ```
-        </details>
+        If this is related to another GitHub issue, please link here too.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Suggested Solution
+      description: |
+        Describe the solution you'd like.
+      placeholder: |
+        A clear and concise description of what you want to happen.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Alternatives
+      description: |
+        Describe alternatives you've considered.
+      placeholder:  |
+        A clear and concise description of any alternative solutions or features you've considered.
     validations:
       required: false
   - type: textarea
     attributes:
-      label: Proposal to improve performance
+      label: Additional Context and References
       description: |
-        How do you plan to improve the performance?
-    validations:
-      required: false
-  - type: textarea
-    attributes:
-      label: Report of performance regression
-      description: |
-        Please provide detailed description of performance comparison to confirm the regression.
-
-        You may use [hyperfine](https://github.com/sharkdp/hyperfine) to run benchmarks and report the results.
-    validations:
-      required: false
-  - type: textarea
-    attributes:
-      label: Misc discussion on performance
-      description: |
-        Anything about the performance.
+        Add any other context or references about the feature here.
     validations:
       required: false
   - type: markdown
