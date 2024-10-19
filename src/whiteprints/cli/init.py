@@ -4,16 +4,22 @@
 
 """Initialize a project."""
 
+import sys
 from collections.abc import Iterable
 from pathlib import Path
 from subprocess import CalledProcessError  # nosec
-from typing import Final
+from typing import Final, TypedDict
 
 from click import ClickException
-from typing_extensions import Unpack
 
 from whiteprints.cli.init_interface import InitKwargs
 from whiteprints.copier_run import Copier
+
+
+if sys.version_info < (3, 11):
+    from typing_extensions import Required, Unpack
+else:
+    from typing import Required, Unpack
 
 
 __all__: Final = ["CopierCopyError", "init"]
@@ -22,14 +28,22 @@ __all__: Final = ["CopierCopyError", "init"]
 WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.2.1"
 """The whiteprints-template-context version pin."""
 
-FEATURE_REPOSITORY = {
-    "pypi": "gh:whiteprints/template-github-publish-pypi.git",
-    "codecov": "gh:whiteprints/template-github-codecov.git",
-    "readthedocs": "gh:whiteprints/template-github-readthedocs.git",
-    "protect_repository": (
-        "gh:whiteprints/template-github-protect-repository.git"
-    ),
-}
+
+class _FeatureRepository(TypedDict):
+    """Feature dictionnary interface."""
+
+    pypi: Required[str]
+    codecov: Required[str]
+    readthedocs: Required[str]
+    protect_repository: Required[str]
+
+
+FEATURE_REPOSITORY = _FeatureRepository(
+    pypi="gh:whiteprints/template-github-publish-pypi.git",
+    codecov="gh:whiteprints/template-github-codecov.git",
+    readthedocs="gh:whiteprints/template-github-readthedocs.git",
+    protect_repository="gh:whiteprints/template-github-protect-repository.git",
+)
 """A mapping from a feature name to its template repository."""
 
 
@@ -73,7 +87,10 @@ def add_github_functionalities(
         if _should_add(feature, cli_kwargs=kwargs):  # pragma: no cover
             copier.copy(
                 [
-                    repository,
+                    # There seems to be a bug in pyright as of 2024/10/19
+                    # repository is guaranteed to be a string, as shown
+                    # in the TypedDict _FeatureRepository...
+                    repository,  # type: ignore[reportPropertyTypeMismatch]
                     project_directory,
                     *copier_args,
                 ],
