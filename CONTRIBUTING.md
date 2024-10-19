@@ -157,11 +157,11 @@ the tutorial [creating a Pull Request](https://docs.github.com/en/pull-requests/
 
 Before submitting changes:
 
-  - I agree to follow this project's [Code of Conduct](CODE_OF_CONDUCT.md)
-  - I have performed a self-review of my own code
-  - I have included relevant tests
-  - I have commented my code, particularly in hard-to-understand areas
-  - I have made corresponding changes to the documentation
+- I agree to follow this project's [Code of Conduct](CODE_OF_CONDUCT.md)
+- I have performed a self-review of my own code
+- I have included relevant tests
+- I have commented my code, particularly in hard-to-understand areas
+- I have made corresponding changes to the documentation
 
 ### Contributor License Agreement
 
