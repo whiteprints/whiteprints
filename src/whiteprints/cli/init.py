@@ -22,6 +22,16 @@ __all__: Final = ["CopierCopyError", "init"]
 WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.2.1"
 """The whiteprints-template-context version pin."""
 
+FEATURE_REPOSITORY = {
+    "pypi": "gh:whiteprints/template-github-publish-pypi.git",
+    "codecov": "gh:whiteprints/template-github-codecov.git",
+    "readthedocs": "gh:whiteprints/template-github-readthedocs.git",
+    "protect_repository": (
+        "gh:whiteprints/template-github-protect-repository.git"
+    ),
+}
+"""A mapping from a feature name to its template repository."""
+
 
 class CopierCopyError(ClickException):
     """An error occured while creating the project."""
@@ -59,49 +69,20 @@ def add_github_functionalities(
         project_directory: directory where the new project will be created.
         kwargs: the command line flags.
     """
-    if _should_add("pypi", cli_kwargs=kwargs):  # pragma: no cover
-        copier.copy(
-            [
-                "gh:whiteprints/template-github-publish-pypi.git",
-                project_directory,
-                *copier_args,
-            ],
-            context=[
-                "whiteprints-template-context=="
-                + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
-            ],
-            trust=True,
-        )
-
-    if _should_add("codecov", cli_kwargs=kwargs):  # pragma: no cover
-        copier.copy(
-            [
-                "gh:whiteprints/template-github-codecov.git",
-                project_directory,
-                *copier_args,
-            ],
-            context=[
-                "whiteprints-template-context=="
-                + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
-            ],
-            trust=True,
-        )
-
-    if (  # pragma: no cover
-        _should_add("protect_repository", cli_kwargs=kwargs)
-    ):
-        copier.copy(
-            [
-                "gh:whiteprints/template-github-protect-repository.git",
-                project_directory,
-                *copier_args,
-            ],
-            context=[
-                "whiteprints-template-context=="
-                + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
-            ],
-            trust=True,
-        )
+    for feature, repository in FEATURE_REPOSITORY.items():
+        if _should_add(feature, cli_kwargs=kwargs):  # pragma: no cover
+            copier.copy(
+                [
+                    repository,
+                    project_directory,
+                    *copier_args,
+                ],
+                context=[
+                    "whiteprints-template-context=="
+                    + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
+                ],
+                trust=True,
+            )
 
 
 def _require_github(**kwargs: Unpack[InitKwargs]) -> bool:
