@@ -5,14 +5,20 @@
 """The 'init' command."""
 
 import importlib
+import sys
 from collections.abc import Iterable
 from pathlib import Path
 
 import rich_click as click
-from typing_extensions import Unpack
 
 from whiteprints.cli.init_interface import InitKwargs
 from whiteprints.loc import _
+
+
+if sys.version_info < (3, 11):
+    from typing_extensions import Unpack
+else:
+    from typing import Unpack
 
 
 @click.command(
