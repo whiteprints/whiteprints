@@ -26,8 +26,8 @@ ARG VIRTUAL_ENV=/opt/venv
 #   - These Python packages usually only provide binary wheels for GLIBC, so
 #   the packages will need to be recompiled fully within the container images,
 #   increasing build times.
-ARG UV_VERSION=0.4.20
-ARG UV_DIGEST="sha256:4e7932d37d1156f8f7be5992363f1307160aff4b3031ee99b03155df78900575"
+ARG UV_VERSION=0.4.25
+ARG UV_DIGEST="sha256:75ea96bbba2e43a11c90173f1b963eb2354a18e7673d2b0ee8e9428fa4afec7a"
 ARG UV_TAG=${UV_VERSION}${UV_DIGEST:+@${UV_DIGEST}}
 ARG UV_BIN="/usr/local/bin"
 
@@ -69,7 +69,7 @@ WORKDIR ${WORKDIR}
 COPY pyproject.toml *.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
     ${UV_BIN}/uv export \
-        --python="/usr/local/bin/python" \
+        --python="${VIRTUAL_ENV}/bin/python" \
         --format="requirements-txt" \
         --output-file requirements.txt \
         --all-extras \
@@ -77,7 +77,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
         --no-dev \
         --no-emit-project && \
     ${UV_BIN}/uv pip install \
-        --python="/usr/local/bin/python" \
+        --python="${VIRTUAL_ENV}/bin/python" \
         --require-hashes \
         --verify-hashes \
         --no-break-system-packages \
@@ -93,7 +93,7 @@ COPY .git .git/
 RUN --mount=type=cache,target=/root/.cache/uv \
     set -ex && \
     ${UV_BIN}/uv pip install \
-        --python="/usr/local/bin/python" \
+        --python="${VIRTUAL_ENV}/bin/python" \
         --no-cache \
         --no-break-system-packages \
         --no-deps \
@@ -110,6 +110,9 @@ FROM docker.io/python:${TAG} AS python_runner
 
 # Copy and activate pre-built virtual environment.
 ARG VIRTUAL_ENV
+RUN apt-get update && \
+    apt-get --no-install-recommends install -y git && \
+    rm -rf /var/lib/apt/lists/*
 COPY --from=python_builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 
