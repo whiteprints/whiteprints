@@ -24,8 +24,7 @@ def test_is_valid_slug(slug: str) -> None:
 
     if is_valid:
         assert re.fullmatch(SLUG_REGEX, slug) is not None, (
-            "A valid slug should match the regular expression "
-            f"'{SLUG_REGEX}'."
+            f"A valid slug should match the regular expression '{SLUG_REGEX}'."
         )
     else:
         with pytest.raises(exception.InvalidAppNameError):

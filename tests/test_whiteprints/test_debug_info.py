@@ -60,17 +60,17 @@ class TestGatherDebugInfo:
     def test_pythonpath_elements_are_paths() -> None:
         """Test that all elements in 'pythonpath' are Path instances."""
         debug_info = gather_debug_info()
-        assert all(
-            isinstance(p, Path) for p in debug_info["pythonpath"]
-        ), "All elements in 'pythonpath' should be Path instances."
+        assert all(isinstance(p, Path) for p in debug_info["pythonpath"]), (
+            "All elements in 'pythonpath' should be Path instances."
+        )
 
     @staticmethod
     def test_operating_system_info_present() -> None:
         """Test that 'operating_system' information is present."""
         debug_info = gather_debug_info()
-        assert (
-            "operating_system" in debug_info
-        ), "'operating_system' key missing in debug_info."
+        assert "operating_system" in debug_info, (
+            "'operating_system' key missing in debug_info."
+        )
 
     @staticmethod
     @pytest.mark.parametrize("field", ["name", "version"])

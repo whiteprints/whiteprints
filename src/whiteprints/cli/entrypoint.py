@@ -274,8 +274,7 @@ class CLIArgsType(TypedDict):
     expose_value=False,
     is_eager=True,
     help=_(
-        "Print system information."
-        " Useful for reporting errors and debugging."
+        "Print system information. Useful for reporting errors and debugging."
     ),
 )
 @click.version_option(version=__version__, prog_name=__app_name__)
