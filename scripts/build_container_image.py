@@ -113,7 +113,17 @@ def get_current_commit_hash() -> str:
     except subprocess.CalledProcessError:
         commit_hash = ""
 
-    return commit_hash
+    return commit_hash or ""
+
+
+def build_wheel() -> None:
+    """Build the project wheel."""
+    build_command = [
+        "run",
+        "-e",
+        "distribute",
+    ]
+    run_command("tox", build_command, capture_output=False)
 
 
 def build_container(
@@ -202,6 +212,7 @@ def main(additional_tag: list[str], os: str, extra_args: list[str]) -> None:
     settings. It also sets build arguments such as the current commit hash and
     build date.
     """
+    build_wheel()
     if os == "all":
         for specific_os in BASE_IMAGE:
             build_container_image(
