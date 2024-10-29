@@ -64,7 +64,8 @@ jobs:
           attestations: true
           print-hash: true
 
-      # Publish to PyPI for stable releases
+      # Publish to PyPI for stable releases, releases candidates and
+      # post-releases
       - name: Publish to PyPI
         if: "!contains(github.ref_name, '-alpha') && !contains(github.ref_name, '-beta') && !contains(github.ref_name, '-pre-alpha') && !contains(github.ref_name, '-planning')"
         uses: pypa/gh-action-pypi-publish@release/v1
