@@ -181,6 +181,7 @@ jobs:
             base: slim-bookworm
             digest: ""
     steps:
+      - run echo "${{ fromJson(needs.build-package.outputs.python-versions)[-1] }}"
       - name: Check out the repository
         uses: actions/checkout@v4
       - name: Set up QEMU
