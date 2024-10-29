@@ -46,9 +46,9 @@ class TestCLI:
             entrypoint.whiteprints,
             ["30a212ea-815d-4659-bf8a-9cb467a11de1"],
         )
-        assert (
-            result.exit_code == MISSING_COMMAND_EXIT_CODE
-        ), "The CLI did not exit properly."
+        assert result.exit_code == MISSING_COMMAND_EXIT_CODE, (
+            "The CLI did not exit properly."
+        )
 
     @staticmethod
     def test_init_python(
@@ -126,6 +126,6 @@ class TestCLI:
                 "--this-flag-should-not-exist",
             ],
         )
-        assert (
-            result.exit_code == CLICK_ERROR
-        ), "The CLI did not exit properly."
+        assert result.exit_code == CLICK_ERROR, (
+            "The CLI did not exit properly."
+        )
