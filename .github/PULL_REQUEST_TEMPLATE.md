@@ -1,4 +1,18 @@
-<h1 align="center">Description</h1>
+# Description
+
+* Fixes #xxxx  <!-- reference an issue here -->
+
+## 📝Changes
+
+<!-- Please replace and include a quick summary of the change and which issue is fixed here start -->
+
+Quick summary of the changes.
+
+<!-- Please replace and include a quick summary of the change and which issue is fixed here end -->
+
+---
+
+## 🚨 Information
 
 <details>
 <summary><b>🙏 New contributors, please read!</b></summary>
@@ -12,20 +26,8 @@
   </ul>
 </details>
 
----
-<!-- start: Please replace and include a quick summary of the change and which issue is fixed here. -->
-
-* Fixes #xxxx  <!-- reference an issue here -->
-
-## 📝Changes
-
-Quick summary of the changes.
-
-<!-- end: Please replace and include a quick summary of the change and which issue is fixed here. -->
----
-
 <details>
-<summary><b>✅ Checklist</b></summary>
+<summary><b>🛂 Checklist</b></summary>
     Please check the following:
     <ul>
         <li>I agree to follow this project's <a href="https://github.com/whiteprints/whiteprints/blob/main/CODE_OF_CONDUCT.md">Code of Conduct</a></li>
