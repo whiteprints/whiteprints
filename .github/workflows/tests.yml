@@ -174,11 +174,11 @@ jobs:
       matrix:
         image:
           - name: alpine
-            python: ${{ fromJson(needs.build-package.outputs.python-versions)[3] }}
+            python: ${{ fromJson(needs.build-package.outputs.python-versions) | last }}
             base: alpine3.20
             digest: ""
           - name: debian
-            python: ${{ fromJson(needs.build-package.outputs.python-versions)[3] }}
+            python: ${{ fromJson(needs.build-package.outputs.python-versions) | last }}
             base: slim-bookworm
             digest: ""
     steps:
