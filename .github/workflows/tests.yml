@@ -47,10 +47,10 @@ jobs:
         uses: actions/upload-artifact@v4
         if: "${{ matrix.tox_env == 'build-documentation' }}"
         with:
-          name: ${{ matrix.tox_env }}
+          name: documentation
           path: docs_build/
           overwrite: true
-  distribute:
+  build-package:
     name: Build and inspect package
     runs-on: ubuntu-latest
     environment:
@@ -67,7 +67,7 @@ jobs:
     name: Run type checker under Python ${{ matrix.python }} on ${{ matrix.os }}
     needs:
       - check
-      - distribute
+      - build-package
     runs-on: ${{ matrix.os }}
     environment:
       name: tests
@@ -98,7 +98,7 @@ jobs:
     needs:
       - check
       - check-types
-      - distribute
+      - build-package
     runs-on: ${{ matrix.os }}
     environment:
       name: tests
