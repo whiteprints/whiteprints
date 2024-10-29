@@ -169,7 +169,7 @@ jobs:
       name: tests
     env:
       REGISTRY: ghcr.io
-      PYTHON: ${{ fromJson(needs.build-package.outputs.python-versions) }}
+      PYTHON: "${{ fromJson(needs.build-package.outputs.python-versions) }}"
     strategy:
       matrix:
         image:
