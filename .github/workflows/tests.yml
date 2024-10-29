@@ -46,7 +46,7 @@ jobs:
       - name: Upload documentation
         uses: actions/upload-artifact@v4
         with:
-          if: "${{ matrix.tox_env == 'build-documentation' }}"
+          if: matrix.tox_env == "build-documentation"
           name: ${{ matrix.tox_env }}
           path: docs_build/
           overwrite: true
