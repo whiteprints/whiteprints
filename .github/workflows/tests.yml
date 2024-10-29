@@ -45,13 +45,13 @@ jobs:
           uvx --quiet --no-progress --with tox-uv tox run -e ${{ matrix.tox_env }}
       - name: Upload documentation
         uses: actions/upload-artifact@v4
+        if: "${{ matrix.tox_env == 'build-documentation' }}"
         with:
-          if: matrix.tox_env == "build-documentation"
           name: ${{ matrix.tox_env }}
           path: docs_build/
           overwrite: true
   distribute:
-    name: tox env ${{ matrix.tox_env }}
+    name: Build and inspect package
     runs-on: ubuntu-latest
     environment:
       name: tests
