@@ -30,6 +30,8 @@ replacement = "](https://raw.githubusercontent.com/whiteprints/whiteprints/refs/
 [build.targets.sdist]
 only-include = [
     "src/whiteprints",
+    "docs",
+    "tests",
 ]
 
 [build.targets.wheel]
