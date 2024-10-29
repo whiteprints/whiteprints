@@ -94,7 +94,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
         --no-break-system-packages \
         --no-index \
         --no-deps \
-        $(ls --sort newest dist/*.whl | tail -1)
+        $(ls -tr dist/*.whl | tail -1)
 
 ## Final Image
 # The image used in the final image MUST match exactly to the python_builder
