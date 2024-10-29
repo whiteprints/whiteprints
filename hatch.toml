@@ -32,6 +32,9 @@ only-include = [
     "src/whiteprints",
     "docs",
     "tests",
+    "uv.lock",
+    "uv.lock.license",
+    "*.md",
 ]
 
 [build.targets.wheel]

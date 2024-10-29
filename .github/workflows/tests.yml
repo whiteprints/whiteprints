@@ -162,6 +162,8 @@ jobs:
           include-hidden-files: true
   container-deploy:
     name: Build Container
+    needs:
+      - build-package
     runs-on: ubuntu-latest
     environment:
       name: tests
@@ -171,11 +173,11 @@ jobs:
       matrix:
         image:
           - name: alpine
-            python: 3.13
+            python: ${{ fromJson(needs.build-package.outputs.python-versions)[-1] }}
             base: alpine3.20
             digest: ""
           - name: debian
-            python: 3.13
+            python: ${{ fromJson(needs.build-package.outputs.python-versions)[-1] }}
             base: slim-bookworm
             digest: ""
     steps:
