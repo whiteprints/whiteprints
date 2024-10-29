@@ -182,7 +182,7 @@ jobs:
             base: slim-bookworm
             digest: ""
     steps:
-      - run echo "${{ env.PYTHON }}"
+      - run echo "$PYTHON"
       - name: Check out the repository
         uses: actions/checkout@v4
       - name: Set up QEMU
