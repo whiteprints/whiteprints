@@ -61,8 +61,13 @@ jobs:
       - name: Build and inspect package
         id: baipp
         uses: hynek/build-and-inspect-python-package@v2
+      - name: Find latest Python
+        id: baipp-latest
+        run: |
+          echo "supported_python_latest=$(echo '${{ steps.baipp.outputs.supported_python_classifiers_json_array }}' | jq -S '.[-1]')" >> "$GITHUB_OUTPUT"
     outputs:
       python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
+      python-latest: ${{ steps.baipp-latest.outputs.supported_python_latest }}
   check-types:
     name: Run type checker under Python ${{ matrix.python }} on ${{ matrix.os }}
     needs:
@@ -174,15 +179,14 @@ jobs:
       matrix:
         image:
           - name: alpine
-            python: ${{ fromJson(needs.build-package.outputs.python-versions) | last }}
+            python: needs.build-package.outputs.python-latest
             base: alpine3.20
             digest: ""
           - name: debian
-            python: ${{ fromJson(needs.build-package.outputs.python-versions) | last }}
+            python: needs.build-package.outputs.python-latest
             base: slim-bookworm
             digest: ""
     steps:
-      - run: echo "$PYTHON"
       - name: Check out the repository
         uses: actions/checkout@v4
       - name: Set up QEMU
