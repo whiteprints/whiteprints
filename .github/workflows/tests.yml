@@ -64,7 +64,7 @@ jobs:
       - name: Find latest Python
         id: baipp-latest
         run: |
-          echo "supported_python_latest=$(echo '${{ steps.baipp.outputs.supported_python_classifiers_json_array }}' | jq -S '.[-1]')" >> "$GITHUB_OUTPUT"
+          echo "supported_python_latest=$(echo '${{ steps.baipp.outputs.supported_python_classifiers_json_array }}' | jq -r -S '.[-1]')" >> "$GITHUB_OUTPUT"
     outputs:
       python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
       python-latest: ${{ steps.baipp-latest.outputs.supported_python_latest }}
