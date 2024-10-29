@@ -121,7 +121,7 @@ jobs:
           enable-cache: true
       - name: Install project
         run: |
-          uv sync --python ${{ matrix.python }}
+          uv sync --no-dev --group=check-types --python ${{ matrix.python }}
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
         with:
@@ -129,7 +129,7 @@ jobs:
       - name: Pick environment to run
         run: |
           import os;
-          env = "TOXENV=py{}{}-test\n".format(*"${{ matrix.python }}".split("."))
+          env = "TOXENV=py{}{}\n".format(*"${{ matrix.python }}".split("."))
           with open(os.environ["GITHUB_ENV"], mode="a", encoding="utf-8") as file_handler:
               file_handler.write(env)
         shell: python
