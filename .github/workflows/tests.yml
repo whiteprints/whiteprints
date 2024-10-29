@@ -65,8 +65,6 @@ jobs:
       python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
   check-types:
     name: Run type checker under Python ${{ matrix.python }} on ${{ matrix.os }}
-    needs:
-      - check
     runs-on: ${{ matrix.os }}
     environment:
       name: tests
@@ -96,6 +94,8 @@ jobs:
     name: Run tests under Python ${{ matrix.python }} on ${{ matrix.os }}
     needs:
       - check
+      - check-types
+      - distribute
     runs-on: ${{ matrix.os }}
     environment:
       name: tests
@@ -222,8 +222,6 @@ jobs:
     needs:
       - test
       - container-deploy
-      - documentation
-      - distribute
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
