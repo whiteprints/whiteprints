@@ -30,49 +30,6 @@ jobs:
           - check-vulnerabilities
           - check-exceptions
           - check-code-maintainability
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@v4
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: "latest"
-      - name: Run the test suite
-        run: |
-  distribute:
-    name: tox env ${{ matrix.tox_env }}
-    runs-on: ubuntu-latest
-    environment:
-      name: tests
-    strategy:
-      matrix:
-        tox_env:
-          - distribute
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@v4
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: "latest"
-          enable-cache: true
-      - name: Run the test suite
-        run: |
-          uvx --quiet --no-progress --with tox-uv tox run -e ${{ matrix.tox_env }}
-      - name: Upload documentation
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.tox_env }}
-          path: dist/
-          overwrite: true
-  documentation:
-    name: tox env ${{ matrix.tox_env }}
-    runs-on: ubuntu-latest
-    environment:
-      name: tests
-    strategy:
-      matrix:
-        tox_env:
           - check-documentation-links
           - build-documentation
     steps:
@@ -89,11 +46,25 @@ jobs:
       - name: Upload documentation
         uses: actions/upload-artifact@v4
         with:
+          if: "${{ matrix.tox_env == build-documentation }}"
           name: ${{ matrix.tox_env }}
           path: docs_build/
           overwrite: true
-  test:
-    name: Run tests under Python ${{ matrix.python }} on ${{ matrix.os }}
+  distribute:
+    name: tox env ${{ matrix.tox_env }}
+    runs-on: ubuntu-latest
+    environment:
+      name: tests
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Build and inspect package
+        id: baipp
+        uses: hynek/build-and-inspect-python-package@v2
+    outputs:
+      python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
+  check-types:
+    name: Run type checker under Python ${{ matrix.python }} on ${{ matrix.os }}
     needs:
       - check
     runs-on: ${{ matrix.os }}
@@ -101,12 +72,7 @@ jobs:
       name: tests
     strategy:
       matrix:
-        python:
-          - "3.9"
-          - "3.10"
-          - "3.11"
-          - "3.12"
-          - "3.13"
+        python: ${{ fromJson(needs.build-package.outputs.python-versions) }}
         os:
           - ubuntu-latest
           - macos-latest
@@ -126,6 +92,28 @@ jobs:
         uses: jakebailey/pyright-action@v2
         with:
           python-version: "${{ matrix.python }}"
+  test:
+    name: Run tests under Python ${{ matrix.python }} on ${{ matrix.os }}
+    needs:
+      - check
+    runs-on: ${{ matrix.os }}
+    environment:
+      name: tests
+    strategy:
+      matrix:
+        python: ${{ fromJson(needs.build-package.outputs.python-versions) }}
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
       - name: Pick environment to run
         run: |
           import os;
