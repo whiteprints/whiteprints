@@ -84,10 +84,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
         --requirement requirements.txt
 
 # Copy in source files.
-COPY README.md hatch.toml hatch_build.py ./
-COPY LICENSES LICENSES/
-COPY src src/
-COPY .git .git/
+COPY dist/*.whl ./dist/
 
 # Manually build/install the package.
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -96,8 +93,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
         --python="${VIRTUAL_ENV}/bin/python" \
         --no-cache \
         --no-break-system-packages \
+        --no-index \
         --no-deps \
-        .
+        $(ls --sort newest dist/*.whl | tail -1)
 
 ## Final Image
 # The image used in the final image MUST match exactly to the python_builder

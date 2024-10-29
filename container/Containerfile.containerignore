@@ -8,16 +8,8 @@
 # Except the following.
 
 ## Sources
-!src/
-!.git/
 !pyproject.toml
-!hatch.toml
-!hatch_build.py
-!LICENSES
-!README.md
 !uv.lock
 
-## Template
-!template
-!jinja_template
-!copier.yml
+## Wheel
+!dist/*.whl

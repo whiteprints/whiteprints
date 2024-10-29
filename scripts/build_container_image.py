@@ -212,7 +212,7 @@ def main(additional_tag: list[str], os: str, extra_args: list[str]) -> None:
     else:
         build_container_image(
             additional_tag,
-            os=specific_os,
+            os=os,
             extra_args=extra_args,
         )
 
