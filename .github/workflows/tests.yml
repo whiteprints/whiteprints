@@ -121,7 +121,7 @@ jobs:
         with:
           version: "latest"
           enable-cache: true
-      - name: Download built packages from the build-package job.
+      - name: Download built packages from the build-package job
         uses: actions/download-artifact@v4
         with:
           name: Packages
@@ -189,6 +189,11 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
+      - name: Download built packages from the build-package job
+        uses: actions/download-artifact@v4
+        with:
+          name: Packages
+          path: dist
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
