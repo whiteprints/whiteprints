@@ -19,7 +19,7 @@ SPDX-License-Identifier: CC-BY-NC-SA-4.0
         <a href="https://pypi.org/project/whiteprints"><img alt="PyPI - Project Version" src="https://img.shields.io/pypi/v/whiteprints.svg?logo=PyPI&logoColor=ffd43b"/></a>
         <a href="https://spdx.org/licenses/GPL-3.0-or-later"><img alt="license badge" src="https://img.shields.io/badge/📝_License-GPL--3.0--or--later-4CAF50.svg"/></a>
         <a href="https://github.com/whiteprints/whiteprints/discussions"><img alt="GitHub Discussions" src="https://img.shields.io/github/discussions/whiteprints/whiteprints.svg?logo=GitHub"></a>
-        <a href="https://spdx.dev/learn/areas-of-interest/licensing/"><img alt="SPDX Licensing" src="https://img.shields.io/badge/SPDX-licensing-0080FF.svg?logo=SPDX"/></a>
+        <a href="https://api.reuse.software/info/github.com/whiteprints/whiteprints"><img alt="REUSE status" src="https://api.reuse.software/badge/github.com/whiteprints/whiteprints"/></a>
         <a href='https://readthedocs.org/projects/whiteprints/'><img src='https://readthedocs.org/projects/whiteprints/badge/?version=latest' alt='Documentation Status' /></a>
         <a href="https://www.contributor-covenant.org/version/2/1/code_of_conduct/"><img alt="contributor covenant badge" src="https://img.shields.io/badge/Contributor_Covenant-2.1-4BAAAA.svg?logo=contributorcovenant"/></a>
         <a href="https://codecov.io/gh/whiteprints/whiteprints" ><img alt="CodeCov code coverage" src="https://codecov.io/gh/whiteprints/whiteprints/graph/badge.svg?token=YrFGtQ5D5F"/></a>
