@@ -26,8 +26,8 @@ ARG VIRTUAL_ENV=/opt/venv
 #   - These Python packages usually only provide binary wheels for GLIBC, so
 #   the packages will need to be recompiled fully within the container images,
 #   increasing build times.
-ARG UV_VERSION=0.4.25
-ARG UV_DIGEST="sha256:75ea96bbba2e43a11c90173f1b963eb2354a18e7673d2b0ee8e9428fa4afec7a"
+ARG UV_VERSION=0.4.28
+ARG UV_DIGEST="sha256:dbd4acba8bfc42ae057ec4cfd65a980c516266e55bb045931873bd2bee531a71"
 ARG UV_TAG=${UV_VERSION}${UV_DIGEST:+@${UV_DIGEST}}
 ARG UV_BIN="/usr/local/bin"
 
