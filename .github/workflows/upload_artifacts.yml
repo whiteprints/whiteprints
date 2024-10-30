@@ -45,6 +45,8 @@ jobs:
     needs:
       - build-package
     steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
       - name: Download built artifact to dist/
         uses: actions/download-artifact@v4
         with:
