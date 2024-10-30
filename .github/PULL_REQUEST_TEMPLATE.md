@@ -28,7 +28,7 @@ Quick summary of the changes.
 
 <details>
 <summary><b>🛂 Checklist</b></summary>
-    Please check the following:
+    <p>Please check the following:</p>
     <ul>
         <li>I agree to follow this project's <a href="https://github.com/whiteprints/whiteprints/blob/main/CODE_OF_CONDUCT.md">Code of Conduct</a></li>
         <li>I have read the <a href="https://github.com/whiteprints/whiteprints/blob/main/CONTRIBUTING.md">Contributor Guide</a></li>

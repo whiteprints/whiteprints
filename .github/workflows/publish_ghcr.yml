@@ -34,6 +34,24 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+-planning[0-9]+.[0-9]+'
 
 jobs:
+  build-package:
+    name: Build and inspect package
+    runs-on: ubuntu-latest
+    environment:
+      name: tests
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Build and inspect package
+        id: baipp
+        uses: hynek/build-and-inspect-python-package@v2
+      - name: Find latest Python
+        id: baipp-latest
+        run: |
+          echo "supported_python_latest=$(echo '${{ steps.baipp.outputs.supported_python_classifiers_json_array }}' | jq -r -S '.[-1]')" >> "$GITHUB_OUTPUT"
+    outputs:
+      python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
+      python-latest: ${{ steps.baipp-latest.outputs.supported_python_latest }}
   container-deploy:
     name: Build and Push Container
     permissions:
@@ -41,6 +59,8 @@ jobs:
       packages: write
       id-token: write
       attestations: write
+    needs:
+      - build-package
     runs-on: ubuntu-latest
     environment:
       name: "${{ (contains(github.ref, '-alpha') || contains(github.ref, '-beta') || contains(github.ref, '-pre-alpha') || contains(github.ref, '-planning')) && 'publish_testghcr' || 'publish_ghcr' }}"
@@ -51,16 +71,21 @@ jobs:
       matrix:
         image:
           - name: alpine
-            python: 3.13.0
+            python: ${{ needs.build-package.outputs.python-latest }}
             base: alpine3.20
-            digest: "sha256:81362dd1ee15848b118895328e56041149e1521310f238ed5b2cdefe674e6dbf"
+            digest: ""
           - name: debian
-            python: 3.13.0
+            python: ${{ needs.build-package.outputs.python-latest }}
             base: slim-bookworm
-            digest: "sha256:2ec5a4a5c3e919570f57675471f081d6299668d909feabd8d4803c6c61af666c"
+            digest: ""
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
+      - name: Download built packages from the build-package job
+        uses: actions/download-artifact@v4
+        with:
+          name: Packages
+          path: dist
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx

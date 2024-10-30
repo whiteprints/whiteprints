@@ -9,104 +9,40 @@ on:
     branches: ["main"]
     tags-ignore: ["**"]
   pull_request:
-  schedule:
-    - cron: "0 8 * * *"
 
 concurrency:
   group: test-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  check:
-    name: tox env ${{ matrix.tox_env }}
+  build-package:
+    name: Build and inspect package
     runs-on: ubuntu-latest
     environment:
       name: tests
-    strategy:
-      matrix:
-        tox_env:
-          - pre-commit
-          - lint
-          - check-vulnerabilities
-          - check-exceptions
-          - check-code-maintainability
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: "latest"
-      - name: Run the test suite
+      - name: Build and inspect package
+        id: baipp
+        uses: hynek/build-and-inspect-python-package@v2
+      - name: Find latest Python
+        id: baipp-latest
         run: |
-  distribute:
-    name: tox env ${{ matrix.tox_env }}
-    runs-on: ubuntu-latest
-    environment:
-      name: tests
-    strategy:
-      matrix:
-        tox_env:
-          - distribute
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@v4
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: "latest"
-          enable-cache: true
-      - name: Run the test suite
-        run: |
-          uvx --quiet --no-progress --with tox-uv tox run -e ${{ matrix.tox_env }}
-      - name: Upload documentation
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.tox_env }}
-          path: dist/
-          overwrite: true
-  documentation:
-    name: tox env ${{ matrix.tox_env }}
-    runs-on: ubuntu-latest
-    environment:
-      name: tests
-    strategy:
-      matrix:
-        tox_env:
-          - check-documentation-links
-          - build-documentation
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@v4
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: "latest"
-          enable-cache: true
-      - name: Run the test suite
-        run: |
-          uvx --quiet --no-progress --with tox-uv tox run -e ${{ matrix.tox_env }}
-      - name: Upload documentation
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.tox_env }}
-          path: docs_build/
-          overwrite: true
-  test:
-    name: Run tests under Python ${{ matrix.python }} on ${{ matrix.os }}
+          echo "supported_python_latest=$(echo '${{ steps.baipp.outputs.supported_python_classifiers_json_array }}' | jq -r -S '.[-1]')" >> "$GITHUB_OUTPUT"
+    outputs:
+      python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
+      python-latest: ${{ steps.baipp-latest.outputs.supported_python_latest }}
+  check-types:
+    name: Run type checker under Python ${{ matrix.python }} on ${{ matrix.os }}
     needs:
-      - check
+      - build-package
     runs-on: ${{ matrix.os }}
     environment:
       name: tests
     strategy:
       matrix:
-        python:
-          - "3.9"
-          - "3.10"
-          - "3.11"
-          - "3.12"
-          - "3.13"
+        python: ${{ fromJson(needs.build-package.outputs.python-versions) }}
         os:
           - ubuntu-latest
           - macos-latest
@@ -126,6 +62,68 @@ jobs:
         uses: jakebailey/pyright-action@v2
         with:
           python-version: "${{ matrix.python }}"
+  check:
+    name: tox env ${{ matrix.tox_env }}
+    runs-on: ubuntu-latest
+    environment:
+      name: tests
+    strategy:
+      matrix:
+        tox_env:
+          - pre-commit
+          - lint
+          - check-vulnerabilities
+          - check-exceptions
+          - check-code-maintainability
+          - check-documentation-links
+          - build-documentation
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Run the test suite
+        run: |
+          uvx --quiet --no-progress --with tox-uv tox run -e ${{ matrix.tox_env }}
+      - name: Upload documentation
+        uses: actions/upload-artifact@v4
+        if: "${{ matrix.tox_env == 'build-documentation' }}"
+        with:
+          name: documentation
+          path: docs_build/
+          overwrite: true
+  test:
+    name: Run tests under Python ${{ matrix.python }} on ${{ matrix.os }}
+    needs:
+      - check
+      - check-types
+      - build-package
+    runs-on: ${{ matrix.os }}
+    environment:
+      name: tests
+    strategy:
+      matrix:
+        python: ${{ fromJson(needs.build-package.outputs.python-versions) }}
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Download built packages from the build-package job
+        uses: actions/download-artifact@v4
+        with:
+          name: Packages
+          path: dist
       - name: Pick environment to run
         run: |
           import os;
@@ -137,7 +135,7 @@ jobs:
         shell: bash
         run: |
           echo "REPORT_FILE=.tox/test_report.md" >> "$GITHUB_ENV"
-          uvx --quiet --no-progress --with tox-uv tox run
+          uvx --quiet --no-progress --with tox-uv tox run --installpkg dist/*.whl
       - name: Output reports to the job summary when tests fail
         if: failure()
         shell: bash
@@ -167,25 +165,33 @@ jobs:
           include-hidden-files: true
   container-deploy:
     name: Build Container
+    needs:
+      - build-package
     runs-on: ubuntu-latest
     environment:
       name: tests
     env:
       REGISTRY: ghcr.io
+      PYTHON: "${{ needs.build-package.outputs.python-versions }}"
     strategy:
       matrix:
         image:
           - name: alpine
-            python: 3.13
+            python: ${{ needs.build-package.outputs.python-latest }}
             base: alpine3.20
             digest: ""
           - name: debian
-            python: 3.13
+            python: ${{ needs.build-package.outputs.python-latest }}
             base: slim-bookworm
             digest: ""
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
+      - name: Download built packages from the build-package job
+        uses: actions/download-artifact@v4
+        with:
+          name: Packages
+          path: dist
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -234,8 +240,6 @@ jobs:
     needs:
       - test
       - container-deploy
-      - documentation
-      - distribute
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
