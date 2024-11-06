@@ -73,8 +73,7 @@ invocation.
     "--pypi",
     "--PyPI",
     help=_(
-        "Configure GitHub to publish package to PyPI."
-        " This imply `--github`."
+        "Configure GitHub to publish package to PyPI. This imply `--github`."
     ),
     type=bool,
     default=False,
@@ -111,8 +110,7 @@ invocation.
     "-pr",
     "--protect-repository",
     help=_(
-        "Configure GitHub to protect branches and tags."
-        " This imply `--github`."
+        "Configure GitHub to protect branches and tags. This imply `--github`."
     ),
     type=bool,
     default=False,
