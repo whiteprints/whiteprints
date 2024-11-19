@@ -41,15 +41,15 @@ from whiteprints import __version__
 __all__: Final = ["DebugInfo", "PackageInfo", "gather_debug_info"]
 
 
-if sys.version_info < (3, 11):
-    from typing_extensions import NotRequired
-else:
+if sys.version_info >= (3, 11):
     from typing import NotRequired
-
-if sys.version_info < (3, 10):
-    from importlib_metadata import packages_distributions
 else:
+    from typing_extensions import NotRequired
+
+if sys.version_info >= (3, 10):
     from importlib.metadata import packages_distributions
+else:
+    from importlib_metadata import packages_distributions
 
 
 class PackageInfo(TypedDict):

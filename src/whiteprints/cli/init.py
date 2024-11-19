@@ -16,10 +16,10 @@ from whiteprints.cli.init_interface import InitKwargs
 from whiteprints.copier_run import Copier
 
 
-if sys.version_info < (3, 11):
-    from typing_extensions import Required, Unpack
-else:
+if sys.version_info >= (3, 11):
     from typing import Required, Unpack
+else:
+    from typing_extensions import Required, Unpack
 
 
 __all__: Final = ["CopierCopyError", "init"]

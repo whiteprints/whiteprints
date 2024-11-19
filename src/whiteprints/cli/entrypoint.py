@@ -24,16 +24,16 @@ from whiteprints.cli.logs import LogLevel, configure_logging
 from whiteprints.loc import _
 
 
-if sys.version_info < (3, 11):
-    from typing_extensions import Unpack
-else:
+if sys.version_info >= (3, 11):
     from typing import Unpack
-
-
-if sys.version_info < (3, 12):
-    from typing_extensions import override
 else:
+    from typing_extensions import Unpack
+
+
+if sys.version_info >= (3, 12):
     from typing import override
+else:
+    from typing_extensions import override
 
 
 __all__: Final = ["whiteprints"]
