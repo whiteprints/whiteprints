@@ -2123,7 +2123,7 @@ wheels = [
 
 [[package]]
 name = "whiteprints"
-version = "0.10.3a3.dev12+g548d2ad"
+version = "0.10.3a3.dev4+g773c404"
 source = { editable = "." }
 dependencies = [
     { name = "distro" },
@@ -2167,7 +2167,7 @@ check-types = [
     { name = "pytest-md-report" },
     { name = "pytest-randomly" },
     { name = "pytest-xdist" },
-    { name = "xdoctest" },
+    { name = "xdoctest", extra = ["colors"] },
 ]
 check-vulnerabilities = [
     { name = "bandit" },
@@ -2201,7 +2201,7 @@ dev = [
     { name = "sphinxcontrib-napoleon" },
     { name = "sphinxcontrib-spelling" },
     { name = "tryceratops" },
-    { name = "xdoctest" },
+    { name = "xdoctest", extra = ["colors"] },
     { name = "xenon" },
 ]
 editor = [
@@ -2217,7 +2217,7 @@ lint = [
     { name = "pytest-md-report" },
     { name = "pytest-randomly" },
     { name = "pytest-xdist" },
-    { name = "xdoctest" },
+    { name = "xdoctest", extra = ["colors"] },
 ]
 localization = [
     { name = "babel" },
@@ -2245,7 +2245,7 @@ tests = [
     { name = "pytest-md-report" },
     { name = "pytest-randomly" },
     { name = "pytest-xdist" },
-    { name = "xdoctest" },
+    { name = "xdoctest", extra = ["colors"] },
 ]
 
 [package.metadata]
@@ -2283,7 +2283,7 @@ check-types = [
     { name = "pytest-md-report", specifier = ">=0.6.2" },
     { name = "pytest-randomly", specifier = ">=3.15" },
     { name = "pytest-xdist", specifier = ">=3.6.1" },
-    { name = "xdoctest", specifier = ">=1.2" },
+    { name = "xdoctest", extras = ["colors"], specifier = ">=1.2" },
 ]
 check-vulnerabilities = [{ name = "bandit", specifier = ">=1.7.10" }]
 coverage = [{ name = "coverage", specifier = ">=7.6.1" }]
@@ -2313,7 +2313,7 @@ dev = [
     { name = "sphinxcontrib-napoleon", specifier = ">=0.7" },
     { name = "sphinxcontrib-spelling", specifier = ">=8" },
     { name = "tryceratops", specifier = ">=2.4" },
-    { name = "xdoctest", specifier = ">=1.2" },
+    { name = "xdoctest", extras = ["colors"], specifier = ">=1.2" },
     { name = "xenon", specifier = ">=0.9.3" },
 ]
 editor = [{ name = "pynvim", specifier = ">=0.4.3" }]
@@ -2327,7 +2327,7 @@ lint = [
     { name = "pytest-md-report", specifier = ">=0.6.2" },
     { name = "pytest-randomly", specifier = ">=3.15" },
     { name = "pytest-xdist", specifier = ">=3.6.1" },
-    { name = "xdoctest", specifier = ">=1.2" },
+    { name = "xdoctest", extras = ["colors"], specifier = ">=1.2" },
 ]
 localization = [{ name = "babel", specifier = ">=2.16" }]
 profile = [{ name = "scalene", specifier = ">=1.5.19" }]
@@ -2351,7 +2351,7 @@ tests = [
     { name = "pytest-md-report", specifier = ">=0.6.2" },
     { name = "pytest-randomly", specifier = ">=3.15" },
     { name = "pytest-xdist", specifier = ">=3.6.1" },
-    { name = "xdoctest", specifier = ">=1.2" },
+    { name = "xdoctest", extras = ["colors"], specifier = ">=1.2" },
 ]
 
 [[package]]
@@ -2361,6 +2361,12 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e9/a5/7f6dfdaf3a221e16ff79281d2a3c3e4b58989c92de8964a317feb1e6cbb5/xdoctest-1.2.0.tar.gz", hash = "sha256:d8cfca6d8991e488d33f756e600d35b9fdf5efd5c3a249d644efcbbbd2ed5863", size = 204804 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/58/b8/e4722f5e5f592a665cc8e55a334ea721c359f09574e6b987dc551a1e1f4c/xdoctest-1.2.0-py3-none-any.whl", hash = "sha256:0f1ecf5939a687bd1fc8deefbff1743c65419cce26dff908f8b84c93fbe486bc", size = 151194 },
+]
+
+[package.optional-dependencies]
+colors = [
+    { name = "colorama", marker = "platform_system == 'Windows'" },
+    { name = "pygments" },
 ]
 
 [[package]]
