@@ -15,10 +15,10 @@ from whiteprints.cli.init_interface import InitKwargs
 from whiteprints.loc import _
 
 
-if sys.version_info < (3, 11):
-    from typing_extensions import Unpack
-else:
+if sys.version_info >= (3, 11):
     from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 
 @click.command(

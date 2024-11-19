@@ -16,10 +16,10 @@ from whiteprints.loc import _
 __all__: Final = ["LogLevel", "configure_logging"]
 
 
-if sys.version_info < (3, 10):
-    from typing_extensions import TypeAlias
-else:
+if sys.version_info >= (3, 11):
     from typing import TypeAlias
+else:
+    from typing_extensions import TypeAlias
 
 
 LogLevel: TypeAlias = Literal[

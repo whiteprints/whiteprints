@@ -22,14 +22,14 @@ repos:
       - id: pyproject-fmt
         args: ["--column-width", "79", "--indent", "4", "--no-print-diff"]
   - repo: https://github.com/fsfe/reuse-tool
-    rev: v4.0.3
+    rev: v5.0.2
     hooks:
-      - id: reuse
+      - id: reuse-lint-file
         name: reuse
         entry: reuse
-        description: "[License] Lint the project directory for compliance with the REUSE Specification"
+        description: "[License] Lint the chand file for compliance with the REUSE Specification"
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.7.2
+    rev: v0.7.4
     hooks:
       - id: ruff-format
         name: "ruff format"
