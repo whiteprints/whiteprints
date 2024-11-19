@@ -93,7 +93,7 @@ tests = [
     "pytest-md-report>=0.6.2",
     "pytest-randomly>=3.15",
     "pytest-xdist>=3.6.1",
-    "xdoctest>=1.2",
+    "xdoctest[colors]>=1.2",
 ]
 editor = [
     "pynvim>=0.4.3",
