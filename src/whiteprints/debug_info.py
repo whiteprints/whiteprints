@@ -149,7 +149,7 @@ def _gather_required_packages() -> list[str]:
     Returns:
         A list of normalized package names extracted from the requirements.
     """
-    package_name_regex = re.compile("==|===|~=|!=|>=|>|<=|<")
+    package_name_regex = re.compile(r"==|===|~=|!=|>=|>|<=|<")
     return [
         package_name_regex.split(package, maxsplit=1)[0].replace("-", "_")
         for package in (
