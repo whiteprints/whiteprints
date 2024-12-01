@@ -1,0 +1,48 @@
+# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: Build package
+
+on:
+  workflow_call:
+jobs:
+  build-sdist:
+    name: Build sdist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and inspect package
+        id: baipp
+        uses: hynek/build-and-inspect-python-package@v2
+        with:
+          skip-wheel: true
+      - name: Save supported Python
+        run: |
+          echo "${{ steps.baipp.outputs.supported_python_classifiers_json_array }}" >> supported_python_classifiers.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: supported-python-classifiers
+          path: ./supported_python_classifiers.json
+  build-wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v4
+      # Use cibuildwheel here instead of uv if you package contains compiled
+      # dependencies
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Build wheels
+        run: uv build --all --wheel --out-dir wheelhouse
+      # here we used uv to build the wheel(s)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl

@@ -1,8 +1,9 @@
+
 # SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-name: Publish package on PyPI
+name: Release package
 
 on:
   push:
@@ -38,7 +39,7 @@ jobs:
     name: Build and inspect package
     runs-on: ubuntu-latest
     environment:
-      name: artifacts
+      name: build-package
     permissions:
       contents: write
       id-token: write
@@ -51,35 +52,10 @@ jobs:
         uses: hynek/build-and-inspect-python-package@v2
         with:
           attest-build-provenance-github: true
-  publish:
-    name: Publish Package
-    runs-on: ubuntu-latest
-    environment:
-      name: "${{ (contains(github.ref, '-alpha') || contains(github.ref, '-beta') || contains(github.ref, '-pre-alpha') || contains(github.ref, '-planning')) && 'publish_testpypi' || 'publish_pypi' }}"
-    needs:
-      - build-package
-    permissions:
-      id-token: write  # Required for trusted publishing
-    steps:
-      - name: Download built packages from the build-package job
-        uses: actions/download-artifact@v4
-        with:
-          name: Packages
-          path: dist
-      # Publish to TestPyPI for pre-releases (alpha, beta, pre-alpha, planning)
-      - name: Publish to TestPyPI
-        if: "contains(github.ref_name, '-alpha') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-pre-alpha') || contains(github.ref_name, '-planning')"
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: 'https://test.pypi.org/legacy/'
-          attestations: true
-          print-hash: true
-      # Publish to PyPI for stable releases, releases candidates and
-      # post-releases
-      - name: Publish to PyPI
-        if: "!contains(github.ref_name, '-alpha') && !contains(github.ref_name, '-beta') && !contains(github.ref_name, '-pre-alpha') && !contains(github.ref_name, '-planning')"
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: 'https://upload.pypi.org/legacy/'
-          attestations: true
-          print-hash: true
+      - name: Find latest Python
+        id: baipp-latest
+        run: |
+          echo "supported_python_latest=$(echo '${{ steps.baipp.outputs.supported_python_classifiers_json_array }}' | jq -r -S '.[-1]')" >> "$GITHUB_OUTPUT"
+    outputs:
+      python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
+      python-latest: ${{ steps.baipp-latest.outputs.supported_python_latest }}
