@@ -71,13 +71,7 @@ jobs:
       matrix:
         image:
           - name: alpine
-            python: ${{ needs.build-package.outputs.python-latest }}
-            base: alpine3.20
-            digest: ""
           - name: debian
-            python: ${{ needs.build-package.outputs.python-latest }}
-            base: slim-bookworm
-            digest: ""
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -98,7 +92,7 @@ jobs:
           flavor: |
             latest=auto
             prefix=
-            suffix=-${{ matrix.image.base }}
+            suffix=-${{ matrix.image.name }}
           tags: |
             type=pep440,pattern={{ version }},event=tag
             type=ref,event=tag
@@ -121,9 +115,6 @@ jobs:
             ${{ steps.docker-meta.outputs.tags }}
           annotations: ${{ steps.docker-meta.outputs.annotations }}
           build-args: |
-            PYTHON_VERSION=${{ matrix.image.python }}
-            BASE_OS=${{ matrix.image.base }}
-            DIGEST=${{ matrix.image.digest }}
             VERSION=${{ steps.docker-meta.outputs.version }}
             REVISION=${{ github.sha }}
             BUILD_DATE=${{ env.BUILD_DATE }}
