@@ -25,7 +25,7 @@
         'github-actions',
       ],
       matchFileNames: [
-        '/.github/workflows*.yml',
+        '.github/workflows/*.yml',
       ],
       commitMessagePrefix: 'ci(dependencies): ',
       commitMessageTopic: '{{depName}}',
@@ -39,7 +39,7 @@
         'dockerfile',
       ],
       matchFileNames: [
-        '/container/Containerfile.*',
+        'Containerfile.*',
       ],
       commitMessagePrefix: 'build(docker): ',
       commitMessageTopic: '{{depName}}',
@@ -53,26 +53,24 @@
         'pep621',
       ],
       matchFileNames: [
-        '/pyproject.toml',
+        'pyproject.toml',
       ],
-      commitMessagePrefix: 'build(pyproject.toml): ',
+      commitMessagePrefix: 'build(project): ',
       commitMessageTopic: '{{depName}}',
       labels: [
         'dependencies',
       ],
     },
     {
-      matchManagers: [
-        'custom.regex',
+      matchManagers: ["regex"],
+      matchFileNames: [
+        'uv.lock'
       ],
-      matchStrings: [
-        '/uv.lock',
-      ],
-      commitMessagePrefix: 'build(uv.lock): ',
-      commitMessageTopic: 'uv.lock',
+      commitMessagePrefix: "build(lockfile): ",
+      commitMessageTopic: "{{depName}}",
       labels: [
         'dependencies',
       ],
-    },
+    }
   ],
 }
