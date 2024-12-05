@@ -60,19 +60,6 @@
       labels: [
         'dependencies',
       ],
-    },
-    {
-      matchManagers: [
-        'custom.regex',
-      ],
-      matchStrings: [
-        '/uv.lock',
-      ],
-      commitMessagePrefix: 'build(uv.lock): ',
-      commitMessageTopic: 'uv.lock',
-      labels: [
-        'dependencies',
-      ],
-    },
+    }
   ],
 }
