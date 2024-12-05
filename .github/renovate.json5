@@ -62,15 +62,17 @@
       ],
     },
     {
-      matchManagers: ["regex"],
-      matchFileNames: [
-        'uv.lock'
+      matchManagers: [
+        'custom.regex',
       ],
-      commitMessagePrefix: "build(lockfile): ",
-      commitMessageTopic: "{{depName}}",
+      matchFileNames: [
+        'uv.lock',
+      ],
+      commitMessagePrefix: 'build(lockfile): ',
+      commitMessageTopic: '{{depName}}',
       labels: [
         'dependencies',
       ],
-    }
+    },
   ],
 }
