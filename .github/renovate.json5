@@ -4,10 +4,23 @@
 
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["config:base"],
+  extends: [
+    "config:base",
+    "group:monorepos",
+    "group:recommended",
+    "docker:pinDigests",
+    "helpers:pinGitHubActionDigests",
+    "replacements:all",
+    "workarounds:all",
+    ":configMigration",
+    ":pinDevDependencies",
+    ":dependencyDashboard"
+  ],
   lockFileMaintenance: {
     enabled: true,
-    schedule: ["weekly"]
+    "extends": [
+      "group:all"
+    ]
   },
   commitMessageAction: "⬆️",
   packageRules: [
@@ -16,7 +29,6 @@
       matchPaths: [
         "/.github/workflows*.yml"
       ],
-      schedule: ["weekly"],
       commitMessagePrefix: "ci(dependencies): ",
       commitMessageTopic: "{{depName}}",
       labels: ["dependencies", "ci"]
@@ -26,7 +38,6 @@
       matchPaths: [
         "/container/Containerfile.*"
       ],
-      schedule: ["weekly"],
       commitMessagePrefix: "build(docker): ",
       commitMessageTopic: "{{depName}}",
       labels: ["dependencies", "container"]
@@ -36,7 +47,6 @@
       matchPaths: [
         "/pyproject.toml"
       ],
-      schedule: ["weekly"],
       commitMessagePrefix: "build(pyproject.toml): ",
       commitMessageTopic: "{{depName}}",
       labels: ["dependencies"]
@@ -49,7 +59,6 @@
       commitMessagePrefix: "build(uv.lock): ",
       commitMessageTopic: "uv.lock",
       labels: ["dependencies"],
-      schedule: ["weekly"]
     },
   ]
 }
