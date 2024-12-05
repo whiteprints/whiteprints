@@ -7,45 +7,50 @@
   extends: ["config:base"],
   lockFileMaintenance: {
     enabled: true,
-    schedule: ["every week"]
+    schedule: ["weekly"]
   },
   commitMessageAction: "⬆️",
   packageRules: [
     {
       matchManagers: ["github-actions"],
-      schedule: ["every week"],
+      matchPaths: [
+        "/.github/workflows*.yml"
+      ],
+      schedule: ["weekly"],
       commitMessagePrefix: "ci(dependencies): ",
       commitMessageTopic: "{{depName}}",
       labels: ["dependencies", "ci"]
-    },
-    {
-      matchManagers: ["pip"],
-      schedule: ["every week"],
-      versioning: "increase",
-      rangeStrategy: "bump",
-      prConcurrentLimit: 99,
-      commitMessagePrefix: "build(dependencies): ",
-      commitMessageTopic: "{{depName}}",
-      labels: ["dependencies"]
     },
     {
       matchManagers: ["dockerfile"],
       matchPaths: [
         "/container/Containerfile.*"
       ],
-      schedule: ["every week"],
+      schedule: ["weekly"],
       commitMessagePrefix: "build(docker): ",
       commitMessageTopic: "{{depName}}",
-      labels: ["dependencies", "docker"]
+      labels: ["dependencies", "container"]
     },
     {
-      matchManagers: ["generic"],
+      matchManagers: ["pep621"],
       matchPaths: [
-        "/**/uv.lock"
+        "/pyproject.toml"
+      ],
+      schedule: ["weekly"],
+      commitMessagePrefix: "build(pyproject.toml): ",
+      commitMessageTopic: "{{depName}}",
+      labels: ["dependencies"]
+    },
+    {
+      matchManagers: ["regex"],
+      matchStrings: [
+        "/uv.lock"
       ],
       commitMessagePrefix: "build(uv.lock): ",
-      commitMessageTopic: "{{depName}}",
-      labels: ["dependencies", "uv.lock"]
-    }
+      commitMessageTopic: "uv.lock",
+      labels: ["dependencies"],
+      schedule: ["weekly"]
+    },
   ]
 }
+
