@@ -1,0 +1,51 @@
+// SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
+//
+/ /SPDX-License-Identifier: GPL-3.0-or-later
+
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:base"],
+  lockFileMaintenance: {
+    enabled: true,
+    schedule: ["every week"]
+  },
+  commitMessageAction: "⬆️",
+  packageRules: [
+    {
+      matchManagers: ["github-actions"],
+      schedule: ["every week"],
+      commitMessagePrefix: "ci(dependencies): ",
+      commitMessageTopic: "{{depName}}",
+      labels: ["dependencies", "ci"]
+    },
+    {
+      matchManagers: ["pip"],
+      schedule: ["every week"],
+      versioning: "increase",
+      rangeStrategy: "bump",
+      prConcurrentLimit: 99,
+      commitMessagePrefix: "build(dependencies): ",
+      commitMessageTopic: "{{depName}}",
+      labels: ["dependencies"]
+    },
+    {
+      matchManagers: ["dockerfile"],
+      matchPaths: [
+        "/container/Containerfile.*"
+      ],
+      schedule: ["every week"],
+      commitMessagePrefix: "build(docker): ",
+      commitMessageTopic: "{{depName}}",
+      labels: ["dependencies", "docker"]
+    },
+    {
+      matchManagers: ["generic"],
+      matchPaths: [
+        "/**/uv.lock"
+      ],
+      commitMessagePrefix: "build(uv.lock): ",
+      commitMessageTopic: "{{depName}}",
+      labels: ["dependencies", "uv.lock"]
+    }
+  ]
+}
