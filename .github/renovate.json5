@@ -1,65 +1,78 @@
-// SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
-//
-// SPDX-License-Identifier: GPL-3.0-or-later
-
 {
-  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   extends: [
-    "config:base",
-    "group:monorepos",
-    "group:recommended",
-    "docker:pinDigests",
-    "helpers:pinGitHubActionDigests",
-    "replacements:all",
-    "workarounds:all",
-    ":configMigration",
-    ":pinDevDependencies",
-    ":dependencyDashboard"
+    'config:recommended',
+    'group:monorepos',
+    'group:recommended',
+    'docker:pinDigests',
+    'helpers:pinGitHubActionDigests',
+    'replacements:all',
+    'workarounds:all',
+    ':configMigration',
+    ':pinDevDependencies',
+    ':dependencyDashboard',
   ],
   lockFileMaintenance: {
     enabled: true,
-    "extends": [
-      "group:all"
-    ]
+    extends: [
+      'group:all',
+    ],
   },
-  commitMessageAction: "⬆️",
+  commitMessageAction: '⬆️',
   packageRules: [
     {
-      matchManagers: ["github-actions"],
-      matchPaths: [
-        "/.github/workflows*.yml"
+      matchManagers: [
+        'github-actions',
       ],
-      commitMessagePrefix: "ci(dependencies): ",
-      commitMessageTopic: "{{depName}}",
-      labels: ["dependencies", "ci"]
+      matchFileNames: [
+        '/.github/workflows*.yml',
+      ],
+      commitMessagePrefix: 'ci(dependencies): ',
+      commitMessageTopic: '{{depName}}',
+      labels: [
+        'dependencies',
+        'ci',
+      ],
     },
     {
-      matchManagers: ["dockerfile"],
-      matchPaths: [
-        "/container/Containerfile.*"
+      matchManagers: [
+        'dockerfile',
       ],
-      commitMessagePrefix: "build(docker): ",
-      commitMessageTopic: "{{depName}}",
-      labels: ["dependencies", "container"]
+      matchFileNames: [
+        '/container/Containerfile.*',
+      ],
+      commitMessagePrefix: 'build(docker): ',
+      commitMessageTopic: '{{depName}}',
+      labels: [
+        'dependencies',
+        'container',
+      ],
     },
     {
-      matchManagers: ["pep621"],
-      matchPaths: [
-        "/pyproject.toml"
+      matchManagers: [
+        'pep621',
       ],
-      commitMessagePrefix: "build(pyproject.toml): ",
-      commitMessageTopic: "{{depName}}",
-      labels: ["dependencies"]
+      matchFileNames: [
+        '/pyproject.toml',
+      ],
+      commitMessagePrefix: 'build(pyproject.toml): ',
+      commitMessageTopic: '{{depName}}',
+      labels: [
+        'dependencies',
+      ],
     },
     {
-      matchManagers: ["regex"],
+      matchManagers: [
+        'custom.regex',
+      ],
       matchStrings: [
-        "/uv.lock"
+        '/uv.lock',
       ],
-      commitMessagePrefix: "build(uv.lock): ",
-      commitMessageTopic: "uv.lock",
-      labels: ["dependencies"],
+      commitMessagePrefix: 'build(uv.lock): ',
+      commitMessageTopic: 'uv.lock',
+      labels: [
+        'dependencies',
+      ],
     },
-  ]
+  ],
 }
-
