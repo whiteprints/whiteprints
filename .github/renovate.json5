@@ -24,7 +24,7 @@
       matchManagers: [
         'github-actions',
       ],
-      commitMessagePrefix: 'ci(dependencies): ⬆️',
+      commitMessagePrefix: 'ci(dependencies): 👷',
       commitMessageTopic: '{{depName}}',
       labels: [
         'dependencies',
@@ -35,7 +35,7 @@
       matchManagers: [
         'dockerfile',
       ],
-      commitMessagePrefix: 'build(container): ⬆️',
+      commitMessagePrefix: 'build(container): 📦',
       commitMessageTopic: '{{depName}}',
       labels: [
         'dependencies',
@@ -55,27 +55,5 @@
         'dependencies',
       ],
     },
-    {
-      matchManagers: [
-        'custom.regex',
-      ],
-      matchFileNames: [
-        'uv.lock',
-      ],
-      commitMessagePrefix: 'build(lockfile): ⬆️',
-      commitMessageTopic: '{{depName}}',
-      labels: [
-        'dependencies',
-      ],
-    },
-    {
-      "matchDepTypes": [
-        "dependencies",
-      ],
-      commitMessagePrefix: 'build(dependencies): 📌',
-      labels: [
-        'dependencies',
-      ],
-    }
   ],
 }
