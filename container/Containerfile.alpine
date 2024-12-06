@@ -5,7 +5,7 @@
 ARG TAG=3.13.0-alpine3.20@sha256:81362dd1ee15848b118895328e56041149e1521310f238ed5b2cdefe674e6dbf
 ARG UV_COMPILE_BYTECODE=1
 ARG PYTHONDONTWRITEBYTECODE=1
-ARG PYTHONBUFFERED=1
+ARG PYTHONUNBUFFERED=1
 
 ARG VIRTUAL_ENV=/opt/venv
 
@@ -42,7 +42,7 @@ COPY --from=uv_image /uv ${UV_BIN}/uv
 
 ARG UV_COMPILE_BYTECODE
 ARG PYTHONDONTWRITEBYTECODE
-ARG PYTHONBUFFERED
+ARG PYTHONUNBUFFERED
 ARG VIRTUAL_ENV
 
 ENV UV_LINK_MODE=copy \
@@ -115,15 +115,12 @@ ENV HOME=${HOME}
 WORKDIR ${HOME}
 
 ARG PYTHONDONTWRITEBYTECODE
-ARG PYTHONBUFFERED
+ARG PYTHONUNBUFFERED
 ENV PYTHONDONTWRITEBYTECODE=${PYTHONDONTWRITEBYTECODE} \
-    PYTHONBUFFERED=${PYTHONBUFFERED}
+    PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
 
-ENTRYPOINT ["whiteprints"]
+ENTRYPOINT ["python", "/opt/venv/bin/whiteprints"]
 
-ARG PYTHON_VERSION
-ARG BASE_OS
-ARG DIGEST
 ARG BUILD_DATE
 ARG VERSION
 ARG REVISION
@@ -141,5 +138,4 @@ LABEL org.opencontainers.image.authors='The "Whiteprints" contributors <whitepri
       org.opencontainers.image.title='whiteprints' \
       org.opencontainers.image.description='A Copier-based cookiecutter for creating Python projects managed by uv.' \
       org.opencontainers.image.ref.name=${TAG} \
-      org.opencontainers.image.base.name='docker.io/python:'${TAG} \
-      org.opencontainers.image.base.digest=${DIGEST}
+      org.opencontainers.image.base.name='docker.io/python:'${TAG}
