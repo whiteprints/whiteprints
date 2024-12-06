@@ -24,9 +24,6 @@
       matchManagers: [
         'github-actions',
       ],
-      matchFileNames: [
-        '.github/workflows/*.yml',
-      ],
       commitMessagePrefix: 'ci(dependencies): ',
       commitMessageTopic: '{{depName}}',
       labels: [
@@ -38,10 +35,7 @@
       matchManagers: [
         'dockerfile',
       ],
-      matchFileNames: [
-        'Containerfile.*',
-      ],
-      commitMessagePrefix: 'build(docker): ',
+      commitMessagePrefix: 'build(container): ',
       commitMessageTopic: '{{depName}}',
       labels: [
         'dependencies',
