@@ -4,13 +4,13 @@
     'config:recommended',
     'group:monorepos',
     'group:recommended',
-    'docker:pinDigests',
-    'helpers:pinGitHubActionDigests',
     'replacements:all',
     'workarounds:all',
-    ':configMigration',
+    'docker:pinDigests',
+    'helpers:pinGitHubActionDigests',
     ':pinDependencies',
     ':pinDevDependencies',
+    ':configMigration',
     ':dependencyDashboard',
   ],
   lockFileMaintenance: {
@@ -19,13 +19,12 @@
       'group:all',
     ],
   },
-  commitMessageAction: '⬆️',
   packageRules: [
     {
       matchManagers: [
         'github-actions',
       ],
-      commitMessagePrefix: 'ci(dependencies): ',
+      commitMessagePrefix: 'ci(dependencies): ⬆️',
       commitMessageTopic: '{{depName}}',
       labels: [
         'dependencies',
@@ -36,7 +35,7 @@
       matchManagers: [
         'dockerfile',
       ],
-      commitMessagePrefix: 'build(container): ',
+      commitMessagePrefix: 'build(container): ⬆️',
       commitMessageTopic: '{{depName}}',
       labels: [
         'dependencies',
@@ -50,7 +49,7 @@
       matchFileNames: [
         'pyproject.toml',
       ],
-      commitMessagePrefix: 'build(dependencies): ',
+      commitMessagePrefix: 'build(dependencies): ⬆️',
       commitMessageTopic: '{{depName}}',
       labels: [
         'dependencies',
@@ -63,7 +62,7 @@
       matchFileNames: [
         'uv.lock',
       ],
-      commitMessagePrefix: 'build(lockfile): ',
+      commitMessagePrefix: 'build(lockfile): ⬆️',
       commitMessageTopic: '{{depName}}',
       labels: [
         'dependencies',
@@ -71,10 +70,9 @@
     },
     {
       "matchDepTypes": [
-        "dependencies"
+        "dependencies",
       ],
-      commitMessagePrefix: 'build(dependencies): ',
-      commitMessageAction: '📌',
+      commitMessagePrefix: 'build(dependencies): 📌',
       labels: [
         'dependencies',
       ],
