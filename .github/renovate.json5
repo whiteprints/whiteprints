@@ -9,6 +9,7 @@
     'replacements:all',
     'workarounds:all',
     ':configMigration',
+    'pinDependencies',
     ':pinDevDependencies',
     ':dependencyDashboard',
   ],
@@ -49,7 +50,7 @@
       matchFileNames: [
         'pyproject.toml',
       ],
-      commitMessagePrefix: 'build(project): ',
+      commitMessagePrefix: 'build(dependencies): ',
       commitMessageTopic: '{{depName}}',
       labels: [
         'dependencies',
@@ -68,5 +69,15 @@
         'dependencies',
       ],
     },
+    {
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      commitMessagePrefix: 'build(dependencies): ',
+      commitMessageAction: '📌',
+      labels: [
+        'dependencies',
+      ],
+    }
   ],
 }
