@@ -41,10 +41,10 @@ jobs:
       name: tests
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Build and inspect package
         id: baipp
-        uses: hynek/build-and-inspect-python-package@v2
+        uses: hynek/build-and-inspect-python-package@f01e4d047aadcc0c054c95ec9900da3ec3fc7a0f # v2
       - name: Find latest Python
         id: baipp-latest
         run: |
@@ -74,19 +74,19 @@ jobs:
           - name: debian
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Download built packages from the build-package job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           name: Packages
           path: dist
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@49b3bc8e6bdd4a60e6116a5414239cba5943d3cf # v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3
       - name: Set up Docker Metadata
         id: docker-meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@369eb591f429131d6889c46b94e711f089e6ca96 # v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           flavor: |
@@ -98,7 +98,7 @@ jobs:
             type=ref,event=tag
             type=sha
       - name: Log in to the Container registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -106,7 +106,7 @@ jobs:
       - name: Set BUILD_DATE
         run: echo "BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
       - name: Build and Push Container
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@48aba3b46d1b1fec4febb7c5d0c644b249a11355 # v6
         id: build-and-push
         with:
           context: .
@@ -122,7 +122,7 @@ jobs:
           cache-from: type=local,src=~/.docker/buildx-cache
           cache-to: type=local,dest=~/.docker/buildx-cache
       - name: Attest
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@619dbb2e03e0189af0c55118e7d3c5e129e99726 # v2
         id: attest
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}

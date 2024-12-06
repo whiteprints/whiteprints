@@ -45,10 +45,10 @@ jobs:
       attestations: write
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Build and inspect package
         id: baipp
-        uses: hynek/build-and-inspect-python-package@v2
+        uses: hynek/build-and-inspect-python-package@f01e4d047aadcc0c054c95ec9900da3ec3fc7a0f # v2
         with:
           attest-build-provenance-github: true
   publish:
@@ -62,7 +62,7 @@ jobs:
       id-token: write  # Required for trusted publishing
     steps:
       - name: Download built packages from the build-package job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           name: Packages
           path: dist

@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-ARG TAG=3.13.0-slim-bookworm@sha256:2ec5a4a5c3e919570f57675471f081d6299668d909feabd8d4803c6c61af666c
+ARG TAG=3.13.1-slim-bookworm@sha256:f41a75c9cee9391c09e0139f7b49d4b1fbb119944ec740ecce4040626dc07bed
 ARG UV_COMPILE_BYTECODE=1
 ARG PYTHONDONTWRITEBYTECODE=1
 ARG PYTHONBUFFERED=1
@@ -22,7 +22,7 @@ ARG VIRTUAL_ENV=/opt/venv
 #   - These Python packages usually only provide binary wheels for GLIBC, so
 #   the packages will need to be recompiled fully within the container images,
 #   increasing build times.
-ARG UV_TAG=0.4.28@sha256:dbd4acba8bfc42ae057ec4cfd65a980c516266e55bb045931873bd2bee531a71
+ARG UV_TAG=0.5.6@sha256:92aa10fc236a5cbd3624c9909f855a860bd209fef17756c831ee84c478423517
 ARG UV_BIN="/usr/local/bin"
 
 FROM ghcr.io/astral-sh/uv:${UV_TAG} AS uv_image

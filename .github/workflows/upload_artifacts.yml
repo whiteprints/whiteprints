@@ -22,7 +22,7 @@ jobs:
       attestations: write
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Set TAG
         id: vars
         shell: python
@@ -34,7 +34,7 @@ jobs:
               file.write(f'tag={tag}\n')
       - name: Build and inspect package
         id: baipp
-        uses: hynek/build-and-inspect-python-package@v2
+        uses: hynek/build-and-inspect-python-package@f01e4d047aadcc0c054c95ec9900da3ec3fc7a0f # v2
         with:
           attest-build-provenance-github: true
     outputs:
@@ -46,9 +46,9 @@ jobs:
       - build-package
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Download built artifact to dist/
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           name: Packages
           path: dist
@@ -68,7 +68,7 @@ jobs:
       attestations: write
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Set TAG
         id: vars
         shell: python
@@ -79,7 +79,7 @@ jobs:
           with open(os.getenv('GITHUB_OUTPUT'), 'a') as file:
               file.write(f'tag={tag}\n')
       - name: Install uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
         with:
           version: "latest"
           enable-cache: true
@@ -88,7 +88,7 @@ jobs:
           uvx --quiet --no-progress --with tox-uv tox run -e build-documentation
           zip -r documentation.zip docs_build
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@619dbb2e03e0189af0c55118e7d3c5e129e99726 # v2
         with:
           subject-path: documentation.zip*
       - name: Upload docs
@@ -112,7 +112,7 @@ jobs:
           - windows-latest
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Set TAG
         id: vars
         shell: python
@@ -123,7 +123,7 @@ jobs:
           with open(os.getenv('GITHUB_OUTPUT'), 'a') as file:
               file.write(f'tag={tag}\n')
       - name: Install uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
         with:
           version: "latest"
           enable-cache: true
@@ -141,7 +141,7 @@ jobs:
         run: |
           uvx --quiet --no-progress --with tox-uv tox run
       - name: Upload BOM vulnerabilities
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
         with:
           name: BOM-vulnerabilities-${{ matrix.os }}-${{ matrix.python }}
           path: BOM/
@@ -159,7 +159,7 @@ jobs:
       attestations: write
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Set TAG
         id: vars
         shell: python
@@ -170,12 +170,12 @@ jobs:
           with open(os.getenv('GITHUB_OUTPUT'), 'a') as file:
               file.write(f'tag={tag}\n')
       - name: Install uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
         with:
           version: "latest"
           enable-cache: true
       - name: Download coverage data
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           pattern: BOM-vulnerabilities-*
           merge-multiple: true
@@ -200,7 +200,7 @@ jobs:
               for f in Path('BOM').rglob('*'):
                   zipf.write(f, f.relative_to('BOM'))
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@619dbb2e03e0189af0c55118e7d3c5e129e99726 # v2
         with:
           subject-path: SBOM.zip*
       - name: Upload SBOM as Release Asset
