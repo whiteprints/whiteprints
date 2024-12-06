@@ -8,6 +8,7 @@ SPDX-License-Identifier: CC-BY-NC-SA-4.0
 # Whiteprints
 
 ![Whiteprints banner](docs/_static/banner.svg)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fwhiteprints%2Fwhiteprints.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fwhiteprints%2Fwhiteprints?ref=badge_shield)
 <div align="center">
     <p>
         <em>
@@ -28,6 +29,9 @@ SPDX-License-Identifier: CC-BY-NC-SA-4.0
         <!-- ALL-CONTRIBUTORS-BADGE:END -->
     </p>
 </div>
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fwhiteprints%2Fwhiteprints.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fwhiteprints%2Fwhiteprints?ref=badge_large)
 
 ## Table of contents
 
