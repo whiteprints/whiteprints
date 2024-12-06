@@ -51,6 +51,6 @@ ci:
   autofix_commit_msg: 'refactoring: auto fixes from pre-commit.com hooks'
   autofix_prs: true
   autoupdate_branch: ''
-  autoupdate_commit_msg: 'ci(dependencies): autoupdate pre-commit hooks'
+  autoupdate_commit_msg: 'ci(dependencies): 👷 autoupdate pre-commit hooks'
   skip: []
   submodules: false

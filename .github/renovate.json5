@@ -18,6 +18,7 @@
     extends: [
       'group:all',
     ],
+    auto_merge: true
   },
   packageRules: [
     {
@@ -30,6 +31,7 @@
         'dependencies',
         'ci',
       ],
+      auto_merge: true
     },
     {
       matchManagers: [
@@ -41,6 +43,7 @@
         'dependencies',
         'container',
       ],
+      auto_merge: true
     },
     {
       matchManagers: [
@@ -54,6 +57,7 @@
       labels: [
         'dependencies',
       ],
+      auto_merge: true
     },
   ],
 }
