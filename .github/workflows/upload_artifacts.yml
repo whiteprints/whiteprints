@@ -88,7 +88,7 @@ jobs:
           uvx --quiet --no-progress --with tox-uv tox run -e build-documentation
           zip -r documentation.zip docs_build
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@619dbb2e03e0189af0c55118e7d3c5e129e99726 # v2
+        uses: actions/attest-build-provenance@c4fbc648846ca6f503a13a2281a5e7b98aa57202 # v2
         with:
           subject-path: documentation.zip*
       - name: Upload docs
@@ -200,7 +200,7 @@ jobs:
               for f in Path('BOM').rglob('*'):
                   zipf.write(f, f.relative_to('BOM'))
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@619dbb2e03e0189af0c55118e7d3c5e129e99726 # v2
+        uses: actions/attest-build-provenance@c4fbc648846ca6f503a13a2281a5e7b98aa57202 # v2
         with:
           subject-path: SBOM.zip*
       - name: Upload SBOM as Release Asset
