@@ -20,20 +20,6 @@ import click
 from semver import Version
 
 
-BASE_IMAGE = {
-    "alpine": {
-        "PYTHON_VERSION": "3.13",
-        "BASE_OS": "alpine3.20",
-        "DIGEST": ""
-    },
-    "debian": {
-        "PYTHON_VERSION": "3.13",
-        "BASE_OS": "slim-bookworm",
-        "DIGEST": "",
-    },
-}
-
-
 def run_command(command: str, args: list[str], *, capture_output: bool = True) -> str | None:
     """Run a git command using subprocess and return its output.
 
@@ -169,16 +155,13 @@ def build_container_image(additional_tag: list[str], os: str, extra_args: list[s
         ),
     }
     name = "whiteprints"
-    base_image = BASE_IMAGE.get(os, {})
-    default_tag = f"{name}:{package['VERSION']}-py{base_image['PYTHON_VERSION']}-{base_image['BASE_OS']}"
-    all_tags = [default_tag, *(f"{name}:{tag}" for tag in additional_tag)]
+    all_tags = [*(f"{name}:{tag}" for tag in additional_tag)]
 
     build_container(
         context_path=Path(),
         file=Path() / "container" / f"Containerfile.{os}",
         tags=all_tags,
         build_args={
-            **base_image,
             **package,
             "UV_COMPILE_BYTECODE": 1,
             "REVISION": get_current_commit_hash(),
@@ -187,6 +170,16 @@ def build_container_image(additional_tag: list[str], os: str, extra_args: list[s
         extra_args=list(extra_args),
     )
 
+
+def containerfiles() -> list[str]:
+    """Find containersfiles."""
+    return [
+        str(containerfile).split(".", maxsplit=1)[1]
+        for containerfile in filter(
+            lambda name: ".containerignore" not in str(name),
+            (Path() / "container").glob(r"Containerfile.*")
+        )
+    ]
 
 @click.command(context_settings={"ignore_unknown_options": True})
 @click.option(
@@ -197,7 +190,7 @@ def build_container_image(additional_tag: list[str], os: str, extra_args: list[s
 )
 @click.argument(
     "os",
-    type=click.Choice([*BASE_IMAGE.keys(), "all"], case_sensitive=False),
+    type=click.Choice([*containerfiles(), "all"], case_sensitive=False),
 )
 @click.argument(
     "extra_args",
@@ -214,7 +207,7 @@ def main(additional_tag: list[str], os: str, extra_args: list[str]) -> None:
     """
     build_wheel()
     if os == "all":
-        for specific_os in BASE_IMAGE:
+        for specific_os in containerfiles():
             build_container_image(
                 additional_tag,
                 os=specific_os,

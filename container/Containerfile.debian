@@ -124,9 +124,6 @@ ENV PYTHONDONTWRITEBYTECODE=${PYTHONDONTWRITEBYTECODE} \
 
 ENTRYPOINT ["whiteprints"]
 
-ARG PYTHON_VERSION
-ARG BASE_OS
-ARG DIGEST
 ARG BUILD_DATE
 ARG VERSION
 ARG REVISION
@@ -144,5 +141,4 @@ LABEL org.opencontainers.image.authors='The "Whiteprints" contributors <whitepri
       org.opencontainers.image.title='whiteprints' \
       org.opencontainers.image.description='A Copier-based cookiecutter for creating Python projects managed by uv.' \
       org.opencontainers.image.ref.name=${TAG} \
-      org.opencontainers.image.base.name='docker.io/python:'${TAG} \
-      org.opencontainers.image.base.digest=${DIGEST}
+      org.opencontainers.image.base.name='docker.io/python:'${TAG}
