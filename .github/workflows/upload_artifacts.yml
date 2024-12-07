@@ -49,7 +49,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo ${{ github.ref_name }}
           gh release upload ${{ github.ref_name }} dist/** --clobber
   docs-generation:
     name: Upload documentation
