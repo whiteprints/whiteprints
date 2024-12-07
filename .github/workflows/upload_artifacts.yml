@@ -33,6 +33,8 @@ jobs:
   release-package:
     name: Upload wheel and sdist
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     needs:
       - build-package
     steps:
