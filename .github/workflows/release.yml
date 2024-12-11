@@ -1,0 +1,61 @@
+
+# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: Release package
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9].post'
+      - 'v[0-9]+.[0-9]+.[0-9].post[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9].post.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc'
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-alpha'
+      - 'v[0-9]+.[0-9]+.[0-9]+-alpha[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-alpha.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-alpha[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-beta'
+      - 'v[0-9]+.[0-9]+.[0-9]+-beta[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-beta.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-beta[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-pre-alpha'
+      - 'v[0-9]+.[0-9]+.[0-9]+-pre-alpha[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-pre-alpha.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-pre-alpha[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-planning'
+      - 'v[0-9]+.[0-9]+.[0-9]+-planning[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-planning.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-planning[0-9]+.[0-9]+'
+
+jobs:
+  build-package:
+    name: Build and inspect package
+    runs-on: ubuntu-latest
+    environment:
+      name: build-package
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Build and inspect package
+        id: baipp
+        uses: hynek/build-and-inspect-python-package@v2
+        with:
+          attest-build-provenance-github: true
+      - name: Find latest Python
+        id: baipp-latest
+        run: |
+          echo "supported_python_latest=$(echo '${{ steps.baipp.outputs.supported_python_classifiers_json_array }}' | jq -r -S '.[-1]')" >> "$GITHUB_OUTPUT"
+    outputs:
+      python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
+      python-latest: ${{ steps.baipp-latest.outputs.supported_python_latest }}
