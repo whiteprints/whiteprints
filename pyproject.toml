@@ -150,12 +150,3 @@ column_width = 79
 indent = 4
 keep_full_version = false
 max_supported_python = "3.13"
-
-[tool.uv]
-managed = true
-cache-keys = [
-    { git = { commit = true, tags = true } },
-    { file = "pyproject.toml" },
-    { file = "hatch.toml" },
-    { file = "hatch_build.py" },
-]
