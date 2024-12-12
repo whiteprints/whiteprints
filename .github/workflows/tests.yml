@@ -85,6 +85,8 @@ jobs:
         with:
           version: "latest"
           enable-cache: true
+      - name: Install just
+        uses: extractions/setup-just@v2
       - name: Run the test suite
         run: |
           just ${{ matrix.receipt }}
@@ -119,6 +121,8 @@ jobs:
         with:
           version: "latest"
           enable-cache: true
+      - name: Install just
+        uses: extractions/setup-just@v2
       - name: Download built packages from the build-package job
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
