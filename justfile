@@ -13,16 +13,20 @@ all:
     @just pre-commit
     @just lint
     @just check-vulnerabilities
+    @just check-code-maintainability
     @just for-all-python check-types
     @just for-all-python test
     @just coverage
     @just BOM
+    @just check-documentation-links
+    @just build-documentation
+    @just build
 
 venv session python: init
     [ -d ".just/{{ session }}/{{ python }}" ] || \
-       mkdir -p ".just/{{ session }}/{{ python }}"
+        mkdir -p ".just/{{ session }}/{{ python }}"
     [ -d ".just/{{ session }}/{{ python }}/tmp" ] || \
-       mkdir -p ".just/{{ session }}/{{ python }}/tmp"
+        mkdir -p ".just/{{ session }}/{{ python }}/tmp"
     [ -d ".just/{{ session }}/{{ python }}/.venv" ] || \
         uv venv \
             --no-project \
