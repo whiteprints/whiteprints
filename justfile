@@ -110,7 +110,7 @@ test-wheel python wheel: (venv "test" python wheel)
     uv pip install \
         --python='\
             {{ justfile_directory() }}\
-            /.just/test/{{ wheel }}/{{ python }}/.venv/bin/python\
+            /.just/test/{{ wheel }}/{{ python }}/.venv\
         ' \
         --no-deps \
         --require-hashes \
@@ -125,7 +125,7 @@ test-wheel python wheel: (venv "test" python wheel)
     uv pip install \
         --python='\
             {{ justfile_directory() }}\
-            /.just/test/{{ wheel }}/{{ python }}/.venv/bin/python\
+            /.just/test/{{ wheel }}/{{ python }}/.venv\
         ' \
         --no-deps \
         {{ wheel }}
@@ -159,7 +159,7 @@ test python: (venv "test" python)
     just uvr " \
         --python='\
             {{ justfile_directory() }}\
-            /.just/test/{{ python }}/.venv/bin/python\
+            /.just/test/{{ python }}/.venv\
         ' \
         --group=tests \
     pytest \
@@ -203,13 +203,13 @@ check-types python: (venv "check-types" python)
     @just uvr " \
         --python='\
             {{ justfile_directory() }}/\
-            .just/check-types/{{ python }}/.venv/bin/python\
+            .just/check-types/{{ python }}/.venv\
         ' \
         --group=check-types \
     pyright \
         --pythonpath='\
             {{ justfile_directory() }}/\
-            .just/check-types/{{ python }}/.venv/bin/python\
+            .just/check-types/{{ python }}/.venv\
         ' \
         --project="{{ justfile_directory() }}/pyrightconfig.json" \
     "
@@ -218,7 +218,7 @@ print-dependency-tree python: (venv "print-dependency-tree" python)
     uv tree \
         --python="\
             {{ justfile_directory() }}/\
-            .just/print-dependency-tree/{{ python }}/.venv/bin/python\
+            .just/print-dependency-tree/{{ python }}/.venv\
         " \
         --frozen \
         --no-dev
