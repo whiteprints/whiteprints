@@ -49,7 +49,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo ${{ github.ref_name }}
           gh release upload ${{ github.ref_name }} dist/** --clobber
   docs-generation:
     name: Upload documentation
@@ -68,9 +67,11 @@ jobs:
         with:
           version: "latest"
           enable-cache: true
+      - name: Install just
+        uses: extractions/setup-just@v2
       - name: Build docs
         run: |
-          uvx --quiet --no-progress --with tox-uv tox run -e build-documentation
+          just build-documentation
           zip -r documentation.zip docs_build
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2
@@ -103,19 +104,11 @@ jobs:
         with:
           version: "latest"
           enable-cache: true
-      - name: Pick environment to run
-        run: |
-          import os
-          python_version = "${{ matrix.python }}".split(".")
-          tox_env = f"TOXENV=py{python_version[0]}{python_version[1]}-BOM-vulnerabilities\n"
-          py_version = f"PYVERSION=py{python_version[0]}{python_version[1]}\n"
-          env_variables = tox_env + py_version
-          with open(os.environ["GITHUB_ENV"], mode="a", encoding="utf-8") as file_handler:
-              file_handler.write(env_variables)
-        shell: python
+      - name: Install just
+        uses: extractions/setup-just@v2
       - name: SBOM generation
         run: |
-          uvx --quiet --no-progress --with tox-uv tox run
+          just BOM-vulnerabilities ${{ matrix.python }}
       - name: Upload BOM vulnerabilities
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
         with:
@@ -141,22 +134,17 @@ jobs:
         with:
           version: "latest"
           enable-cache: true
+      - name: Install just
+        uses: extractions/setup-just@v2
       - name: Download coverage data
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           pattern: BOM-vulnerabilities-*
           merge-multiple: true
           path: BOM/
-      - name: Pick environment to run
-        run: |
-          import os
-          env_variables = f"TOXENV=BOM-licenses\n"
-          with open(os.environ["GITHUB_ENV"], mode="a", encoding="utf-8") as file_handler:
-              file_handler.write(env_variables)
-        shell: python
       - name: SBOM generation
         run: |
-          uvx --quiet --no-progress --with tox-uv tox run
+          just BOM-licenses
       - name: Create BOM Archive
         shell: python
         run: |

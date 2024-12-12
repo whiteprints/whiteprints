@@ -49,7 +49,7 @@ and even contribute 😊.
 ## Highlights
 
 - Managed by [uv]
-- [Tox], [Pytest] and [Sphinx] for the development
+- [Just], [Pytest] and [Sphinx] for the development
 - Template for [GitHub] with actions to publish to [PyPI], [ReadTheDocs] and
   [CodeCov]
 
@@ -132,7 +132,7 @@ In case of doubt, please check the [SPDX] header of each individual source code 
 [SPDX]: https://spdx.dev/
 [REUSE]: https://reuse.software/
 [uv]: https://docs.astral.sh/uv/
-[Tox]: https://tox.wiki/
+[Just]: https://just.systems/man/en/
 [Pytest]: https://docs.pytest.org/en/stable/
 [Sphinx]: https://www.sphinx-doc.org/en/master/index.html
 [PyPI]: https://pypi.org/

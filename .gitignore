@@ -47,3 +47,6 @@ BOM/
 
 # Copier
 .copier-answers.yml
+
+# just
+.just/

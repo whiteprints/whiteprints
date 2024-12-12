@@ -63,13 +63,13 @@ jobs:
         with:
           python-version: "${{ matrix.python }}"
   check:
-    name: tox env ${{ matrix.tox_env }}
+    name: just ${{ matrix.receipt }}
     runs-on: ubuntu-latest
     environment:
       name: tests
     strategy:
       matrix:
-        tox_env:
+        receipt:
           - pre-commit
           - lint
           - check-vulnerabilities
@@ -85,12 +85,14 @@ jobs:
         with:
           version: "latest"
           enable-cache: true
+      - name: Install just
+        uses: extractions/setup-just@v2
       - name: Run the test suite
         run: |
-          uvx --quiet --no-progress --with tox-uv tox run -e ${{ matrix.tox_env }}
+          just ${{ matrix.receipt }}
       - name: Upload documentation
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
-        if: "${{ matrix.tox_env == 'build-documentation' }}"
+        if: "${{ matrix.receipt == 'build-documentation' }}"
         with:
           name: documentation
           path: docs_build/
@@ -119,23 +121,18 @@ jobs:
         with:
           version: "latest"
           enable-cache: true
+      - name: Install just
+        uses: extractions/setup-just@v2
       - name: Download built packages from the build-package job
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           name: Packages
           path: dist
-      - name: Pick environment to run
-        run: |
-          import os;
-          env = "TOXENV=py{}{}\n".format(*"${{ matrix.python }}".split("."))
-          with open(os.environ["GITHUB_ENV"], mode="a", encoding="utf-8") as file_handler:
-              file_handler.write(env)
-        shell: python
       - name: Run the test suite
         shell: bash
         run: |
-          echo "REPORT_FILE=.tox/test_report.md" >> "$GITHUB_ENV"
-          uvx --quiet --no-progress --with tox-uv tox run --installpkg dist/*.whl
+          echo "REPORT_FILE=.just/test_report.md" >> "$GITHUB_ENV"
+          just test-wheel ${{ matrix.python }} dist/*.whl
       - name: Output reports to the job summary when tests fail
         if: failure()
         shell: bash
@@ -152,7 +149,7 @@ jobs:
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
         with:
           name: coverage-data-${{ matrix.os }}-${{ matrix.python }}
-          path: .tox/.coverage.*
+          path: .just/.coverage.*
           overwrite: true
           include-hidden-files: true
       - name: Upload test results
@@ -160,7 +157,7 @@ jobs:
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.python }}
-          path: .tox/junit.*
+          path: .just/.junit-*.xml
           overwrite: true
           include-hidden-files: true
   container-deploy:
@@ -239,18 +236,20 @@ jobs:
         with:
           version: "latest"
           enable-cache: true
+      - name: Install just
+        uses: extractions/setup-just@v2
       - name: Download coverage data
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           pattern: coverage-data-*
           merge-multiple: true
-          path: .tox/
+          path: .just/
       - name: Run coverage
         run: |
-          uvx --quiet --no-progress --with tox-uv tox run -e coverage-combine
-          uvx --quiet --no-progress --with tox-uv tox run -e coverage-report
-          uvx --quiet --no-progress --with tox-uv tox run -e coverage
-          uvx --quiet --no-progress --with tox-uv tox run --quiet --quiet -e coverage -- --format=markdown >> $GITHUB_STEP_SUMMARY
+          just coverage-combine
+          just coverage-report
+          just coverage
+          just coverage --format=markdown >> $GITHUB_STEP_SUMMARY
       - name: Upload coverage report to CodeCov
         if: always()
         uses: codecov/codecov-action@7f8b4b4bde536c465e797be725718b88c5d95e0e # v5
@@ -258,5 +257,5 @@ jobs:
           name: codecov-umbrella
           verbose: true
           flags: pytest
-          file: .tox/.coverage.xml
+          files: .just/.coverage.xml
           use_oidc: true
