@@ -162,7 +162,7 @@ test python: (venv "test" python)
         --junitxml='{{ justfile_directory() }}/.just/.junit.{{ python }}.xml' \
         --md-report-output='\
             {{ justfile_directory() }}/.just/.test_report{{ python }}.md\
-        '\
+        ' \
         --basetemp="{{ justfile_directory() }}/.just/test/{{ python }}/tmp" \
         --cov-config="{{ justfile_directory() }}/.coveragerc" \
         "{{ justfile_directory() }}/src" \
