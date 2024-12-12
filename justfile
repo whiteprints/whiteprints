@@ -212,13 +212,38 @@ build:
 
 coverage-combine:
     @[ "$(find .just -maxdepth 1 -type f -name '.coverage.*')" ] \
-        || just all test
+        || just for-all-python test
     @just uvr " \
         --directory='.just' \
         --only-group=coverage \
     coverage combine \
         --rcfile='{{ justfile_directory() }}/.coveragerc' \
         --data-file=.coverage \
+    "
+
+coverage-report:
+    @[ -f "{{ justfile_directory() }}/.just/.coverage" ] || \
+        just coverage-combine
+    @just uvr " \
+        --only-group=coverage \
+    coverage html \
+        --rcfile='{{ justfile_directory() }}/.coveragerc' \
+        --directory='{{ justfile_directory() }}/.just/coverage/htmlcov' \
+        --data-file='{{ justfile_directory() }}/.just/.coverage' \
+    "
+    @just uvr " \
+        --only-group=coverage \
+    coverage lcov \
+        --rcfile='{{ justfile_directory() }}/.coveragerc' \
+        -o='{{ justfile_directory() }}/.just/coverage.lcov' \
+        --data-file='{{ justfile_directory() }}/.just/.coverage' \
+    "
+    @just uvr " \
+        --only-group=coverage \
+    coverage xml \
+        --rcfile='{{ justfile_directory() }}/.coveragerc' \
+        -o='{{ justfile_directory() }}/.just/coverage.xml' \
+        --data-file='{{ justfile_directory() }}/.just/.coverage' \
     "
 
 coverage args="":
