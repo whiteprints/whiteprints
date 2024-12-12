@@ -463,17 +463,16 @@ sphinx-build args="":
             --fail-on-warning \
             --keep-going \
         docs \
-        docs_build \
         {{ args }} \
     "
 
 # Build the documentation
-build-documentation:
-    @just sphinx-build --builder=html
+build-documentation dest="docs_build":
+    @just sphinx-build "--builder=html '{{ dest }}'"
 
 # Check that there are no dead links in the documentation
-check-documentation-links:
-    @just sphinx-build --builder=linkcheck
+check-documentation-links dest="docs_build":
+    @just sphinx-build "--builder=linkcheck '{{ dest }}'"
 
 # Run `sphinx-autobuild`
 sphinx-autobuild args="":
