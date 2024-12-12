@@ -125,7 +125,10 @@ test-wheel python wheel: (venv "test" python wheel)
             {{ justfile_directory() }}/\
             .just/.test_report.{{ python }}.html\
         ' \
-        --junitxml='{{ justfile_directory() }}/.just/.junit.{{ python }}.xml' \
+        --junitxml='\
+            {{ justfile_directory() }}\
+            /.just/.junit-{{ arch() }}-{{ os() }}-{{ python }}.xml\
+        ' \
         --md-report-output='\
             {{ justfile_directory() }}/.just/.test_report{{ python }}.md\
         ' \
