@@ -85,7 +85,6 @@ html_theme_options = {
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "pip": ("https://pip.pypa.io/en/stable", None),
-    "tox": ("https://tox.wiki/en/stable/", None),
     "numpy": ("https://numpy.org/doc/stable", None),
     "pandas": ("https://pandas.pydata.org/docs", None),
     "scipy": ("https://docs.scipy.org/doc/scipy", None),

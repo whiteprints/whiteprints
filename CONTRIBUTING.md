@@ -82,34 +82,34 @@ Please see [uv]'s documentation for more advanced usage.
 
 ## How to test the project
 
-The test suite is managed by [Tox].
+The test suite is managed by [just].
 
 Run the full test suite:
 
 ```console
-uvx tox run
+uvx --from rust-just just all
 ```
 
-List the available [Tox] sessions:
+List the available [just] sessions:
 
 ```console
-uvx tox list
+uvx --from rust-just just
 ```
 
-You can also run a specific [Tox] session.
-For example, invoke the unit test suite like this:
+You can also run a specific [just] session.
+For example, to build the documentation
 
 ```console
-uvx tox run -m test
+uvx --from rust-just just build-documentation
 ```
 
 Unit tests are located in the _tests_ directory,
 and are written using the [pytest] testing framework.
 
 [pytest]: https://docs.pytest.org/en/stable/
-[Tox]: https://tox.wiki/en/stable/
+[Just]: https://just.systems/man/en/
 
-Please see [Tox]'s documentation for more advanced usage.
+Please see [just]'s documentation for more advanced usage.
 
 ## How to submit changes
 
@@ -123,7 +123,7 @@ Then commit and push your modifications on your branch.
 
 Your contribution needs to meet the following guidelines for acceptance:
 
-  - The [Tox] test suite must pass without errors and warnings.
+  - The [just] test suite must pass without errors and warnings.
   - Include unit tests; this project maintains [100% code coverage](https://codecov.io/gh/whiteprints/whiteprints).
   - If your changes add functionality, update the documentation accordingly.
 

@@ -18,7 +18,7 @@ Here is a list of important resources for contributors:
 - The project source code: located in the `src/` directory.
 - The tests: located in the `tests/` directory.
 - The documentation source code: located in the `docs/` directory.
-- `tox.ini` contains [Tox]'s configuration
+- `justfile` contains [Just]'s configuration
 - `pyproject.toml` contains the [project metadata] and the [build system]
 
 [project metadata]: https://peps.python.org/pep-0621/
@@ -34,7 +34,7 @@ The project relies on the following tools for development:
 - [reuse]: check the licenses compliance.
 - [ruff]: check and fix the Python's code format and syntax.
 - [cyclonedx-bom]: generate a [bill of material] of the supply chain.
-- [tox]: orchestrate tools and tests.
+- [Just]: orchestrate tools and tests.
 
 [pip-audit]: https://github.com/pypa/pip-audit
 [pre-commit]: https://pre-commit.com/
@@ -54,7 +54,7 @@ uv tool install pyright
 uv tool install reuse
 uv tool install ruff
 uv tool install cyclonedx-bom
-uv tool install tox --with "tox-uv"
+uv tool install rust-just"
 ```
 
-[Tox]: https://tox.wiki/en/stable/
+[Just]: https://just.systems/man/en/
