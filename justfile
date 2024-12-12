@@ -95,47 +95,30 @@ for-all-python session args="":
 
 test-wheel python wheel: (venv "test" python wheel)
     @just requirements " \
-        --output-file='\
-            {{ justfile_directory() }}\
-            /.just/test/{{ wheel }}/{{ python }}/requirements.txt\
-        ' \
-    "
-    @just requirements " \
         --only-group=tests \
         --output-file='\
             {{ justfile_directory() }}\
             /.just/test/{{ wheel }}/{{ python }}/requirements-tests.txt\
         ' \
     "
-    uv pip install \
-        --python='\
-            {{ justfile_directory() }}\
-            /.just/test/{{ wheel }}/{{ python }}/.venv\
-        ' \
-        --no-deps \
-        --require-hashes \
-        --requirements='\
-            {{ justfile_directory() }}\
-            /.just/test/{{ wheel }}/{{ python }}/requirements.txt\
-        ' \
-        --requirements='\
-            {{ justfile_directory() }}\
-            /.just/test/{{ wheel }}/{{ python }}/requirements-tests.txt\
-        '
-    uv pip install \
-        --python='\
-            {{ justfile_directory() }}\
-            /.just/test/{{ wheel }}/{{ python }}/.venv\
-        ' \
-        --no-deps \
-        {{ wheel }}
-    TMPDIR="{{ justfile_directory() }}/.just/test/{{ wheel }}/{{ python }}/tmp" \
+    @TMPDIR="{{ justfile_directory() }}/.just/test/{{ wheel }}/{{ python }}/tmp" \
     PYTHONOPTIMIZE=0 \
     COVERAGE_FILE="\
         {{ justfile_directory() }}/\
         .just/.coverage.{{ arch() }}-{{ os() }}-{{ python }}\
     " \
-    .just/test/{{ wheel }}/{{ python }}/.venv/bin/pytest \
+    just uvr " \
+        --with-requirements='\
+            {{ justfile_directory() }}\
+            /.just/test/{{ wheel }}/{{ python }}/requirements-tests.txt\
+        ' \
+        --with='{{ wheel }}' \
+        --python='\
+            {{ justfile_directory() }}\
+            /.just/test/{{ wheel }}/{{ python }}/.venv\
+        ' \
+        --no-sync \
+    pytest \
         --html='\
             {{ justfile_directory() }}/\
             .just/.test_report.{{ python }}.html\
@@ -143,11 +126,12 @@ test-wheel python wheel: (venv "test" python wheel)
         --junitxml='{{ justfile_directory() }}/.just/.junit.{{ python }}.xml' \
         --md-report-output='\
             {{ justfile_directory() }}/.just/.test_report{{ python }}.md\
-        '\
+        ' \
         --basetemp='{{ justfile_directory() }}/.just/test/{{ wheel }}/{{ python }}/tmp' \
         --cov-config='{{ justfile_directory() }}/.coveragerc' \
         '{{ justfile_directory() }}/src' \
-        '{{ justfile_directory() }}/tests'
+        '{{ justfile_directory() }}/tests' \
+    "
 
 test python: (venv "test" python)
     @TMPDIR="{{ justfile_directory() }}/.just/test/{{ python }}/tmp/" \
