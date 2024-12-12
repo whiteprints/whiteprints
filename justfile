@@ -9,9 +9,6 @@ default:
 init:
     [ -d .just ] || mkdir .just
 
-clean:
-    rm -rf .just
-
 all:
     @just pre-commit
     @just lint
@@ -53,6 +50,16 @@ uvx args="":
         --isolated \
         {{ args }} \
     "
+
+clean-python:
+    @just uvx "pyclean ."
+
+clean-just:
+    rm -rf .just
+
+clean-all:
+    @just clean-python
+    @just clean-just
 
 for-all-python session:
     for python in `grep -v '^#' {{ justfile_directory() }}/.python-versions`; do \
@@ -158,10 +165,16 @@ coverage:
         --skip-covered \
     "
 
+reuse args:
+    @just uvx " \
+        reuse \
+        {{ args }} \
+    "
+
 BOM-licenses:
     [ -d "BOM" ] || mkdir "BOM"
-    @just uvx " \
-    reuse spdx \
+    @just reuse " \
+        spdx \
         --creator-organization 'whiteprints <whiteprints@pm.me>' \
         --output BOM/project_licenses.spdx \
     "
@@ -214,3 +227,36 @@ check-vulnerabilities:
         {{ justfile_directory() }}/tests \
         {{ justfile_directory() }}/docs \
     "
+
+radon args:
+    @just uvx " \
+        radon \
+        {{ args }} \
+    "
+
+audit-code-maintainability:
+    @just radon " \
+        mi \
+        tests \
+        docs \
+        src \
+    "
+
+xenon args:
+    @just uvx " \
+        xenon \
+        {{ args }} \
+    "
+
+check-code-maintainability:
+    @just xenon " \
+        --max-average=A \
+        --max-modules=A \
+        --max-absolute=A \
+        tests \
+        docs \
+        src \
+    "
+
+check-licenses:
+    @just reuse lint
