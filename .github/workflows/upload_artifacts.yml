@@ -68,7 +68,7 @@ jobs:
           version: "latest"
           enable-cache: true
       - name: Install just
-        uses: extractions/setup-just@v2
+        uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
       - name: Build docs
         run: |
           just build-documentation
@@ -105,7 +105,7 @@ jobs:
           version: "latest"
           enable-cache: true
       - name: Install just
-        uses: extractions/setup-just@v2
+        uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
       - name: SBOM generation
         run: |
           just BOM-vulnerabilities ${{ matrix.python }}
@@ -135,7 +135,7 @@ jobs:
           version: "latest"
           enable-cache: true
       - name: Install just
-        uses: extractions/setup-just@v2
+        uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
       - name: Download coverage data
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
