@@ -101,7 +101,9 @@ test-wheel python wheel: (venv "test" python wheel)
             /.just/test/{{ wheel }}/{{ python }}/requirements-tests.txt\
         ' \
     "
-    @TMPDIR="{{ justfile_directory() }}/.just/test/{{ wheel }}/{{ python }}/tmp" \
+    @TMPDIR="\
+        {{ justfile_directory() }}/.just/test/{{ wheel }}/{{ python }}/tmp\
+    " \
     PYTHONOPTIMIZE=0 \
     COVERAGE_FILE="\
         {{ justfile_directory() }}/\
@@ -127,7 +129,10 @@ test-wheel python wheel: (venv "test" python wheel)
         --md-report-output='\
             {{ justfile_directory() }}/.just/.test_report{{ python }}.md\
         ' \
-        --basetemp='{{ justfile_directory() }}/.just/test/{{ wheel }}/{{ python }}/tmp' \
+        --basetemp='\
+            {{ justfile_directory() }}/\
+            .just/test/{{ wheel }}/{{ python }}/tmp\
+        ' \
         --cov-config='{{ justfile_directory() }}/.coveragerc' \
         '{{ justfile_directory() }}/src' \
         '{{ justfile_directory() }}/tests' \
@@ -289,8 +294,14 @@ BOM-vulnerabilities python:
         --from cyclonedx-bom \
     cyclonedx-py requirements \
         --outfile \
-            'BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/project_dependencies.cdx.json' \
-        'BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/requirements.txt' \
+            '\
+                BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/\
+                project_dependencies.cdx.json\
+            ' \
+        ' \
+            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/\
+            requirements.txt\
+        ' \
     "
     @just pip-audit " \
         --requirement 'BOM/vulnerabilities-{{ python }}/requirements.txt' \
