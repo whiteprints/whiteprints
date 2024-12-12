@@ -10,4 +10,4 @@ build:
     python: "3"
   commands:
     - curl -LsSf https://astral.sh/uv/install.sh | sh
-    - uvx --from rust-just just build-documentation -- --jobs auto --builder html --keep-going ./docs/ $READTHEDOCS_OUTPUT/html/
+    - $HOME/.local/bin/uvx --from rust-just just build-documentation $READTHEDOCS_OUTPUT/html/
