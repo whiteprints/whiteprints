@@ -224,10 +224,10 @@ check-types python: (venv "check-types" python)
         ' \
         --group=check-types \
     pyright \
-        --pythonpath='\
-            {{ justfile_directory() }}/\
-            .just/check-types/{{ python }}/.venv\
-        ' \
+        --pythonpath='$( \
+            uv python find \
+            {{ justfile_directory() }}/.just/check-types/{{ python }}/.venv \
+        )' \
         --project="{{ justfile_directory() }}/pyrightconfig.json" \
     "
 
