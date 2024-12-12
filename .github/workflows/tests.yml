@@ -127,9 +127,8 @@ jobs:
       - name: Run the test suite
         shell: bash
         run: |
-          echo "REPORT_FILE=.tox/test_report.md" >> "$GITHUB_ENV"
-          just test dist/*.whl
-          uvx --quiet --no-progress --with tox-uv tox run --installpkg dist/*.whl
+          echo "REPORT_FILE=.just/test_report.md" >> "$GITHUB_ENV"
+          just test-wheel ${{ matrix.python }} dist/*.whl
       - name: Output reports to the job summary when tests fail
         if: failure()
         shell: bash
