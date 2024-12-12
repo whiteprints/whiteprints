@@ -2161,7 +2161,7 @@ wheels = [
 
 [[package]]
 name = "whiteprints"
-version = "0.10.9.dev9+g6f6c9ff.d20241212"
+version = "0.10.9.dev15+g5fae1c1.d20241212"
 source = { editable = "." }
 dependencies = [
     { name = "distro" },

@@ -22,17 +22,17 @@ all:
     @just build-documentation
     @just build
 
-venv session python: init
-    [ -d ".just/{{ session }}/{{ python }}" ] || \
-        mkdir -p ".just/{{ session }}/{{ python }}"
-    [ -d ".just/{{ session }}/{{ python }}/tmp" ] || \
-        mkdir -p ".just/{{ session }}/{{ python }}/tmp"
-    [ -d ".just/{{ session }}/{{ python }}/.venv" ] || \
+venv session python wheel="": init
+    [ -d ".just/{{ session }}/{{ wheel }}/{{ python }}" ] || \
+        mkdir -p ".just/{{ session }}/{{ wheel }}/{{ python }}"
+    [ -d ".just/{{ session }}/{{ wheel }}/{{ python }}/tmp" ] || \
+        mkdir -p ".just/{{ session }}/{{ wheel }}/{{ python }}/tmp"
+    [ -d ".just/{{ session }}/{{ wheel }}/{{ python }}/.venv" ] || \
         uv venv \
             --no-project \
             --no-config \
             --python={{ python }} \
-            ".just/{{ session }}/{{ python }}/.venv"
+            ".just/{{ session }}/{{ wheel }}/{{ python }}/.venv"
 
 uv args="":
     uv \
@@ -52,6 +52,16 @@ uvx args="":
     @just uv " \
         tool run \
         --isolated \
+        {{ args }} \
+    "
+
+requirements args="":
+    @just uv " \
+        export \
+        --quiet \
+        --frozen \
+        --no-dev \
+        --no-emit-project \
         {{ args }} \
     "
 
@@ -77,10 +87,66 @@ clean-all:
     @just clean-docs
     @just clean-translation
 
-for-all-python session:
+for-all-python session args="":
     for python in `grep -v '^#' {{ justfile_directory() }}/.python-versions`; do \
-        just {{ session }} $python; \
+        just {{ session }} $python {{ args }}; \
     done
+
+test-wheel python wheel: (venv "test" python wheel)
+    @just requirements " \
+        --output-file='\
+            {{ justfile_directory() }}\
+            /.just/test/{{ wheel }}/{{ python }}/requirements.txt\
+        ' \
+    "
+    @just requirements " \
+        --only-group=tests \
+        --output-file='\
+            {{ justfile_directory() }}\
+            /.just/test/{{ wheel }}/{{ python }}/requirements-tests.txt\
+        ' \
+    "
+    uv pip install \
+        --python='\
+            {{ justfile_directory() }}\
+            /.just/test/{{ wheel }}/{{ python }}/.venv/bin/python\
+        ' \
+        --no-deps \
+        --require-hashes \
+        --requirements='\
+            {{ justfile_directory() }}\
+            /.just/test/{{ wheel }}/{{ python }}/requirements.txt\
+        ' \
+        --requirements='\
+            {{ justfile_directory() }}\
+            /.just/test/{{ wheel }}/{{ python }}/requirements-tests.txt\
+        '
+    uv pip install \
+        --python='\
+            {{ justfile_directory() }}\
+            /.just/test/{{ wheel }}/{{ python }}/.venv/bin/python\
+        ' \
+        --no-deps \
+        {{ wheel }}
+    TMPDIR="{{ justfile_directory() }}/.just/test/{{ wheel }}/{{ python }}/tmp" \
+    PYTHONOPTIMIZE=0 \
+    COVERAGE_FILE="\
+        {{ justfile_directory() }}/\
+        .just/.coverage.{{ arch() }}-{{ os() }}-{{ python }}\
+    " \
+    .just/test/{{ wheel }}/{{ python }}/.venv/bin/pytest \
+        --html='\
+            {{ justfile_directory() }}/\
+            .just/.test_report.{{ python }}.html\
+        ' \
+        --junitxml='{{ justfile_directory() }}/.just/.junit.{{ python }}.xml' \
+        --md-report-output='\
+            {{ justfile_directory() }}/.just/.test_report{{ python }}.md\
+        '\
+        --basetemp='{{ justfile_directory() }}/.just/test/{{ wheel }}/{{ python }}/tmp' \
+        --cov-config='{{ justfile_directory() }}/.coveragerc' \
+        '{{ justfile_directory() }}/src' \
+        '{{ justfile_directory() }}/tests'
 
 test python: (venv "test" python)
     @TMPDIR="{{ justfile_directory() }}/.just/test/{{ python }}/tmp/" \
@@ -170,7 +236,7 @@ coverage-combine:
         --data-file=.coverage \
     "
 
-coverage:
+coverage args="":
     @[ -f "{{ justfile_directory() }}/.just/.coverage" ] || \
         just coverage-combine
     @just uvr " \
@@ -179,6 +245,7 @@ coverage:
         --rcfile='{{ justfile_directory() }}/.coveragerc' \
         --data-file='{{ justfile_directory() }}/.just/.coverage' \
         --skip-covered \
+        {{ args }} \
     "
 
 reuse args="":
@@ -200,16 +267,6 @@ pip-audit args="":
         pip-audit \
         --disable-pip \
         --require-hashes \
-        {{ args }} \
-    "
-
-requirements args="":
-    @just uv " \
-        export \
-        --quiet \
-        --frozen \
-        --no-dev \
-        --no-emit-project \
         {{ args }} \
     "
 
@@ -370,10 +427,11 @@ translation-update locale="":
             --locale='{{ locale }}' \
     "
 
-install-dev-tools:
+dev-tools-upgrade:
+    @just uv "tool install --upgrade rust-just"
+    @just uv "tool install --upgrade pre-commit --with=pre-commit-uv"
+    @just uv "tool install --upgrade reuse"
+    @just uv "tool install --upgrade pyright"
     @just uv "tool install --upgrade pip-audit"
-    @just uv "tool install --with pre-commit-uv --upgrade pre-commit"
-    @just uv "tool install pyright"
-    @just uv "tool install reuse"
-    @just uv "tool install ruff"
-    @just uv "tool install cyclonedx-bom"
+    @just uv "tool install --upgrade ruff"
+    @just uv "tool install --upgrade cyclonedx-bom"
