@@ -3,12 +3,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
+# list all receipts
 default:
     @just --list
 
+# initialise Just working directory
 init:
     [ -d .just ] || mkdir .just
 
+# run all tests
 all:
     @just pre-commit
     @just lint
@@ -23,22 +26,25 @@ all:
     @just build-documentation
     @just build
 
-venv session python wheel="": init
-    [ -d ".just/{{ session }}/{{ wheel }}/{{ python }}" ] || \
-        mkdir -p ".just/{{ session }}/{{ wheel }}/{{ python }}"
-    [ -d ".just/{{ session }}/{{ wheel }}/{{ python }}/tmp" ] || \
-        mkdir -p ".just/{{ session }}/{{ wheel }}/{{ python }}/tmp"
-    [ -d ".just/{{ session }}/{{ wheel }}/{{ python }}/.venv" ] || \
+# Create a virtual environment for a receipt, Python and optionally a wheel
+venv receipt python wheel="": init
+    [ -d ".just/{{ receipt }}/{{ wheel }}/{{ python }}" ] || \
+        mkdir -p ".just/{{ receipt }}/{{ wheel }}/{{ python }}"
+    [ -d ".just/{{ receipt }}/{{ wheel }}/{{ python }}/tmp" ] || \
+        mkdir -p ".just/{{ receipt }}/{{ wheel }}/{{ python }}/tmp"
+    [ -d ".just/{{ receipt }}/{{ wheel }}/{{ python }}/.venv" ] || \
         uv venv \
             --no-project \
             --no-config \
             --python={{ python }} \
-            ".just/{{ session }}/{{ wheel }}/{{ python }}/.venv"
+            ".just/{{ receipt }}/{{ wheel }}/{{ python }}/.venv"
 
+# Run `uv`
 uv args="":
     uv \
     {{ args }}
 
+# Run `uv run`
 uvr args="":
     @just uv " \
         run \
@@ -49,6 +55,7 @@ uvr args="":
         {{ args }} \
     "
 
+# Run `uv tool run`
 uvx args="":
     @just uv " \
         tool run \
@@ -56,6 +63,7 @@ uvx args="":
         {{ args }} \
     "
 
+# Export a pip requirements file
 requirements args="":
     @just uv " \
         export \
@@ -66,33 +74,46 @@ requirements args="":
         {{ args }} \
     "
 
+# Clean Python temporary files
 clean-python:
     @just uvx "pyclean ."
 
+# Clean the generated Bill of Material (BOM)
 clean-BOM:
     rm -rf BOM
 
+# Clean the documentation
 clean-docs:
     rm -rf docs_build
 
+# Clean the just working directory
 clean-just:
     rm -rf .just
 
+# Clean the compiled translation file
 clean-translation:
     find src/ -name *.mo -type f -delete
 
+# Clean the sdist and wheel directory
+clean dist:
+    rm -rf dist
+
+# Clean everything
 clean-all:
     @just clean-python
     @just clean-BOM
     @just clean-just
     @just clean-docs
     @just clean-translation
+    @just clean-dist
 
-for-all-python session args="":
+# Run a receipt for all Python versions (found in the .python-versions file). Works for all receipt whose first argument is a Python version
+for-all-python receipt args="":
     for python in `grep -v '^#' {{ justfile_directory() }}/.python-versions`; do \
-        just {{ session }} $python {{ args }}; \
+        just {{ receipt }} $python {{ args }}; \
     done
 
+# Run the tests with pytest for a given Python and wheel
 test-wheel python wheel: (venv "test" python wheel)
     @just requirements " \
         --only-group=tests \
@@ -141,6 +162,7 @@ test-wheel python wheel: (venv "test" python wheel)
         '{{ justfile_directory() }}/tests' \
     "
 
+# Run the tests with pytest for a given Python
 test python: (venv "test" python)
     @TMPDIR="{{ justfile_directory() }}/.just/test/{{ python }}/tmp/" \
     PYTHONOPTIMIZE=0 \
@@ -169,9 +191,11 @@ test python: (venv "test" python)
         "{{ justfile_directory() }}/tests" \
     "
 
+# Open a test report in a web browser
 test-report python:
     $BROWSER "{{ justfile_directory() }}/.just/.test_report.{{ python }}.html"
 
+# Run pre-commit
 pre-commit args="":
     @just uvx " \
         --with pre-commit-uv \
@@ -181,6 +205,7 @@ pre-commit args="":
         {{ args }} \
     "
 
+# Lint the project with pylint
 lint:
     @just uvr " \
         --group=lint \
@@ -191,6 +216,7 @@ lint:
         '{{ justfile_directory() }}/docs' \
     "
 
+# Check the types corectness with Pyright for a given Python
 check-types python: (venv "check-types" python)
     @just uvr " \
         --python='\
@@ -206,6 +232,7 @@ check-types python: (venv "check-types" python)
         --project="{{ justfile_directory() }}/pyrightconfig.json" \
     "
 
+# Print the dependency tree for a given Python
 print-dependency-tree python: (venv "print-dependency-tree" python)
     uv tree \
         --python="\
@@ -215,9 +242,11 @@ print-dependency-tree python: (venv "print-dependency-tree" python)
         --frozen \
         --no-dev
 
+# Build the project sdist and wheel
 build:
     uv build
 
+# Combine coverage files
 coverage-combine:
     @[ "$(find .just -maxdepth 1 -type f -name '.coverage.*')" ] \
         || just for-all-python test
@@ -229,6 +258,7 @@ coverage-combine:
         --data-file=.coverage \
     "
 
+# Report coverage in various formats (lcov, html, xml)
 coverage-report:
     @[ -f "{{ justfile_directory() }}/.just/.coverage" ] || \
         just coverage-combine
@@ -254,6 +284,7 @@ coverage-report:
         --data-file='{{ justfile_directory() }}/.just/.coverage' \
     "
 
+# Print coverage
 coverage args="":
     @[ -f "{{ justfile_directory() }}/.just/.coverage" ] || \
         just coverage-combine
@@ -266,12 +297,14 @@ coverage args="":
         {{ args }} \
     "
 
+# Run `reuse`
 reuse args="":
     @just uvx " \
         reuse \
         {{ args }} \
     "
 
+# Export Bill of Material of project's files and their licenses
 BOM-licenses:
     [ -d "BOM" ] || mkdir "BOM"
     @just reuse " \
@@ -280,6 +313,7 @@ BOM-licenses:
         --output BOM/project_licenses.spdx \
     "
 
+# Run `pip-audit`
 pip-audit args="":
     @just uvx " \
         pip-audit \
@@ -288,6 +322,7 @@ pip-audit args="":
         {{ args }} \
     "
 
+# Export Bill of Material of project's dependencies and vulnerabilities for a given Python
 BOM-vulnerabilities python:
     [ -d "BOM" ] || mkdir -p "BOM/vulnerabilities-{{ python }}"
     @just requirements " \
@@ -312,22 +347,26 @@ BOM-vulnerabilities python:
         --output 'BOM/vulnerabilities-{{ python }}/vulnerabilities.cdx.json' \
     "
 
+# Export a Bill of Material of project files licenses and dependencies
 BOM:
     @just BOM-licenses
     @just for-all-python BOM-vulnerabilities
 
+# Try to autofix a maximum of errors and typos
 autofix:
     -@just pre-commit trailing-whitespace
     -@just pre-commit pyproject-fmt
     -@just pre-commit ruff-format
     -@just pre-commit ruff
 
+# Run `bandit`
 bandit args="":
     @just uvx " \
         bandit \
         {{ args }} \
     "
 
+# Check code vulnerabilities (static analysis)
 check-vulnerabilities:
     @just bandit " \
         --recursive \
@@ -337,6 +376,7 @@ check-vulnerabilities:
         {{ justfile_directory() }}/docs \
     "
 
+# Run `tryceratops`
 tryceratops args="":
     @just uvr " \
         --group=check-exceptions \
@@ -344,6 +384,7 @@ tryceratops args="":
         {{ args }} \
     "
 
+# Check code exceptions (static analysis)
 check-exceptions:
     @just tryceratops " \
         src \
@@ -351,12 +392,14 @@ check-exceptions:
         docs \
     "
 
+# Run `radon`
 radon args="":
     @just uvx " \
         radon \
         {{ args }} \
     "
 
+# Print a report of the project's code complexity
 audit-code-maintainability:
     @just radon " \
         mi \
@@ -365,12 +408,14 @@ audit-code-maintainability:
         src \
     "
 
+# Run `xenon`
 xenon args="":
     @just uvx " \
         xenon \
         {{ args }} \
     "
 
+# Check code complexity
 check-code-maintainability:
     @just xenon " \
         --max-average=A \
@@ -381,9 +426,11 @@ check-code-maintainability:
         src \
     "
 
+# Check licenses
 check-licenses:
     @just reuse lint
 
+# Check for vulnerabilities in the dependencies
 check-supply-chain python: (venv "check-supply-chain" python)
     @just requirements " \
         --output-file '\
@@ -398,6 +445,7 @@ check-supply-chain python: (venv "check-supply-chain" python)
         ' \
     "
 
+# Run `sphinx-build`
 sphinx-build args="":
     @just uvr " \
             --group=build-documentation \
@@ -410,12 +458,15 @@ sphinx-build args="":
         {{ args }} \
     "
 
+# Build the documentation
 build-documentation:
     @just sphinx-build --builder=html
 
+# Check that there are no dead links in the documentation
 check-documentation-links:
     @just sphinx-build --builder=linkcheck
 
+# Run `sphinx-autobuild`
 sphinx-autobuild args="":
     @just uvr " \
             --group=serve-documentation \
@@ -428,9 +479,11 @@ sphinx-autobuild args="":
         {{ args }} \
     "
 
+# Serve the documentation on a given port. If port=0 a random available port is set.
 serve-documentation port="0":
     @just sphinx-autobuild "--port={{ port }}"
 
+# Run `pybabel`
 pybabel args="":
     @just uvr " \
         --only-group=localization \
@@ -439,6 +492,7 @@ pybabel args="":
         {{ args }} \
     "
 
+# Extract the translation from the Python source files
 translation-extract:
     @just pybabel " \
         extract \
@@ -448,6 +502,7 @@ translation-extract:
             src \
     "
 
+# Initialize a translation for a given locale (language)
 translation-init locale:
     @just pybabel " \
         init \
@@ -456,6 +511,7 @@ translation-init locale:
             --locale='{{ locale }}' \
     "
 
+# Update a translation for a given locale (language)
 translation-update locale="":
     @just pybabel " \
         update \
@@ -465,6 +521,7 @@ translation-update locale="":
             --locale='{{ locale }}' \
     "
 
+# Install or update the tools used by Just receipts
 dev-tools-upgrade:
     @just uv "tool install --upgrade rust-just"
     @just uv "tool install --upgrade pre-commit --with=pre-commit-uv"
