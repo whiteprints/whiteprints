@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+cache-keys = [
+    { git = { commit = true, tags = true } },
+    { file = "pyproject.toml" },
+    { file = "uv.toml.py" },
+    { file = "hatch.toml" },
+    { file = "hatch_build.py" },
+    { file = "*.md" },
+    { file = "uv.lock" },
+]
