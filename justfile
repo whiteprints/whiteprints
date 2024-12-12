@@ -323,9 +323,13 @@ pip-audit args="":
 
 # Export Bill of Material of project's dependencies and vulnerabilities for a given Python
 BOM-vulnerabilities python:
-    [ -d "BOM" ] || mkdir -p "BOM/vulnerabilities-{{ python }}"
+    [ -d "BOM" ] || \
+        mkdir -p "BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}"
     @just requirements " \
-        --output-file 'BOM/vulnerabilities-{{ python }}/requirements.txt' \
+        --output-file '\
+            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/\
+            requirements.txt\
+        ' \
     "
     @just uvx " \
         --from cyclonedx-bom \
@@ -335,15 +339,21 @@ BOM-vulnerabilities python:
                 BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/\
                 project_dependencies.cdx.json\
             ' \
-        ' \
+        '\
             BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/\
             requirements.txt\
         ' \
     "
     @just pip-audit " \
-        --requirement 'BOM/vulnerabilities-{{ python }}/requirements.txt' \
+        --requirement '\
+            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/\
+            requirements.txt\
+        ' \
         --format cyclonedx-json \
-        --output 'BOM/vulnerabilities-{{ python }}/vulnerabilities.cdx.json' \
+        --output '\
+            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/\
+            vulnerabilities.cdx.json\
+        ' \
     "
 
 # Export a Bill of Material of project files licenses and dependencies
