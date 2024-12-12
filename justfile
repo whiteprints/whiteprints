@@ -289,8 +289,8 @@ BOM-vulnerabilities python:
         --from cyclonedx-bom \
     cyclonedx-py requirements \
         --outfile \
-            'BOM/vulnerabilities-{{ python }}/project_dependencies.cdx.json' \
-        'BOM/vulnerabilities-{{ python }}/requirements.txt' \
+            'BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/project_dependencies.cdx.json' \
+        'BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/requirements.txt' \
     "
     @just pip-audit " \
         --requirement 'BOM/vulnerabilities-{{ python }}/requirements.txt' \
