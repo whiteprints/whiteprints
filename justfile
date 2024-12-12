@@ -13,6 +13,7 @@ all:
     @just pre-commit
     @just lint
     @just check-vulnerabilities
+    @just check-exceptions
     @just check-code-maintainability
     @just for-all-python check-types
     @just for-all-python test
@@ -311,6 +312,19 @@ check-vulnerabilities:
         {{ justfile_directory() }}/src \
         {{ justfile_directory() }}/tests \
         {{ justfile_directory() }}/docs \
+    "
+
+tryceratops args="":
+    @just uvx " \
+        tryceratops \
+        {{ args }} \
+    "
+
+check-exceptions:
+    @just tryceratops " \
+        src \
+        tests \
+        docs \
     "
 
 radon args="":
