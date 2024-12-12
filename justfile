@@ -315,7 +315,8 @@ check-vulnerabilities:
     "
 
 tryceratops args="":
-    @just uvx " \
+    @just uvr " \
+        --group=check-exceptions \
         tryceratops \
         {{ args }} \
     "
