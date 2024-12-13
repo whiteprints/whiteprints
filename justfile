@@ -3,12 +3,23 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # list all receipts
+
+
+# Uncomment this to use project local uv cache.
+# export UV_CACHE_DIR := ".just/.cache/uv"
+export UV_NO_PROGRESS := "true"
+
+
 default:
     @just --list
 
-# initialise Just working directory
+# initialise Just working directory and synchronize the virtualenv
 init:
-    [ -d .just ] || mkdir .just
+    [ -d .just ] || mkdir -p .just
+    uv sync \
+        --frozen \
+        --all-groups \
+        --all-extras
 
 # run all tests
 all:
@@ -94,8 +105,11 @@ clean-translation:
     find src/ -name *.mo -type f -delete
 
 # Clean the sdist and wheel directory
-clean dist:
+clean-dist:
     rm -rf dist
+
+clean-uv-cache:
+    uv cache prune
 
 # Clean everything
 clean-all:
@@ -228,7 +242,7 @@ check-types python: (venv "check-types" python)
             uv python find \
             {{ justfile_directory() }}/.just/check-types/{{ python }}/.venv \
         )' \
-        --project="{{ justfile_directory() }}/pyrightconfig.json" \
+        --project='{{ justfile_directory() }}/pyrightconfig.json' \
     "
 
 # Print the dependency tree for a given Python
