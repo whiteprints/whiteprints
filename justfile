@@ -2,14 +2,13 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# list all receipts
-
 
 # Uncomment this to use project local uv cache.
 # export UV_CACHE_DIR := ".just/.cache/uv"
 export UV_NO_PROGRESS := "true"
 
 
+# list all receipts
 default:
     @just --list
 
@@ -40,14 +39,13 @@ all:
 venv receipt python wheel="": init
     [ -d ".just/{{ receipt }}/{{ wheel }}/{{ python }}" ] || \
         mkdir -p ".just/{{ receipt }}/{{ wheel }}/{{ python }}"
-    [ -d ".just/{{ receipt }}/{{ wheel }}/{{ python }}/tmp" ] || \
-        mkdir -p ".just/{{ receipt }}/{{ wheel }}/{{ python }}/tmp"
-    [ -d ".just/{{ receipt }}/{{ wheel }}/{{ python }}/.venv" ] || \
-        uv venv \
-            --no-project \
-            --no-config \
-            --python={{ python }} \
-            ".just/{{ receipt }}/{{ wheel }}/{{ python }}/.venv"
+    rm -rf ".just/{{ receipt }}/{{ wheel }}/{{ python }}/tmp"
+    mkdir -p ".just/{{ receipt }}/{{ wheel }}/{{ python }}/tmp"
+    uv venv \
+        --no-project \
+        --no-config \
+        --python={{ python }} \
+        ".just/{{ receipt }}/{{ wheel }}/{{ python }}/.venv"
 
 # Run `uv`
 uv args="":
