@@ -91,7 +91,7 @@ jobs:
         run: |
           just ${{ matrix.receipt }}
       - name: Upload documentation
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4
         if: "${{ matrix.receipt == 'build-documentation' }}"
         with:
           name: documentation
@@ -146,7 +146,7 @@ jobs:
           fi
       - name: Upload coverage data
         if: always()
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4
         with:
           name: coverage-data-${{ matrix.os }}-${{ matrix.python }}
           path: .just/.coverage.*
@@ -154,7 +154,7 @@ jobs:
           include-hidden-files: true
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.python }}
           path: .just/.junit-*.xml
