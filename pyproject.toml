@@ -4,6 +4,11 @@
 
 [build-system]
 build-backend = "hatchling.build"
+requires = [
+    "hatch-fancy-pypi-readme>=24.1",
+    "hatch-vcs>=0.4",
+    "hatchling>=1.27",
+]
 
 [project]
 name = "whiteprints"
