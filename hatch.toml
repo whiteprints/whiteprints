@@ -52,9 +52,6 @@ exclude = [
 
 [build.hooks.custom]
 dependencies = [
-    "hatch-fancy-pypi-readme>=24.1",
-    "hatch-vcs>=0.4",
-    "hatchling>=1.27",
     "babel>=1.25.0",
     "setuptools>=2.16.0",
     "typing-extensions>=4.12.1; python_version<'3.12'",
