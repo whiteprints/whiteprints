@@ -7,7 +7,7 @@ build-backend = "hatchling.build"
 requires = [
     "hatch-fancy-pypi-readme>=24.1",
     "hatch-vcs>=0.4",
-    "hatchling>=1.25",
+    "hatchling>=1.27",
 ]
 
 [project]
@@ -54,7 +54,7 @@ dependencies = [
     "python-dotenv==1.0.1",
     "rich-click==1.8.5",
     "typing-extensions==4.12.2; python_full_version<'3.12'",
-    "uv==0.5.13",
+    "uv==0.5.16",
 ]
 
 urls.changelog = "https://github.com/whiteprints/whiteprints/releases"
