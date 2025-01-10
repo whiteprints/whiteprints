@@ -2333,7 +2333,7 @@ wheels = [
 
 [[package]]
 name = "whiteprints"
-version = "0.10.9.dev23+g51558d0.d20250110"
+version = "0.10.9.dev33+ga43a272.d20250110"
 source = { editable = "." }
 dependencies = [
     { name = "distro" },
@@ -2390,6 +2390,7 @@ coverage = [
 ]
 dev = [
     { name = "babel" },
+    { name = "bandit" },
     { name = "beartype" },
     { name = "coverage" },
     { name = "hypothesis" },
@@ -2399,6 +2400,7 @@ dev = [
     { name = "pydata-sphinx-theme" },
     { name = "pylint" },
     { name = "pynvim" },
+    { name = "pyright" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "pytest-html" },
@@ -2508,6 +2510,7 @@ check-vulnerabilities = [{ name = "bandit", specifier = ">=1.7.10" }]
 coverage = [{ name = "coverage", specifier = ">=7.6.1" }]
 dev = [
     { name = "babel", specifier = ">=2.16" },
+    { name = "bandit", specifier = ">=1.7.10" },
     { name = "beartype", specifier = ">=0.18.5" },
     { name = "coverage", specifier = ">=7.6.1" },
     { name = "hypothesis", specifier = ">=6.110.1" },
@@ -2516,6 +2519,7 @@ dev = [
     { name = "pydata-sphinx-theme", specifier = ">=0.16" },
     { name = "pylint", specifier = ">=3.2.6" },
     { name = "pynvim", specifier = ">=0.4.3" },
+    { name = "pyright", specifier = ">=1.1.386" },
     { name = "pytest", specifier = ">=8.3.2" },
     { name = "pytest-cov", specifier = ">=5" },
     { name = "pytest-html", specifier = ">=4.1.1" },
