@@ -112,7 +112,7 @@ clean-uv-cache:
     @just uv "cache prune"
 
 clean-coverage:
-    rm -rf "{{ justfile_directory() }}/.just/.coverage*"
+    rm -f "{{ justfile_directory() }}/.just/.coverage*"
 
 # Clean everything
 clean-all:
@@ -181,6 +181,7 @@ test-wheel python wheel: (venv "test" python wheel)
 
 # Run the tests with pytest for a given Python
 test python: (venv "test" python)
+    rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }}"
     @TMPDIR="{{ justfile_directory() }}/.just/test/{{ python }}/tmp/" \
     PYTHONOPTIMIZE=0 \
     COVERAGE_FILE="\
