@@ -17,8 +17,6 @@ omit =
   /usr/*
   # omit anything in a temporary directory anywhere
   /tmp/**
-  # omit anything related to tox
-  **/.tox/**
   # omit anything related to just
   **/.just/**
 
