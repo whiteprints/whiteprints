@@ -17,7 +17,7 @@ keywords = [
     "Python",
 ]
 license = "GPL-3.0-or-later"
-license-files.paths = [
+license-files = [
     "LICENSES/GPL-3.0-or-later.txt",
 ]
 maintainers = [
