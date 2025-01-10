@@ -16,6 +16,7 @@ default:
 init:
     [ -d .just ] || mkdir -p .just
     uv sync \
+        --refresh \
         --frozen \
         --all-groups \
         --all-extras
@@ -56,6 +57,7 @@ uv args="":
 uvr args="":
     @just uv " \
         run \
+        --refresh \
         --isolated \
         --no-dev \
         --no-editable \
@@ -107,10 +109,14 @@ clean-dist:
     rm -rf dist
 
 clean-uv-cache:
-    uv cache prune
+    @just uv "cache prune"
+
+clean-coverage:
+    rm -rf "{{ justfile_directory() }}/.just/.coverage*"
 
 # Clean everything
 clean-all:
+    @just clean-coverage
     @just clean-python
     @just clean-BOM
     @just clean-just
