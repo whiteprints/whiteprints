@@ -132,6 +132,7 @@ for-all-python receipt args="":
 
 # Run the tests with pytest for a given Python and wheel
 test-wheel python wheel: (venv "test" python wheel)
+    rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }}"
     @just requirements " \
         --only-group=tests \
         --output-file='\
