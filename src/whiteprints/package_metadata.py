@@ -22,6 +22,15 @@ def _find_license_files(
     license_paths: list[metadata.PackagePath],
     license_files: list[str],
 ) -> list[metadata.PackagePath]:
+    """Find the licenses in the wheel defined in the package metadata.
+
+    Args:
+        license_paths: list of license paths found in the package wheel.
+        license_files: list of licenses found in the wheel metadata.
+
+    Returns:
+        the list of code licenses used by the present package.
+    """
     return [
         license_path
         for license_path in license_paths
