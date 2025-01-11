@@ -2,8 +2,10 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-name: Bot auto-merge
-on: pull_request
+name: "Bot auto-merge"
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
 
 permissions:
   contents: write
