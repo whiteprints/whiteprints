@@ -132,7 +132,7 @@ for-all-python receipt args="":
 
 # Run the tests with pytest for a given Python and wheel
 test-wheel python wheel: (venv "test" python wheel)
-    rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }}"
+    rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .jost/.coverage"
     @just requirements " \
         --only-group=tests \
         --output-file='\
@@ -182,7 +182,7 @@ test-wheel python wheel: (venv "test" python wheel)
 
 # Run the tests with pytest for a given Python
 test python: (venv "test" python)
-    rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }}"
+    rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
     @TMPDIR="{{ justfile_directory() }}/.just/test/{{ python }}/tmp/" \
     PYTHONOPTIMIZE=0 \
     COVERAGE_FILE="\
