@@ -49,7 +49,7 @@ dynamic = [
     "version",
 ]
 dependencies = [
-    "distro==1.9",
+    "distro==1.9.0",
     "importlib-metadata==8.6.0; python_full_version<'3.10.0'",
     "python-dotenv==1.0.1",
     "rich-click==1.8.5",
@@ -92,9 +92,9 @@ tests = [
     "pytest-cov>=5.0.0",
     "pytest-html>=4.1.1",
     "pytest-md-report>=0.6.2",
-    "pytest-randomly>=3.15",
+    "pytest-randomly>=3.15.0",
     "pytest-xdist>=3.6.1",
-    "xdoctest[colors]>=1.2",
+    "xdoctest[colors]>=1.2.0",
 ]
 editor = [
     "pynvim>=0.4.3",
@@ -130,12 +130,12 @@ check-vulnerabilities = [
 ]
 build-documentation = [
     "myst-parser[linkify]>=3.0.1",
-    "pydata-sphinx-theme>=0.16",
+    "pydata-sphinx-theme>=0.16.0",
     "sphinx>=7.4.7",
     "sphinx-autoapi>=3.3.3",
     "sphinx-click>=6.0.0",
     "sphinx-copybutton>=0.5.2",
-    "sphinxcontrib-napoleon>=0.7",
+    "sphinxcontrib-napoleon>=0.7.0",
     "sphinxcontrib-spelling>=8.0.0",
 ]
 serve-documentation = [
