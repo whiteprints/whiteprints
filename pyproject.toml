@@ -149,5 +149,5 @@ localization = [
 [tool.pyproject-fmt]
 column_width = 79
 indent = 4
-keep_full_version = false
+keep_full_version = true
 max_supported_python = "3.13"
