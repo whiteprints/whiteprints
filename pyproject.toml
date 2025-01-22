@@ -21,10 +21,10 @@ license-files = [
     "LICENSES/GPL-3.0-or-later.txt",
 ]
 maintainers = [
-    { name = "Romain Brault", email = "" },
+    { name = "Romain Brault", email = "whiteprints@pm.me" },
 ]
 authors = [
-    { name = "Romain Brault", email = "" },
+    { name = "Romain Brault", email = "whiteprints@pm.me" },
 ]
 requires-python = ">=3.9,<4.0"
 classifiers = [
