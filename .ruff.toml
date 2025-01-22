@@ -17,7 +17,7 @@ exclude = [
     ".pants.d",
     ".ruff_cache",
     ".svn",
-    ".tox",
+    ".just",
     ".venv",
     "__pypackages__",
     "_build",
