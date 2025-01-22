@@ -7,13 +7,17 @@
 
 # Python
 .python-version
+
 ## Cache
 __pycache__
 *.pyc
+
 ## Logs
 *.log
+
 ## Editors
 .idea
+
 ## Build
 site
 dist
@@ -21,20 +25,23 @@ build
 _build
 docs_build
 *.egg-info
+
 ## Localization
 *.mo
+
 ## Tests
 .pytest_cache
 .hypothesis
+
 ## Coverage
 .coverage
 .coverage.*
 profile.*
 coverage.*
 htmlcov
+
 ## Integration
-.nox
-.tox
+.just/
 
 # Node
 node_modules
@@ -47,6 +54,3 @@ BOM/
 
 # Copier
 .copier-answers.yml
-
-# just
-.just/
