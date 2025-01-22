@@ -74,7 +74,7 @@ jobs:
           just build-documentation
           zip -r documentation.zip docs_build
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2
+        uses: actions/attest-build-provenance@520d128f165991a6c774bcb264f323e3d70747f4 # v2
         with:
           subject-path: documentation.zip*
       - name: Upload docs
@@ -155,7 +155,7 @@ jobs:
               for f in Path('BOM').rglob('*'):
                   zipf.write(f, f.relative_to('BOM'))
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2
+        uses: actions/attest-build-provenance@520d128f165991a6c774bcb264f323e3d70747f4 # v2
         with:
           subject-path: SBOM.zip*
       - name: Upload SBOM as Release Asset
