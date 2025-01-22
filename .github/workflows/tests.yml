@@ -252,7 +252,7 @@ jobs:
           just coverage --format=markdown >> $GITHUB_STEP_SUMMARY
       - name: Upload coverage report to CodeCov
         if: always()
-        uses: codecov/codecov-action@1e68e06f1dbfde0e4cefc87efeba9e4643565303 # v5
+        uses: codecov/codecov-action@5a605bd92782ce0810fa3b8acc235c921b497052 # v5
         with:
           name: codecov-umbrella
           verbose: true
