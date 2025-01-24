@@ -14,7 +14,7 @@ on:
 jobs:
   build-and-test:
     name: Build and Test
-    uses: ./.github/workflows/callable/build_and_test.yml
+    uses: ./.github/workflows/build_and_test.yml
     with:
       python-version: default
       os: default
