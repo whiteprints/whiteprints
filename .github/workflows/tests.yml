@@ -31,7 +31,13 @@ jobs:
         with:
           pattern: coverage-data-*
           merge-multiple: true
-          path: .just/.coverage.xml
+          path: |
+            .just/.coverage.xml
+            .just/.coverage
+      - name: Report coverage
+        run: |
+          just coverage
+          just coverage --format=markdown >> $GITHUB_STEP_SUMMARY
       - name: Upload coverage report to CodeCov
         if: always()
         uses: codecov/codecov-action@0da7aa657d958d32c117fc47e1f977e7524753c7 # v5
