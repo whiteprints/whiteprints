@@ -223,7 +223,7 @@ jobs:
           cache-to: type=local,dest=~/.docker/buildx-cache
 
   coverage:
-    name: Coverage
+    name: Merge coverage
     runs-on: ubuntu-latest
     environment:
       name: coverage
