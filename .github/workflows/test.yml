@@ -16,6 +16,5 @@ jobs:
     name: Build and Test
     uses: ./.github/workflows/build_and_test.yml
     with:
-      python-version: default
-      os: default
-      docker-image: default
+      os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+      docker-image: ["debian", "alpine"]

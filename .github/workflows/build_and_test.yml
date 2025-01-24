@@ -9,19 +9,13 @@ on:
     inputs:
       python-version:
         description: Python versions to use (comma-separated). Use 'default' to autodetect.
-        required: false
-        default: default
-        type: string
+        default: "default"
       os:
-        description: Operating systems to use (comma-separated). Use 'default' to test on all.
-        required: false
-        default: default
-        type: string
+        description: Operating systems to use.
+        required: true
       docker-image:
-        description: Docker images to use (comma-separated). Use 'default' for the default images.
-        required: false
-        default: default
-        type: string
+        description: Docker images to use.
+        required: true
 
 concurrency:
   group: test-${{ github.ref }}
@@ -57,7 +51,7 @@ jobs:
     strategy:
       matrix:
         python: ${{ inputs.python-version != 'default' && fromJson(inputs.python-version) || fromJson(needs.build-package.outputs.python-versions) }}
-        os: ${{ inputs.os != 'default' && fromJson(inputs.os) || ['ubuntu-latest', 'macos-latest', 'windows-latest'] }}
+        os: ${{ inputs.os }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -86,7 +80,7 @@ jobs:
       PYTHON: "${{ needs.build-package.outputs.python-versions }}"
     strategy:
       matrix:
-        image: ${{ inputs.docker-image != 'default' && fromJson(inputs.docker-image, ',') || ['alpine', 'debian'] }}
+        image: ${{ inputs.docker-image }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
