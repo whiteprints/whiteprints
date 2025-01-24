@@ -211,9 +211,9 @@ jobs:
         uses: docker/build-push-action@67a2d409c0a876cbe6b11854e3e25193efe4e62d # v6
         with:
           context: .
-          file: ./container/Containerfile.${{ matrix.image.name }}
+          file: ./container/Containerfile.${{ matrix.image }}
           tags: |
-            ${{ steps.meta.outputs.tags }}-${{ matrix.image.name }}
+            ${{ steps.meta.outputs.tags }}-${{ matrix.image }}
           annotations: ${{ steps.meta.outputs.annotations }}
           build-args: |
             VERSION=${{ steps.meta.outputs.version }}
