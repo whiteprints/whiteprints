@@ -8,17 +8,20 @@ on:
   workflow_call:
     inputs:
       python-version:
-        description: "Python version(s) to use (comma-separated or 'default' to autodetect)"
+        description: Python versions to use (comma-separated). Use 'default' to autodetect.
         required: false
-        default: "default"
+        default: default
+        type: string
       os:
-        description: "Operating system(s) to test on (comma-separated, or 'default' for all)"
+        description: Operating systems to use (comma-separated). Use 'default' to test on all.
         required: false
-        default: "default"
+        default: default
+        type: string
       docker-image:
-        description: "Docker image(s) to build (comma-separated, or 'default' for predefined matrix)"
+        description: Docker images to use (comma-separated). Use 'default' for the default images.
         required: false
-        default: "default"
+        default: default
+        type: string
 
 concurrency:
   group: test-${{ github.ref }}
