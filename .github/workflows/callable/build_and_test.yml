@@ -1,0 +1,129 @@
+# SPDX-License-IdentifierText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: Build and test
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: "Python version(s) to use (comma-separated or 'default' to autodetect)"
+        required: false
+        default: "default"
+      os:
+        description: "Operating system(s) to test on (comma-separated, or 'default' for all)"
+        required: false
+        default: "default"
+      docker-image:
+        description: "Docker image(s) to build (comma-separated, or 'default' for predefined matrix)"
+        required: false
+        default: "default"
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-package:
+    name: Build and inspect package
+    runs-on: ubuntu-latest
+    environment:
+      name: tests
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Build and inspect package
+        id: baipp
+        uses: hynek/build-and-inspect-python-package@v2
+      - name: Find latest Python
+        id: baipp-latest
+        run: |
+          echo "supported_python_latest=$(echo '${{ steps.baipp.outputs.supported_python_classifiers_json_array }}' | jq -r -S '.[-1]')" >> "$GITHUB_OUTPUT"
+    outputs:
+      python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
+      python-latest: ${{ steps.baipp-latest.outputs.supported_python_latest }}
+
+  check-types:
+    name: Run type checker under Python ${{ matrix.python }} on ${{ matrix.os }}
+    needs:
+      - build-package
+    runs-on: ${{ matrix.os }}
+    environment:
+      name: tests
+    strategy:
+      matrix:
+        python: ${{ inputs.python-version != 'default' && fromJson(inputs.python-version) || fromJson(needs.build-package.outputs.python-versions) }}
+        os: ${{ inputs.os != 'default' && split(inputs.os, ',') || ['ubuntu-latest', 'macos-latest', 'windows-latest'] }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Install project
+        run: |
+          uv sync --no-dev --group=check-types --python ${{ matrix.python }}
+      - name: Run Pyright
+        uses: jakebailey/pyright-action@v2
+        with:
+          python-version: "${{ matrix.python }}"
+
+  container-deploy:
+    name: Build Container
+    needs:
+      - build-package
+    runs-on: ubuntu-latest
+    environment:
+      name: tests
+    env:
+      REGISTRY: ghcr.io
+      PYTHON: "${{ needs.build-package.outputs.python-versions }}"
+    strategy:
+      matrix:
+        image: ${{ inputs.docker-image != 'default' && split(inputs.docker-image, ',') || ['alpine', 'debian'] }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Download built packages from the build-package job
+        uses: actions/download-artifact@v4
+        with:
+          name: Packages
+          path: dist
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}
+          tags: |
+            type=pep440,pattern={{version}},event=tag
+            type=ref,event=branch,prefix=latest-
+            type=sha
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set BUILD_DATE
+        run: echo "BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./container/Containerfile.${{ matrix.image.name }}
+          tags: |
+            ${{ steps.meta.outputs.tags }}-${{ matrix.image.name }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+            REVISION=${{ github.sha }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
+          cache-from: type=local,src=~/.docker/buildx-cache
+          cache-to: type=local,dest=~/.docker/buildx-cache

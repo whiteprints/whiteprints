@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: Test Workflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    tags-ignore: ["**"]
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    uses: ./.github/workflows/callable/build_and_test.yml
+    with:
+      python-version: default
+      os: default
+      docker-image: default
