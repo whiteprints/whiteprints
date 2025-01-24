@@ -110,7 +110,7 @@ jobs:
           path: docs_build/
           overwrite: true
 
-  tests:
+  test-package:
     name: Run tests under Python ${{ matrix.python }} on ${{ matrix.os }}
     needs:
       - check-code
@@ -171,7 +171,7 @@ jobs:
           overwrite: true
           include-hidden-files: true
 
-  container-deploy:
+  build-container:
     name: Build Container
     needs:
       - build-package
@@ -228,8 +228,8 @@ jobs:
     environment:
       name: coverage
     needs:
-      - test
-      - container-deploy
+      - test-package
+      - build-container
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
