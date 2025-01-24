@@ -183,7 +183,7 @@ jobs:
       PYTHON: "${{ needs.build-package.outputs.python-versions }}"
     strategy:
       matrix:
-        image: ${{ fromJson(inputs.docker-image) }}
+        image: ${{ fromJson(inputs.container-image) }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
