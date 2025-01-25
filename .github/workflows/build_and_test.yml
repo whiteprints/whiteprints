@@ -226,7 +226,7 @@ jobs:
     name: Merge coverage
     runs-on: ubuntu-latest
     environment:
-      name: coverage
+      name: tests
     needs:
       - test-package
       - build-container
