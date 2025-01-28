@@ -31,9 +31,8 @@ jobs:
       - name: Download coverage data
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
-          include-hidden-files: true
-          path: |
-            .just/.coverage
+          merge-multiple: true
+          path: .just/.coverage
       - name: Install uv
         uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5
         with:
