@@ -249,13 +249,11 @@ jobs:
       - name: Run coverage
         run: |
           just coverage-combine
-          just coverage-report
-      - name: Upload coverage data
+      - name: Upload coverage
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
-          overwrite: true
-          include-hidden-files: true
+          name: .coverage
           path: |
             .just/.coverage
-            .just/.coverage.xml
-
+          overwrite: true
+          include-hidden-files: true

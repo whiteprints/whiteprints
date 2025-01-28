@@ -33,8 +33,13 @@ jobs:
         with:
           pattern: coverage-data-*
           merge-multiple: true
-          path: |
-            .just/.coverage*
+          path: .just/
+      - name: Download coverage
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        with:
+          name: .coverage
+          merge-multiple: true
+          path: .just/
       - name: Install uv
         uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5
         with:
@@ -45,6 +50,7 @@ jobs:
       - name: Report coverage
         run: |
           just coverage
+          just coverage-report
           just coverage --format=markdown >> $GITHUB_STEP_SUMMARY
       - name: Upload coverage report to CodeCov
         if: always()

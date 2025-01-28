@@ -19,7 +19,6 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-
       - name: Try to download built artifact
         id: download-artifact
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
@@ -27,31 +26,24 @@ jobs:
           name: Packages
           path: dist
         continue-on-error: true
-
       - name: Build and Test Workflow (fallback if no artifacts available)
         if: steps.download-artifact.outcome == 'failure'
         uses: ./.github/workflows/build_and_test.yml
         id: build_and_test
-        with:
-          python-version: "default"
-          os: "['ubuntu-latest']"
-
-      - name: Set Python Versions from Build and Test Workflow
-        if: steps.download-artifact.outcome == 'failure'
-        run: echo "PYTHON_VERSIONS=${{ steps.build_and_test.outputs.python-versions }}" >> $GITHUB_ENV
-
       - name: Retry downloading artifact after fallback build
         if: steps.download-artifact.outcome == 'failure'
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           name: Packages
           path: dist
-
       - name: Upload dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload ${{ github.ref_name }} dist/** --clobber
+    outputs:
+      python-versions: ${{ steps.build_and_test.outputs.python-versions }}
+
   docs-generation:
     name: Upload documentation
     runs-on: ubuntu-latest
@@ -93,7 +85,7 @@ jobs:
       name: artifacts
     strategy:
       matrix:
-        python: ${{ fromJson(steps.build_and_test.outputs.python-versions) }}
+        python: ${{ fromJson(needs.release-package.outputs.python-versions) }}
         os:
           - ubuntu-latest
           - macos-latest
@@ -101,20 +93,16 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-
       - name: Install uv
         uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5
         with:
           version: "latest"
           enable-cache: true
-
       - name: Install just
         uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
-
       - name: SBOM generation
         run: |
           just BOM-vulnerabilities ${{ matrix.python }}
-
       - name: Upload BOM vulnerabilities
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
