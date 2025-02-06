@@ -101,7 +101,6 @@ class TestCLI:
                 "--data",
                 "target_python_version=py39",
             ],
-            env={"UV_NO_CACHE": "true"},
         )
         assert result.exit_code == 0, "The CLI did not exit properly."
 
