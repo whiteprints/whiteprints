@@ -15,11 +15,6 @@ default:
 # initialise Just working directory and synchronize the virtualenv
 init:
     [ -d .just ] || mkdir -p .just
-    uv sync \
-        --refresh \
-        --frozen \
-        --all-groups \
-        --all-extras
 
 # run all tests
 all:
@@ -62,6 +57,7 @@ uvr args="":
         --no-dev \
         --no-editable \
         --frozen \
+        --exact \
         {{ args }} \
     "
 
@@ -76,11 +72,11 @@ uvx args="":
 # Export a pip requirements file
 requirements args="":
     @just uv " \
-        export \
+        pip compile \
         --quiet \
-        --frozen \
-        --no-dev \
-        --no-emit-project \
+        --refresh \
+        --all-extras \
+        --generate-hashes \
         {{ args }} \
     "
 
@@ -131,15 +127,8 @@ for-all-python receipt args="":
     done
 
 # Run the tests with pytest for a given Python and wheel
-test-wheel python wheel: (venv "test" python wheel)
-    rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .jost/.coverage"
-    @just requirements " \
-        --only-group=tests \
-        --output-file='\
-            {{ justfile_directory() }}\
-            /.just/test/{{ wheel }}/{{ python }}/requirements-tests.txt\
-        ' \
-    "
+test-wheel python wheel resolution="highest": (venv "test" python wheel)
+    rm -f "{{ justfile_directory() }}/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
     @TMPDIR="\
         {{ justfile_directory() }}/.just/test/{{ wheel }}/{{ python }}/tmp\
     " \
@@ -149,16 +138,13 @@ test-wheel python wheel: (venv "test" python wheel)
         .just/.coverage.{{ arch() }}-{{ os() }}-{{ python }}\
     " \
     just uvr " \
-        --with-requirements='\
-            {{ justfile_directory() }}\
-            /.just/test/{{ wheel }}/{{ python }}/requirements-tests.txt\
-        ' \
+        --resolution={{ resolution }} \
         --with='{{ wheel }}' \
+        --group=tests \
         --python='\
             {{ justfile_directory() }}\
             /.just/test/{{ wheel }}/{{ python }}/.venv\
         ' \
-        --no-sync \
     pytest \
         --html='\
             {{ justfile_directory() }}/\
@@ -342,10 +328,11 @@ pip-audit args="":
     "
 
 # Export Bill of Material of project's dependencies and vulnerabilities for a given Python
-BOM-vulnerabilities python:
+BOM-vulnerabilities python resolution="highest":
     [ -d "BOM" ] || \
         mkdir -p "BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}"
     @just requirements " \
+        --resolution={{ resolution }} \
         --output-file '\
             BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/\
             requirements.txt\

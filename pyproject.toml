@@ -97,7 +97,7 @@ tests = [
     "xdoctest[colors]>=1.2.0",
 ]
 editor = [
-    "pynvim>=0.4.3",
+    "pynvim>=0.5.2",
 ]
 profile = [
     "scalene>=1.5.19",
@@ -132,7 +132,7 @@ build-documentation = [
     "myst-parser[linkify]>=3.0.1",
     "pydata-sphinx-theme>=0.16.0",
     "sphinx>=7.4.7",
-    "sphinx-autoapi>=3.3.3",
+    "sphinx-autoapi>=3.4.0",
     "sphinx-click>=6.0.0",
     "sphinx-copybutton>=0.5.2",
     "sphinxcontrib-napoleon>=0.7.0",
