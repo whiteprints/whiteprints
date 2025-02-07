@@ -147,23 +147,20 @@ test-wheel python wheel resolution="highest": (venv "test" python wheel)
         ' \
     pytest \
         --html='\
-            {{ justfile_directory() }}/\
             .just/.test_report.{{ python }}.html\
         ' \
         --junitxml='\
-            {{ justfile_directory() }}\
             /.just/.junit-{{ arch() }}-{{ os() }}-{{ python }}.xml\
         ' \
         --md-report-output='\
-            {{ justfile_directory() }}/.just/.test_report{{ python }}.md\
+            .just/.test_report{{ python }}.md\
         ' \
         --basetemp='\
-            {{ justfile_directory() }}/\
             .just/test/{{ wheel }}/{{ python }}/tmp\
         ' \
-        --cov-config='{{ justfile_directory() }}/.coveragerc' \
-        '{{ justfile_directory() }}/src' \
-        '{{ justfile_directory() }}/tests' \
+        --cov-config='.coveragerc' \
+        'src' \
+        'tests' \
     "
 
 # Run the tests with pytest for a given Python
@@ -172,28 +169,25 @@ test-repository python: (venv "test" python)
     @TMPDIR="{{ justfile_directory() }}/.just/test/{{ python }}/tmp/" \
     PYTHONOPTIMIZE=0 \
     COVERAGE_FILE="\
-        {{ justfile_directory() }}/\
         .just/.coverage.{{ arch() }}-{{ os() }}-{{ python }}\
     " \
     just uvr " \
         --python='\
-            {{ justfile_directory() }}\
-            /.just/test/{{ python }}/.venv\
+            .just/test/{{ python }}/.venv\
         ' \
         --group=tests \
     pytest \
         --html='\
-            {{ justfile_directory() }}/\
             .just/.test_report.{{ python }}.html\
         ' \
-        --junitxml='{{ justfile_directory() }}/.just/.junit.{{ python }}.xml' \
+        --junitxml='.just/.junit.{{ python }}.xml' \
         --md-report-output='\
-            {{ justfile_directory() }}/.just/.test_report{{ python }}.md\
+            .just/.test_report{{ python }}.md\
         ' \
-        --basetemp="{{ justfile_directory() }}/.just/test/{{ python }}/tmp" \
-        --cov-config="{{ justfile_directory() }}/.coveragerc" \
-        "{{ justfile_directory() }}/src" \
-        "{{ justfile_directory() }}/tests" \
+        --basetemp=".just/test/{{ python }}/tmp" \
+        --cov-config=".coveragerc" \
+        "src" \
+        "tests" \
     "
 
 alias test := test-repository
