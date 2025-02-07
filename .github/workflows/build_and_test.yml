@@ -33,10 +33,6 @@ on:
         default: "['debian', 'alpine']"
         required: false
 
-concurrency:
-  group: test-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
   build-package:
     name: Build and inspect package
