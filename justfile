@@ -167,7 +167,7 @@ test-wheel python wheel resolution="highest": (venv "test" python wheel)
     "
 
 # Run the tests with pytest for a given Python
-test-repository python *args='': (venv "test" python)
+test-repository python: (venv "test" python)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
     @TMPDIR="{{ justfile_directory() }}/.just/test/{{ python }}/tmp/" \
     PYTHONOPTIMIZE=0 \
