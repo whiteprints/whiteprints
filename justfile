@@ -180,7 +180,9 @@ test-repository python: (venv "test" python)
         --html='\
             .just/.test_report.{{ python }}.html\
         ' \
-        --junitxml='.just/.junit.{{ python }}.xml' \
+        --junitxml='\
+            .just/.junit-{{ arch() }}-{{ os() }}-{{ python }}.xml\
+        ' \
         --md-report-output='\
             .just/.test_report{{ python }}.md\
         ' \
