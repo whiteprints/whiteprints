@@ -135,7 +135,7 @@ test-wheel python wheel resolution="highest": (venv "test" python wheel)
     PYTHONOPTIMIZE=0 \
     COVERAGE_FILE="\
         {{ justfile_directory() }}/\
-        .just/.coverage.{{ arch() }}-{{ os() }}-{{ python }}\
+        .just/.coverage.wheel.{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}\
     " \
     just uvr " \
         --resolution={{ resolution }} \
@@ -169,7 +169,7 @@ test-repository python: (venv "test" python)
     @TMPDIR="{{ justfile_directory() }}/.just/test/{{ python }}/tmp/" \
     PYTHONOPTIMIZE=0 \
     COVERAGE_FILE="\
-        .just/.coverage.{{ arch() }}-{{ os() }}-{{ python }}\
+        .just/.coverage.repository.{{ arch() }}-{{ os() }}-{{ python }}\
     " \
     just uvr " \
         --python='\
