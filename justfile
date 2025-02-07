@@ -24,7 +24,7 @@ all:
     @just check-exceptions
     @just check-code-maintainability
     @just for-all-python check-types
-    @just for-all-python test
+    @just for-all-python test-repository
     @just coverage
     @just BOM
     @just check-documentation-links
@@ -167,7 +167,7 @@ test-wheel python wheel resolution="highest": (venv "test" python wheel)
     "
 
 # Run the tests with pytest for a given Python
-test python: (venv "test" python)
+test-repository python *args='': (venv "test" python)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
     @TMPDIR="{{ justfile_directory() }}/.just/test/{{ python }}/tmp/" \
     PYTHONOPTIMIZE=0 \
@@ -195,6 +195,8 @@ test python: (venv "test" python)
         "{{ justfile_directory() }}/src" \
         "{{ justfile_directory() }}/tests" \
     "
+
+alias test := test-repository
 
 # Open a test report in a web browser
 test-report python:
@@ -254,7 +256,7 @@ build:
 # Combine coverage files
 coverage-combine:
     @[ "$(find .just -maxdepth 1 -type f -name '.coverage.*')" ] \
-        || just for-all-python test
+        || just for-all-python test-repository
     @just uvr " \
         --directory='.just' \
         --only-group=coverage \
