@@ -108,7 +108,7 @@ clean-uv-cache:
     @just uv "cache prune"
 
 clean-coverage:
-    rm -f "{{ justfile_directory() }}/.just/.coverage*"
+    rm -f ".just/.coverage*"
 
 # Clean everything
 clean-all:
@@ -128,9 +128,9 @@ for-all-python receipt args="":
 
 # Run the tests with pytest for a given Python and wheel
 test-wheel python wheel resolution="highest": (venv "test" python wheel)
-    rm -f "{{ justfile_directory() }}/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
+    rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
     @TMPDIR="\
-        {{ justfile_directory() }}/.just/test/{{ wheel }}/{{ python }}/tmp\
+        .just/test/{{ wheel }}/{{ python }}/tmp\
     " \
     PYTHONOPTIMIZE=0 \
     COVERAGE_FILE="\
@@ -141,16 +141,13 @@ test-wheel python wheel resolution="highest": (venv "test" python wheel)
         --resolution={{ resolution }} \
         --with='{{ wheel }}' \
         --group=tests \
-        --python='\
-            {{ justfile_directory() }}\
-            /.just/test/{{ wheel }}/{{ python }}/.venv\
-        ' \
+        --python='.just/test/{{ wheel }}/{{ python }}/.venv' \
     pytest \
         --html='\
             .just/.test_report.{{ python }}.html\
         ' \
         --junitxml='\
-            /.just/.junit-{{ arch() }}-{{ os() }}-{{ python }}.xml\
+            .just/.junit-{{ arch() }}-{{ os() }}-{{ python }}.xml\
         ' \
         --md-report-output='\
             .just/.test_report{{ python }}.md\
@@ -166,7 +163,7 @@ test-wheel python wheel resolution="highest": (venv "test" python wheel)
 # Run the tests with pytest for a given Python
 test-repository python: (venv "test" python)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
-    @TMPDIR="{{ justfile_directory() }}/.just/test/{{ python }}/tmp/" \
+    @TMPDIR=".just/test/{{ python }}/tmp/" \
     PYTHONOPTIMIZE=0 \
     COVERAGE_FILE="\
         .just/.coverage.{{ arch() }}-{{ os() }}-{{ python }}\
@@ -194,7 +191,7 @@ alias test := test-repository
 
 # Open a test report in a web browser
 test-report python:
-    $BROWSER "{{ justfile_directory() }}/.just/.test_report.{{ python }}.html"
+    $BROWSER ".just/.test_report.{{ python }}.html"
 
 # Run pre-commit
 pre-commit args="":
@@ -228,7 +225,7 @@ check-types python: (venv "check-types" python)
     pyright \
         --pythonpath='$( \
             uv python find \
-            {{ justfile_directory() }}/.just/check-types/{{ python }}/.venv \
+            .just/check-types/{{ python }}/.venv \
         )' \
         --project='{{ justfile_directory() }}/pyrightconfig.json' \
     "
@@ -261,39 +258,39 @@ coverage-combine:
 
 # Report coverage in various formats (lcov, html, xml)
 coverage-report:
-    @[ -f "{{ justfile_directory() }}/.just/.coverage" ] || \
+    @[ -f ".just/.coverage" ] || \
         just coverage-combine
     @just uvr " \
         --only-group=coverage \
     coverage html \
         --rcfile='{{ justfile_directory() }}/.coveragerc' \
-        --directory='{{ justfile_directory() }}/.just/coverage/htmlcov' \
-        --data-file='{{ justfile_directory() }}/.just/.coverage' \
+        --directory='.just/coverage/htmlcov' \
+        --data-file='.just/.coverage' \
     "
     @just uvr " \
         --only-group=coverage \
     coverage lcov \
         --rcfile='{{ justfile_directory() }}/.coveragerc' \
-        -o='{{ justfile_directory() }}/.just/coverage.lcov' \
-        --data-file='{{ justfile_directory() }}/.just/.coverage' \
+        -o='.just/coverage.lcov' \
+        --data-file='.just/.coverage' \
     "
     @just uvr " \
         --only-group=coverage \
     coverage xml \
         --rcfile='{{ justfile_directory() }}/.coveragerc' \
-        -o='{{ justfile_directory() }}/.just/coverage.xml' \
-        --data-file='{{ justfile_directory() }}/.just/.coverage' \
+        -o='.just/coverage.xml' \
+        --data-file='.just/.coverage' \
     "
 
 # Print coverage
 coverage args="":
-    @[ -f "{{ justfile_directory() }}/.just/.coverage" ] || \
+    @[ -f ".just/.coverage" ] || \
         just coverage-combine
     @just uvr " \
         --only-group=coverage \
     coverage report \
-        --rcfile='{{ justfile_directory() }}/.coveragerc' \
-        --data-file='{{ justfile_directory() }}/.just/.coverage' \
+        --rcfile='.coveragerc' \
+        --data-file='.just/.coverage' \
         --skip-covered \
         {{ args }} \
     "
@@ -446,13 +443,13 @@ check-licenses:
 check-supply-chain python: (venv "check-supply-chain" python)
     @just requirements " \
         --output-file '\
-            {{ justfile_directory() }}/.just/check-supply-chain/\
+            .just/check-supply-chain/\
             {{ python }}/tmp/requirements.txt\
         ' \
     "
     @just pip-audit " \
         --requirement '\
-            {{ justfile_directory() }}/.just/check-supply-chain/\
+            .just/check-supply-chain/\
             {{ python }}/tmp/requirements.txt\
         ' \
     "
@@ -486,7 +483,7 @@ sphinx-autobuild args="":
             --keep-going \
             --open-browser \
         docs \
-        '{{ justfile_directory() }}/.just/sphinx-autobuild/tmp/docs_build/' \
+        '.just/sphinx-autobuild/tmp/docs_build/' \
         {{ args }} \
     "
 
