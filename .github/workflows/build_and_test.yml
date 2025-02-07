@@ -134,7 +134,7 @@ jobs:
         python: ${{ inputs.python-version != 'default' && fromJson(inputs.python-version) || fromJson(needs.build-package.outputs.python-versions) }}
         os: ${{ fromJson(inputs.os) }}
         strategy: ${{ fromJson(inputs.strategy )}}
-        receipt: ${{ formJson(inputs.target )}}
+        receipt: ${{ from(inputs.target )}}
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
