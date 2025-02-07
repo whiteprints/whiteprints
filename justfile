@@ -130,7 +130,7 @@ for-all-python receipt args="":
 test-wheel python wheel resolution="highest": (venv "test" python wheel)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
     @TMPDIR="\
-        .just/test/{{ wheel }}/{{ python }}/tmp\
+        {{ justfile_directory() }}/.just/test/{{ wheel }}/{{ python }}/tmp\
     " \
     PYTHONOPTIMIZE=0 \
     COVERAGE_FILE="\
@@ -141,7 +141,10 @@ test-wheel python wheel resolution="highest": (venv "test" python wheel)
         --resolution={{ resolution }} \
         --with='{{ wheel }}' \
         --group=tests \
-        --python='.just/test/{{ wheel }}/{{ python }}/.venv' \
+        --python='\
+            {{ justfile_directory() }}\
+            /.just/test/{{ wheel }}/{{ python }}/.venv\
+        ' \
     pytest \
         --html='\
             .just/.test_report.{{ python }}.html\
@@ -163,7 +166,7 @@ test-wheel python wheel resolution="highest": (venv "test" python wheel)
 # Run the tests with pytest for a given Python
 test-repository python: (venv "test" python)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
-    @TMPDIR=".just/test/{{ python }}/tmp/" \
+    @TMPDIR="{{ justfile_directory() }}/.just/test/{{ python }}/tmp/" \
     PYTHONOPTIMIZE=0 \
     COVERAGE_FILE="\
         .just/.coverage.{{ arch() }}-{{ os() }}-{{ python }}\
@@ -191,7 +194,7 @@ alias test := test-repository
 
 # Open a test report in a web browser
 test-report python:
-    $BROWSER ".just/.test_report.{{ python }}.html"
+    $BROWSER "{{ justfile_directory() }}/.just/.test_report.{{ python }}.html"
 
 # Run pre-commit
 pre-commit args="":
@@ -225,7 +228,7 @@ check-types python: (venv "check-types" python)
     pyright \
         --pythonpath='$( \
             uv python find \
-            .just/check-types/{{ python }}/.venv \
+            {{ justfile_directory() }}/.just/check-types/{{ python }}/.venv \
         )' \
         --project='{{ justfile_directory() }}/pyrightconfig.json' \
     "
@@ -258,39 +261,39 @@ coverage-combine:
 
 # Report coverage in various formats (lcov, html, xml)
 coverage-report:
-    @[ -f ".just/.coverage" ] || \
+    @[ -f "{{ justfile_directory() }}/.just/.coverage" ] || \
         just coverage-combine
     @just uvr " \
         --only-group=coverage \
     coverage html \
         --rcfile='{{ justfile_directory() }}/.coveragerc' \
-        --directory='.just/coverage/htmlcov' \
-        --data-file='.just/.coverage' \
+        --directory='{{ justfile_directory() }}/.just/coverage/htmlcov' \
+        --data-file='{{ justfile_directory() }}/.just/.coverage' \
     "
     @just uvr " \
         --only-group=coverage \
     coverage lcov \
         --rcfile='{{ justfile_directory() }}/.coveragerc' \
-        -o='.just/coverage.lcov' \
-        --data-file='.just/.coverage' \
+        -o='{{ justfile_directory() }}/.just/coverage.lcov' \
+        --data-file='{{ justfile_directory() }}/.just/.coverage' \
     "
     @just uvr " \
         --only-group=coverage \
     coverage xml \
         --rcfile='{{ justfile_directory() }}/.coveragerc' \
-        -o='.just/coverage.xml' \
-        --data-file='.just/.coverage' \
+        -o='{{ justfile_directory() }}/.just/coverage.xml' \
+        --data-file='{{ justfile_directory() }}/.just/.coverage' \
     "
 
 # Print coverage
 coverage args="":
-    @[ -f ".just/.coverage" ] || \
+    @[ -f "{{ justfile_directory() }}/.just/.coverage" ] || \
         just coverage-combine
     @just uvr " \
         --only-group=coverage \
     coverage report \
-        --rcfile='.coveragerc' \
-        --data-file='.just/.coverage' \
+        --rcfile='{{ justfile_directory() }}/.coveragerc' \
+        --data-file='{{ justfile_directory() }}/.just/.coverage' \
         --skip-covered \
         {{ args }} \
     "
@@ -443,13 +446,13 @@ check-licenses:
 check-supply-chain python: (venv "check-supply-chain" python)
     @just requirements " \
         --output-file '\
-            .just/check-supply-chain/\
+            {{ justfile_directory() }}/.just/check-supply-chain/\
             {{ python }}/tmp/requirements.txt\
         ' \
     "
     @just pip-audit " \
         --requirement '\
-            .just/check-supply-chain/\
+            {{ justfile_directory() }}/.just/check-supply-chain/\
             {{ python }}/tmp/requirements.txt\
         ' \
     "
@@ -483,7 +486,7 @@ sphinx-autobuild args="":
             --keep-going \
             --open-browser \
         docs \
-        '.just/sphinx-autobuild/tmp/docs_build/' \
+        '{{ justfile_directory() }}/.just/sphinx-autobuild/tmp/docs_build/' \
         {{ args }} \
     "
 
