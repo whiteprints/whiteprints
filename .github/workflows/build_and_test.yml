@@ -371,6 +371,7 @@ jobs:
     needs:
       - test-repository
       - test-wheel
+      - test-wheel-mspv-latest
       - build-container
     steps:
       - name: Check out the repository
