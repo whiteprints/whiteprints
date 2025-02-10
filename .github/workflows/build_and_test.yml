@@ -365,6 +365,7 @@ jobs:
         with:
           context: .
           file: ./container/Containerfile.${{ matrix.image }}
+          load: true
           tags: |
             ${{ steps.meta.outputs.tags }}-${{ matrix.image }}
           annotations: ${{ steps.meta.outputs.annotations }}
@@ -374,6 +375,9 @@ jobs:
             BUILD_DATE=${{ env.BUILD_DATE }}
           cache-from: type=local,src=~/.docker/buildx-cache
           cache-to: type=local,dest=~/.docker/buildx-cache
+      - name: Test
+        run:
+          docker run --rm ${{ steps.meta.outputs.tags }}-${{ matrix.image }} --version
 
   coverage:
     name: Merge coverage
