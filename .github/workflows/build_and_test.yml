@@ -64,7 +64,7 @@ jobs:
       python-latest: ${{ steps.baipp-latest.outputs.supported_python_latest }}
 
   check-types:
-    name: Run type checker under Python ${{ matrix.python }} on ${{ matrix.os }}
+    name: Run type checker under Python ${{ matrix.python.version }} on ${{ matrix.os }}
     needs:
       - build-package
     runs-on: ${{ matrix.os }}
@@ -72,8 +72,9 @@ jobs:
       name: tests
     strategy:
       matrix:
-        python: ${{ inputs.test-repository-python-version != 'default' && fromJson(inputs.test-repository-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
         os: ${{ fromJson(inputs.test-repository-os) }}
+        python:
+          - version: ${{ inputs.test-repository-python-version != 'default' && fromJson(inputs.test-repository-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -84,11 +85,11 @@ jobs:
           enable-cache: true
       - name: Install project
         run: |
-          uv sync --no-dev --group=check-types --python ${{ matrix.python }}
+          uv sync --no-dev --group=check-types --python ${{ matrix.python.version }}
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
         with:
-          python-version: "${{ matrix.python }}"
+          python-version: "${{ matrix.python.version }}"
 
   check-code:
     name: just ${{ matrix.receipt }}
@@ -127,7 +128,7 @@ jobs:
           overwrite: true
 
   test-wheel-mspv-latest:
-    name: Run tests against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
+    name: Run tests against wheel under Python ${{ matrix.python.version }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.python.strategy }}
     if: ${{ contains(fromJson(inputs.target), 'test-wheel-mspv-latest') }}
     needs:
       - check-code
@@ -139,10 +140,10 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJson(inputs.test-wheel-os) }}
-        include:
-          - python: ${{ inputs.test-wheel-python-version != 'default' && fromJson(inputs.test-wheel-python-version)[0] || fromJson(needs.build-package.outputs.python-versions)[0] }}
+        python:
+          - version: ${{ inputs.test-wheel-python-version != 'default' && fromJson(inputs.test-wheel-python-version)[0] || fromJson(needs.build-package.outputs.python-versions)[0] }}
             strategy: "lowest"
-          - python: ${{ inputs.test-wheel-python-version != 'default' && fromJson(inputs.test-wheel-python-version)[4] || fromJson(needs.build-package.outputs.python-versions)[4] }}
+          - version: ${{ inputs.test-wheel-python-version != 'default' && fromJson(inputs.test-wheel-python-version)[4] || fromJson(needs.build-package.outputs.python-versions)[4] }}
             strategy: "highest"
     steps:
       - name: Check out the repository
@@ -163,7 +164,7 @@ jobs:
         shell: bash
         run: |
           echo "REPORT_FILE=.just/test_report.md" >> "$GITHUB_ENV"
-          just test-wheel ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }}
+          just test-wheel ${{ matrix.python.version }} dist/*.whl ${{ matrix.python.strategy }}
       - name: Output reports to the job summary when tests fail
         if: failure()
         shell: bash
@@ -179,7 +180,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
-          name: coverage-data-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
+          name: coverage-data-test-wheel-${{ matrix.os }}-${{ matrix.python.version }}-${{ matrix.python.strategy }}
           path: .just/.coverage.*
           overwrite: true
           include-hidden-files: true
@@ -187,13 +188,13 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
-          name: test-results-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
+          name: test-results-test-wheel-${{ matrix.os }}-${{ matrix.python.version }}-${{ matrix.python.strategy }}
           path: .just/.junit-*.xml
           overwrite: true
           include-hidden-files: true
 
   test-wheel:
-    name: Run tests against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
+    name: Run tests against wheel under Python ${{ matrix.python.version }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.python.strategy }}
     if: ${{ contains(fromJson(inputs.target), 'test-wheel') }}
     needs:
       - check-code
@@ -205,8 +206,9 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJson(inputs.test-wheel-os) }}
-        python: ${{ inputs.test-wheel.python-version != 'default' && fromJson(inputs.test-wheel-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
-        strategy: ${{ fromJson(inputs.test-wheel-strategy )}}
+        python:
+          - version: ${{ inputs.test-wheel.python-version != 'default' && fromJson(inputs.test-wheel-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
+          - strategy: ${{ fromJson(inputs.test-wheel-strategy )}}
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -226,7 +228,7 @@ jobs:
         shell: bash
         run: |
           echo "REPORT_FILE=.just/test_report.md" >> "$GITHUB_ENV"
-          just test-wheel ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }}
+          just test-wheel ${{ matrix.python.version }} dist/*.whl ${{ matrix.python.strategy }}
       - name: Output reports to the job summary when tests fail
         if: failure()
         shell: bash
@@ -242,7 +244,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
-          name: coverage-data-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
+          name: coverage-data-test-wheel-${{ matrix.os }}-${{ matrix.python.version }}-${{ matrix.python.strategy }}
           path: .just/.coverage.*
           overwrite: true
           include-hidden-files: true
@@ -250,13 +252,13 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
-          name: test-results-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
+          name: test-results-test-wheel-${{ matrix.os }}-${{ matrix.python.version }}-${{ matrix.python.strategy }}
           path: .just/.junit-*.xml
           overwrite: true
           include-hidden-files: true
 
   test-repository:
-    name: Run tests against repository under Python ${{ matrix.python }} on ${{ matrix.os }}
+    name: Run tests against repository under Python ${{ matrix.python.version }} on ${{ matrix.os }}
     if: ${{ contains(fromJson(inputs.target), 'test-repository') }}
     needs:
       - check-code
@@ -268,7 +270,8 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJson(inputs.test-repository-os) }}
-        python: ${{ inputs.test-repository-python-version != 'default' && fromJson(inputs.test-repository-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
+        python:
+          - version: ${{ inputs.test-repository-python-version != 'default' && fromJson(inputs.test-repository-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -283,7 +286,7 @@ jobs:
         shell: bash
         run: |
           echo "REPORT_FILE=.just/test_report.md" >> "$GITHUB_ENV"
-          just test-repository ${{ matrix.python }}
+          just test-repository ${{ matrix.python.version }}
       - name: Output reports to the job summary when tests fail
         if: failure()
         shell: bash
@@ -299,7 +302,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
-          name: coverage-data-test-repository-${{ matrix.os }}-${{ matrix.python }}
+          name: coverage-data-test-repository-${{ matrix.os }}-${{ matrix.python.version }}
           path: .just/.coverage.*
           overwrite: true
           include-hidden-files: true
@@ -307,7 +310,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
-          name: test-results-test-repository-${{ matrix.os }}-${{ matrix.python }}
+          name: test-results-test-repository-${{ matrix.os }}-${{ matrix.python.version }}
           path: .just/.junit-*.xml
           overwrite: true
           include-hidden-files: true
