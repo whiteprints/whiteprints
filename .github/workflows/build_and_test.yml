@@ -153,9 +153,9 @@ jobs:
         strategy: ["lowest", "highest"]
         include:
           - strategy: "lowest"
-            python: ${{ needs.build-package.outputs.python-oldest-latest[0] }}
+            python: ${{ fromJson(needs.build-package.outputs.python-oldest-latest)[0] }}
           - strategy: "highest"
-            python: ${{ needs.build-package.outputs.python-oldest-latest[1] }}
+            python: ${{ formJson(needs.build-package.outputs.python-oldest-latest)[1] }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
