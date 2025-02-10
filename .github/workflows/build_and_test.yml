@@ -25,7 +25,7 @@ on:
       test-wheel-python-version:
         description: Python versions to use when testing the wheel (comma-separated). Use 'trove' to set from PyPI trove classifiers. Use 'strategy' to set a Python interpreter adapted to the resolution strategy.
         type: string
-        default: "trove"
+        default: "strategy"
         required: false
       test-wheel-os:
         description: Operating systems to use when testing the wheel.
