@@ -127,10 +127,20 @@ for-all-python receipt args="":
     done
 
 # Run the tests with pytest for a given Python and wheel
-test-wheel python wheel resolution="highest": (venv "test" python wheel)
+test-wheel python wheel resolution="highest": (venv ("test-" + resolution) python wheel)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
+    @just uvr " \
+        --resolution={{ resolution }} \
+        --group=tests \
+        --with={{ wheel }} \
+        --python='\
+            {{ justfile_directory() }}\
+            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/.venv\
+        ' \
+    whiteprints --version \
+    "
     @TMPDIR="\
-        {{ justfile_directory() }}/.just/test/{{ wheel }}/{{ python }}/tmp\
+        {{ justfile_directory() }}/.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/tmp\
     " \
     PYTHONOPTIMIZE=0 \
     COVERAGE_FILE="\
@@ -139,11 +149,11 @@ test-wheel python wheel resolution="highest": (venv "test" python wheel)
     " \
     just uvr " \
         --resolution={{ resolution }} \
-        --with='{{ wheel }}' \
         --group=tests \
+        --with={{ wheel }} \
         --python='\
             {{ justfile_directory() }}\
-            /.just/test/{{ wheel }}/{{ python }}/.venv\
+            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/.venv\
         ' \
     pytest \
         --html='\
@@ -156,7 +166,7 @@ test-wheel python wheel resolution="highest": (venv "test" python wheel)
             .just/.test_report{{ python }}.md\
         ' \
         --basetemp='\
-            .just/test/{{ wheel }}/{{ python }}/tmp\
+            .just/test-{{ resolution }}/{{ wheel }}/{{ python }}/tmp\
         ' \
         --cov-config='.coveragerc' \
         'src' \
