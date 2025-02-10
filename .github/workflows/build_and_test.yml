@@ -128,7 +128,7 @@ jobs:
 
   test-wheel-mspv-latest:
     name: Run tests against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
-    if: ${{ contains(fromJson(inputs.target), 'test-wheel') }}
+    if: ${{ contains(fromJson(inputs.target), 'test-wheel-mspv-latest') }}
     needs:
       - check-code
       - check-types
