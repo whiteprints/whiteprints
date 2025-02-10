@@ -140,9 +140,9 @@ jobs:
       matrix:
         os: ${{ fromJson(inputs.test-wheel-os) }}
         include:
-          - python: ${{ inputs.test-wheel.python-version != 'default' && fromJson(inputs.test-wheel-python-version)[0] || fromJson(needs.build-package.outputs.python-versions)[0] }}
+          - python: ${{ inputs.test-wheel-python-version != 'default' && fromJson(inputs.test-wheel-python-version)[0] || fromJson(needs.build-package.outputs.python-versions)[0] }}
             strategy: "lowest"
-          - python: ${{ inputs.test-wheel.python-version != 'default' && fromJson(inputs.test-wheel-python-version)[-1] || fromJson(needs.build-package.outputs.python-versions)[-1] }}
+          - python: ${{ inputs.test-wheel-python-version != 'default' && fromJson(inputs.test-wheel-python-version)[4] || fromJson(needs.build-package.outputs.python-versions)[4] }}
             strategy: "highest"
     steps:
       - name: Check out the repository
