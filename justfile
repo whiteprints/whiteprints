@@ -129,15 +129,13 @@ for-all-python receipt args="":
 # Run the tests with pytest for a given Python and wheel
 test-wheel python wheel resolution="highest": (venv ("test-" + resolution) python wheel)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
-    @just uvr " \
+    @just requirements " \
         --resolution={{ resolution }} \
-        --group=tests \
-        --with={{ wheel }} \
-        --python='\
+        --output-file '\
             {{ justfile_directory() }}\
-            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/.venv\
+            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements.txt\
         ' \
-    whiteprints --version \
+        pyproject.toml \
     "
     @TMPDIR="\
         {{ justfile_directory() }}/.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/tmp\
@@ -148,9 +146,12 @@ test-wheel python wheel resolution="highest": (venv ("test-" + resolution) pytho
         .just/.coverage.wheel.{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}\
     " \
     just uvr " \
-        --resolution={{ resolution }} \
         --group=tests \
         --with={{ wheel }} \
+        --with-requirements='\
+            {{ justfile_directory() }}\
+            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements.txt\
+        ' \
         --python='\
             {{ justfile_directory() }}\
             /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/.venv\
