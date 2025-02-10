@@ -10,20 +10,30 @@ on:
       target:
         description: Tests target
         type: string
-        default: "['test-wheel', 'test-repository']"
+        default: "['test-wheel-mspv-latest', 'test-repository']"
         required: false
-      python-version:
-        description: Python versions to use (comma-separated). Use 'default' to autodetect.
+      test-repository-python-version:
+        description: Python versions to use when cheking types and testing the repository (comma-separated). Use 'default' to autodetect.
         type: string
         default: "default"
         required: false
-      os:
-        description: Operating systems to use.
+      test-repository-os:
+        description: Operating systems to use when checking types and testing the repository.
         type: string
         default: "['ubuntu-latest', 'macos-latest', 'windows-latest']"
         required: false
-      strategy:
-        description: Dependency resolution strategy
+      test-wheel-python-version:
+        description: Python versions to use when testing the wheel (comma-separated). Use 'default' to autodetect.
+        type: string
+        default: "default"
+        required: false
+      test-wheel-os:
+        description: Operating systems to use when testing the wheel.
+        type: string
+        default: "['ubuntu-latest', 'macos-latest', 'windows-latest']"
+        required: false
+      test-wheel-strategy:
+        description: Dependency resolution strategy when testing the wheel
         type: string
         default: "['lowest', 'highest']"
         required: false
@@ -62,8 +72,8 @@ jobs:
       name: tests
     strategy:
       matrix:
-        python: ${{ inputs.python-version != 'default' && fromJson(inputs.python-version) || fromJson(needs.build-package.outputs.python-versions) }}
-        os: ${{ fromJson(inputs.os) }}
+        python: ${{ inputs.test-repository-python-version != 'default' && fromJson(inputs.test-repository-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
+        os: ${{ fromJson(inputs.test-repository-os) }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -116,6 +126,72 @@ jobs:
           path: docs_build/
           overwrite: true
 
+  test-wheel-mspv-latest:
+    name: Run tests against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
+    if: ${{ contains(fromJson(inputs.target), 'test-wheel') }}
+    needs:
+      - check-code
+      - check-types
+      - build-package
+    runs-on: ${{ matrix.os }}
+    environment:
+      name: tests
+    strategy:
+      matrix:
+        os: ${{ fromJson(inputs.test-wheel-os) }}
+        include:
+          - python: ${{ inputs.test-wheel.python-version != 'default' && fromJson(inputs.test-wheel-python-version)[0] || fromJson(needs.build-package.outputs.python-versions)[0] }}
+            strategy: "lowest"
+          - python: ${{ inputs.test-wheel.python-version != 'default' && fromJson(inputs.test-wheel-python-version)[-1] || fromJson(needs.build-package.outputs.python-versions)[-1] }}
+            strategy: "highest"
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Install just
+        uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
+      - name: Download built packages from the build-package job
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        with:
+          name: Packages
+          path: dist
+      - name: Run the test suite
+        shell: bash
+        run: |
+          echo "REPORT_FILE=.just/test_report.md" >> "$GITHUB_ENV"
+          just test-wheel ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }}
+      - name: Output reports to the job summary when tests fail
+        if: failure()
+        shell: bash
+        run: |
+          if [ -f "$REPORT_FILE" ]; then
+            echo "<details><summary>Failed Test Report</summary>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            cat "$REPORT_FILE" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "</details>" >> $GITHUB_STEP_SUMMARY
+          fi
+      - name: Upload coverage data
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
+        with:
+          name: coverage-data-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
+          path: .just/.coverage.*
+          overwrite: true
+          include-hidden-files: true
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
+        with:
+          name: test-results-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
+          path: .just/.junit-*.xml
+          overwrite: true
+          include-hidden-files: true
+
   test-wheel:
     name: Run tests against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
     if: ${{ contains(fromJson(inputs.target), 'test-wheel') }}
@@ -128,9 +204,9 @@ jobs:
       name: tests
     strategy:
       matrix:
-        python: ${{ inputs.python-version != 'default' && fromJson(inputs.python-version) || fromJson(needs.build-package.outputs.python-versions) }}
-        os: ${{ fromJson(inputs.os) }}
-        strategy: ${{ fromJson(inputs.strategy )}}
+        os: ${{ fromJson(inputs.test-wheel-os) }}
+        python: ${{ inputs.test-wheel.python-version != 'default' && fromJson(inputs.test-wheel-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
+        strategy: ${{ fromJson(inputs.test-wheel-strategy )}}
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -191,8 +267,8 @@ jobs:
       name: tests
     strategy:
       matrix:
-        python: ${{ inputs.python-version != 'default' && fromJson(inputs.python-version) || fromJson(needs.build-package.outputs.python-versions) }}
-        os: ${{ fromJson(inputs.os) }}
+        os: ${{ fromJson(inputs.test-repository-os) }}
+        python: ${{ inputs.test-repository-python-version != 'default' && fromJson(inputs.test-repository-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
