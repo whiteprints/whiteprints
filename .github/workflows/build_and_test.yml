@@ -17,9 +17,9 @@ on:
         default: "['test-wheel', 'test-repository']"
         required: false
       test-repository-python-version:
-        description: Python versions to use when cheking types and testing the repository (comma-separated). Use 'trove' to set from PyPI trove classifiers.
+        description: Python versions to use when cheking types and testing the repository (comma-separated). Use 'from-trove' to set from PyPI trove classifiers.
         type: string
-        default: "trove"
+        default: "from-trove"
         required: false
       test-repository-os:
         description: Operating systems to use when checking types and testing the repository.
@@ -27,9 +27,9 @@ on:
         default: "['ubuntu-latest', 'macos-latest', 'windows-latest']"
         required: false
       test-wheel-python-version:
-        description: Python versions to use when testing the wheel (comma-separated). Use 'trove' to set from PyPI trove classifiers. Use 'strategy' to set a Python interpreter adapted to the resolution strategy.
+        description: Python versions to use when testing the wheel (comma-separated). Use 'from-trove' to set from PyPI trove classifiers. Use 'from-strategy' to set a Python interpreter adapted to the resolution strategy.
         type: string
-        default: "strategy"
+        default: "from-strategy"
         required: false
       test-wheel-os:
         description: Operating systems to use when testing the wheel.
@@ -80,7 +80,7 @@ jobs:
       name: tests
     strategy:
       matrix:
-        python: ${{ inputs.test-repository-python-version != 'trove' && fromJson(inputs.test-repository-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
+        python: ${{ inputs.test-repository-python-version != 'from-trove' && fromJson(inputs.test-repository-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
         os: ${{ fromJson(inputs.test-repository-os) }}
     steps:
       - name: Check out the repository
@@ -136,7 +136,7 @@ jobs:
 
   test-wheel-from-strategy:
     name: Run tests against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
-    if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel-python-version == 'strategy' }}
+    if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel-python-version == 'from-strategy' }}
     needs:
       - check-code
       - check-types
@@ -203,7 +203,7 @@ jobs:
 
   test-wheel:
     name: Run tests against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
-    if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel-python-version != 'strategy' }}
+    if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel-python-version != 'from-strategy' }}
     needs:
       - check-code
       - check-types
@@ -214,7 +214,7 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJson(inputs.test-wheel-os) }}
-        python: ${{ inputs.test-wheel-python-version != 'trove' && fromJson(inputs.test-wheel-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
+        python: ${{ inputs.test-wheel-python-version != 'from-trove' && fromJson(inputs.test-wheel-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
         strategy: ${{ fromJson(inputs.test-wheel-strategy )}}
     steps:
       - name: Check out the repository
@@ -277,7 +277,7 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJson(inputs.test-repository-os) }}
-        python: ${{ inputs.test-repository-python-version != 'trove' && fromJson(inputs.test-repository-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
+        python: ${{ inputs.test-repository-python-version != 'from-trove' && fromJson(inputs.test-repository-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4

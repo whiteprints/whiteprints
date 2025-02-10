@@ -10,11 +10,21 @@ on:
     branches: ["main"]
     tags-ignore: ["**"]
   pull_request:
+  schedule:
+    - cron: "0 3 * * *"
 
 jobs:
   build-and-test:
     name: Build and Test
     uses: ./.github/workflows/build_and_test.yml
+
+  build-and-test:
+    name: Build and Test
+    uses: ./.github/workflows/build_and_test.yml
+    with:
+      target: ${{ github.event_name == 'schedule' && '["test-wheel"]' || '["test-wheel", "test-repository"]' }}
+      test-wheel-python-version: "from-strategy"
+      test-wheel-strategy: ${{ github.event_name == 'schedule' && '["highest"]' || '["lowest", "highest"]' }}
 
   coverage:
     name: Coverage
