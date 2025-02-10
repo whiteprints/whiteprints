@@ -10,12 +10,12 @@ on:
       target:
         description: Tests target
         type: string
-        default: "['test-wheel-mspv-latest', 'test-repository']"
+        default: "['test-wheel', 'test-repository']"
         required: false
       test-repository-python-version:
-        description: Python versions to use when cheking types and testing the repository (comma-separated). Use 'default' to autodetect.
+        description: Python versions to use when cheking types and testing the repository (comma-separated). Use 'trove' to set from PyPI trove classifiers.
         type: string
-        default: "default"
+        default: "trove"
         required: false
       test-repository-os:
         description: Operating systems to use when checking types and testing the repository.
@@ -23,9 +23,9 @@ on:
         default: "['ubuntu-latest', 'macos-latest', 'windows-latest']"
         required: false
       test-wheel-python-version:
-        description: Python versions to use when testing the wheel (comma-separated). Use 'default' to autodetect.
+        description: Python versions to use when testing the wheel (comma-separated). Use 'trove' to set from PyPI trove classifiers. Use 'strategy' to set a Python interpreter adapted to the resolution strategy.
         type: string
-        default: "default"
+        default: "trove"
         required: false
       test-wheel-os:
         description: Operating systems to use when testing the wheel.
@@ -33,7 +33,7 @@ on:
         default: "['ubuntu-latest', 'macos-latest', 'windows-latest']"
         required: false
       test-wheel-strategy:
-        description: Dependency resolution strategy when testing the wheel
+        description: Dependency resolution strategy when testing the wheel.
         type: string
         default: "['lowest', 'highest']"
         required: false
@@ -83,7 +83,7 @@ jobs:
       name: tests
     strategy:
       matrix:
-        python: ${{ inputs.test-repository-python-version != 'default' && fromJson(inputs.test-repository-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
+        python: ${{ inputs.test-repository-python-version != 'trove' && fromJson(inputs.test-repository-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
         os: ${{ fromJson(inputs.test-repository-os) }}
     steps:
       - name: Check out the repository
@@ -137,9 +137,9 @@ jobs:
           path: docs_build/
           overwrite: true
 
-  test-wheel-mspv-latest:
+  test-wheel-from-strategy:
     name: Run tests against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
-    if: ${{ contains(fromJson(inputs.target), 'test-wheel-mspv-latest') }}
+    if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel.python-version == 'strategy' }}
     needs:
       - check-code
       - check-types
@@ -150,7 +150,7 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJson(inputs.test-wheel-os) }}
-        strategy: ["lowest", "highest"]
+        strategy: ${{ fromJson(inputs.test-wheel-strategy )}}
         include:
           - strategy: "lowest"
             python: ${{ fromJson(needs.build-package.outputs.python-oldest-latest)[0] }}
@@ -206,7 +206,7 @@ jobs:
 
   test-wheel:
     name: Run tests against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
-    if: ${{ contains(fromJson(inputs.target), 'test-wheel') }}
+    if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel.python-version != 'strategy' }}
     needs:
       - check-code
       - check-types
@@ -217,7 +217,7 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJson(inputs.test-wheel-os) }}
-        python: ${{ inputs.test-wheel.python-version != 'default' && fromJson(inputs.test-wheel-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
+        python: ${{ inputs.test-wheel.python-version != 'trove' && fromJson(inputs.test-wheel-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
         strategy: ${{ fromJson(inputs.test-wheel-strategy )}}
     steps:
       - name: Check out the repository
@@ -280,7 +280,7 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJson(inputs.test-repository-os) }}
-        python: ${{ inputs.test-repository-python-version != 'default' && fromJson(inputs.test-repository-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
+        python: ${{ inputs.test-repository-python-version != 'trove' && fromJson(inputs.test-repository-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -383,7 +383,7 @@ jobs:
     needs:
       - test-repository
       - test-wheel
-      - test-wheel-mspv-latest
+      - test-wheel-from-strategy
       - build-container
     steps:
       - name: Check out the repository
