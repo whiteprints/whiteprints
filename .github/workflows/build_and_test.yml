@@ -55,13 +55,24 @@ jobs:
       - name: Build and inspect package
         id: baipp
         uses: hynek/build-and-inspect-python-package@v2
-      - name: Find latest Python
+      - name: Find oldest and latest Python
         id: baipp-latest
         run: |
-          echo "supported_python_latest=$(echo '${{ steps.baipp.outputs.supported_python_classifiers_json_array }}' | jq -r -S '.[-1]')" >> "$GITHUB_OUTPUT"
+          # Save the supported Python versions JSON from the previous step
+          python_versions='${{ steps.baipp.outputs.supported_python_classifiers_json_array }}'
+          # Convert to semver strings and sort them properly.
+          # The jq filter:
+          #   map(tostring)                -> converts each element to a string
+          #   sort_by(split(".") | map(tonumber))
+          #                                -> splits version string into numeric parts and sorts
+          sorted_versions=$(echo "$python_versions" | jq -r 'map(tostring) | sort_by(split(".") | map(tonumber))')
+          oldest=$(echo "$sorted_versions" | jq -r '.[0]')
+          latest=$(echo "$sorted_versions" | jq -r '.[-1]')
+          # Write the output as a JSON array, e.g. ["3.7","3.14"]
+          echo "supported_python_oldest_latest=[\"$oldest\",\"$latest\"]" >> "$GITHUB_OUTPUT"
     outputs:
       python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
-      python-latest: ${{ steps.baipp-latest.outputs.supported_python_latest }}
+      python-oldest-latest: ${{ steps.baipp-latest.outputs.supported_python_oldest_latest }}
 
   check-types:
     name: Run type checker under Python ${{ matrix.python }} on ${{ matrix.os }}
@@ -142,9 +153,9 @@ jobs:
         strategy: ["lowest", "highest"]
         include:
           - strategy: "lowest"
-            python: ${{ inputs.test-wheel-python-version != 'default' && fromJson(inputs.test-wheel-python-version)[0] || fromJson(needs.build-package.outputs.python-versions)[0] }}
+            python: ${{ needs.build-package.outputs.python-oldest-latest[0] }}
           - strategy: "highest"
-            python: ${{ inputs.test-wheel-python-version != 'default' && fromJson(inputs.test-wheel-python-version)[4] || fromJson(needs.build-package.outputs.python-versions)[4] }}
+            python: ${{ needs.build-package.outputs.python-oldest-latest[1] }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
