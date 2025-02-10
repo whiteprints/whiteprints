@@ -139,7 +139,7 @@ jobs:
 
   test-wheel-from-strategy:
     name: Run tests against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
-    if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel.python-version == 'strategy' }}
+    if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel-python-version == 'strategy' }}
     needs:
       - check-code
       - check-types
@@ -206,7 +206,7 @@ jobs:
 
   test-wheel:
     name: Run tests against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
-    if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel.python-version != 'strategy' }}
+    if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel-python-version != 'strategy' }}
     needs:
       - check-code
       - check-types
@@ -217,7 +217,7 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJson(inputs.test-wheel-os) }}
-        python: ${{ inputs.test-wheel.python-version != 'trove' && fromJson(inputs.test-wheel-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
+        python: ${{ inputs.test-wheel-python-version != 'trove' && fromJson(inputs.test-wheel-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
         strategy: ${{ fromJson(inputs.test-wheel-strategy )}}
     steps:
       - name: Check out the repository
