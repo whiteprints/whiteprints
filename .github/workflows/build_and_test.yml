@@ -377,6 +377,7 @@ jobs:
 
   coverage:
     name: Merge coverage
+    if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
     environment:
       name: tests
