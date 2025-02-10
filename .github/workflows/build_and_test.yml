@@ -2,6 +2,10 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+# This workflow builds the package, runs type checking, lints and validates the code,
+# tests both the built wheel and the repository under multiple operating systems and Python versions,
+# builds container images, and finally merges coverage data.
+
 name: Build and test
 
 on:
@@ -58,17 +62,10 @@ jobs:
       - name: Find oldest and latest Python
         id: baipp-latest
         run: |
-          # Save the supported Python versions JSON from the previous step
           python_versions='${{ steps.baipp.outputs.supported_python_classifiers_json_array }}'
-          # Convert to semver strings and sort them properly.
-          # The jq filter:
-          #   map(tostring)                -> converts each element to a string
-          #   sort_by(split(".") | map(tonumber))
-          #                                -> splits version string into numeric parts and sorts
           sorted_versions=$(echo "$python_versions" | jq -r 'map(tostring) | sort_by(split(".") | map(tonumber))')
           oldest=$(echo "$sorted_versions" | jq -r '.[0]')
           latest=$(echo "$sorted_versions" | jq -r '.[-1]')
-          # Write the output as a JSON array, e.g. ["3.7","3.14"]
           echo "supported_python_oldest_latest=[\"$oldest\",\"$latest\"]" >> "$GITHUB_OUTPUT"
     outputs:
       python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
