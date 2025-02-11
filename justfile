@@ -129,8 +129,28 @@ for-all-python receipt args="":
 # Run the tests with pytest for a given Python and wheel
 test-wheel python wheel resolution="highest": (venv ("test-" + resolution) python wheel)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
+    rm -f '\
+        {{ justfile_directory() }}\
+        /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements.txt \
+        {{ justfile_directory() }}\
+        /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements-dev.txt\
+    '
+    uv export \
+        --frozen \
+        --only-dev \
+        --only-group=tests \
+        --quiet \
+        --no-emit-project \
+        --output-file '\
+            {{ justfile_directory() }}\
+            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements-dev.txt\
+        '
     @just requirements " \
         --resolution={{ resolution }} \
+        --constraints='\
+            {{ justfile_directory() }}\
+            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements-dev.txt\
+        ' \
         --output-file '\
             {{ justfile_directory() }}\
             /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements.txt\
@@ -146,11 +166,15 @@ test-wheel python wheel resolution="highest": (venv ("test-" + resolution) pytho
         .just/.coverage.wheel.{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}\
     " \
     just uvr " \
-        --group=tests \
+        --no-sync \
         --with={{ wheel }} \
         --with-requirements='\
             {{ justfile_directory() }}\
             /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements.txt\
+        ' \
+        --with-requirements='\
+            {{ justfile_directory() }}\
+            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements-dev.txt\
         ' \
         --python='\
             {{ justfile_directory() }}\
