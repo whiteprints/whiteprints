@@ -30,7 +30,7 @@ class TestCLI:
         """
         result = cli_runner.invoke(
             entrypoint.whiteprints,
-            ["init", "--helps"],
+            ["init", "--help"],
         )
         assert result.exit_code == 0, "The CLI did not exit properly."
 
