@@ -52,6 +52,7 @@ uv args="":
 uvr args="":
     @just uv " \
         run \
+        --all-extras \
         --refresh \
         --isolated \
         --no-dev \
@@ -156,10 +157,6 @@ test-dist python wheel resolution="highest": (venv ("test-" + resolution) python
             {{ justfile_directory() }}\
             /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements.txt\
         ' \
-        --with-requirements='\
-            {{ justfile_directory() }}\
-            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements-dev.txt\
-        ' \
         --python='\
             {{ justfile_directory() }}\
             /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/.venv\
@@ -191,11 +188,9 @@ test-repository python: (venv "test" python)
         .just/.coverage.repository.{{ arch() }}-{{ os() }}-{{ python }}\
     " \
     just uvr " \
-        --all-extras \
         --python='\
             .just/test/{{ python }}/.venv\
         ' \
-        --group=tests \
     pytest \
         --html='\
             .just/.test_report.{{ python }}.html\
@@ -482,7 +477,6 @@ check-supply-chain python: (venv "check-supply-chain" python)
 # Run `sphinx-build`
 sphinx-build args="":
     @just uvr " \
-            --group=build-documentation \
         sphinx-build \
             --jobs=auto \
             --fail-on-warning \
