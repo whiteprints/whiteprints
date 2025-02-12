@@ -58,7 +58,6 @@ dependencies = [
     "typing-extensions==4.12.2; python_full_version<'3.12.0'",
     "uv==0.5.30",
 ]
-
 optional-dependencies.build-documentation = [
     "astroid>=3.3.8",
     "myst-parser[linkify]==3.0.1",
