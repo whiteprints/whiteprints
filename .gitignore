@@ -54,3 +54,6 @@ BOM/
 
 # Copier
 .copier-answers.yml
+
+# IDE
+.vscode

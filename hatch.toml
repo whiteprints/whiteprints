@@ -29,12 +29,24 @@ replacement = "](https://raw.githubusercontent.com/whiteprints/whiteprints/refs/
 
 [build.targets.sdist]
 only-include = [
+    "justfile",
     "src/whiteprints",
     "docs",
     "tests",
+    "container",
     "uv.lock",
-    "uv.lock.license",
+    ".coveragerc",
+    ".pre-commit-config.yaml",
+    ".pylintrc",
+    ".python-versions",
     "*.md",
+    "*.ini",
+    "*.toml",
+    "*.yaml",
+    "*.yml",
+    "*.json",
+    "*.license",
+    ".gitattributes",
 ]
 
 [build.targets.wheel]
