@@ -75,7 +75,6 @@ requirements args="":
         pip compile \
         --quiet \
         --refresh \
-        --all-extras \
         --generate-hashes \
         {{ args }} \
     "
@@ -127,30 +126,15 @@ for-all-python receipt args="":
     done
 
 # Run the tests with pytest for a given Python and wheel
-test-wheel python wheel resolution="highest": (venv ("test-" + resolution) python wheel)
+test-dist python wheel resolution="highest": (venv ("test-" + resolution) python wheel)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
     rm -f '\
         {{ justfile_directory() }}\
-        /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements.txt \
-        {{ justfile_directory() }}\
-        /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements-dev.txt\
+        /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements.txt\
     '
-    uv export \
-        --frozen \
-        --only-dev \
-        --only-group=tests \
-        --quiet \
-        --no-emit-project \
-        --output-file '\
-            {{ justfile_directory() }}\
-            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements-dev.txt\
-        '
     @just requirements " \
         --resolution={{ resolution }} \
-        --constraints='\
-            {{ justfile_directory() }}\
-            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements-dev.txt\
-        ' \
+        --all-extras \
         --output-file '\
             {{ justfile_directory() }}\
             /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements.txt\
@@ -171,10 +155,6 @@ test-wheel python wheel resolution="highest": (venv ("test-" + resolution) pytho
         --with-requirements='\
             {{ justfile_directory() }}\
             /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements.txt\
-        ' \
-        --with-requirements='\
-            {{ justfile_directory() }}\
-            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements-dev.txt\
         ' \
         --python='\
             {{ justfile_directory() }}\
@@ -207,6 +187,7 @@ test-repository python: (venv "test" python)
         .just/.coverage.repository.{{ arch() }}-{{ os() }}-{{ python }}\
     " \
     just uvr " \
+        --all-extras \
         --python='\
             .just/test/{{ python }}/.venv\
         ' \
