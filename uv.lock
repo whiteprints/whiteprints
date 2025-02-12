@@ -542,7 +542,7 @@ name = "importlib-metadata"
 version = "8.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "zipp", marker = "python_full_version < '3.10'" },
+    { name = "zipp" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/33/08/c1395a292bb23fd03bdf572a1357c5a733d3eecbab877641ceacab23db6e/importlib_metadata-8.6.1.tar.gz", hash = "sha256:310b41d755445d74569f993ccfc22838295d9fe005425094fad953d7f15c8580", size = 55767 }
 wheels = [
@@ -2227,6 +2227,7 @@ dependencies = [
 
 [package.optional-dependencies]
 build-documentation = [
+    { name = "astroid" },
     { name = "myst-parser", extra = ["linkify"] },
     { name = "pydata-sphinx-theme" },
     { name = "sphinx" },
@@ -2311,6 +2312,7 @@ serve-documentation = [
 
 [package.metadata]
 requires-dist = [
+    { name = "astroid", marker = "extra == 'build-documentation'", specifier = ">=3.3.8" },
     { name = "beartype", marker = "extra == 'tests'", specifier = "==0.19.0" },
     { name = "click", specifier = ">=8.1.8" },
     { name = "distro", specifier = "==1.9.0" },
