@@ -156,6 +156,10 @@ test-dist python wheel resolution="highest": (venv ("test-" + resolution) python
             {{ justfile_directory() }}\
             /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements.txt\
         ' \
+        --with-requirements='\
+            {{ justfile_directory() }}\
+            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements-dev.txt\
+        ' \
         --python='\
             {{ justfile_directory() }}\
             /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/.venv\
