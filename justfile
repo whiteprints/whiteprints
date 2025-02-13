@@ -6,6 +6,8 @@
 # Uncomment this to use project local uv cache.
 # export UV_CACHE_DIR := ".just/.cache/uv"
 export UV_NO_PROGRESS := "true"
+export PYTHONOPTIMIZE := "0"
+export PYTHONDONTWRITEBYTECODE := "1"
 
 
 # list all receipts
@@ -33,15 +35,15 @@ all:
 
 # Create a virtual environment for a receipt, Python and optionally a wheel
 venv receipt python wheel="": init
-    [ -d ".just/{{ receipt }}/{{ file_stem(wheel) }}/{{ python }}" ] || \
-        mkdir -p ".just/{{ receipt }}/{{ file_stem(wheel) }}/{{ python }}"
-    rm -rf ".just/{{ receipt }}/{{file_stem( wheel) }}/{{ python }}/tmp"
-    mkdir -p ".just/{{ receipt }}/{{ file_stem(wheel) }}/{{ python }}/tmp"
+    [ -d ".just/{{ receipt }}{{ if wheel == '' { '' } else { '/' + file_stem(wheel) } }}/{{ python }}" ] || \
+        mkdir -p ".just/{{ receipt }}{{ if wheel == '' { '' } else { '/'+ file_stem(wheel) } }}/{{ python }}"
+    rm -rf ".just/{{ receipt }}{{ if wheel == '' { '' } else { '/' + file_stem(wheel) } }}/{{ python }}/tmp"
+    mkdir -p ".just/{{ receipt }}{{ if wheel == '' { '' } else { '/' + file_stem(wheel) } }}/{{ python }}/tmp"
     uv venv \
         --no-project \
         --no-config \
         --python={{ python }} \
-        ".just/{{ receipt }}/{{ file_stem(wheel) }}/{{ python }}/.venv"
+        ".just/{{ receipt }}{{ if wheel == '' { '' } else { '/' + file_stem(wheel) } }}/{{ python }}/.venv"
 
 # Run `uv`
 uv args="":
@@ -148,56 +150,46 @@ for-all-python receipt args="":
         just {{ receipt }} $python {{ args }}; \
     done
 
-# Run the tests with pytest for a given Python and wheel for a given resolution
-test-dist python wheel resolution="highest": (venv ("test-dist-" + resolution) python wheel)
+# Run the tests with pytest for a given Python and wheel for a given resolution.
+test-dist python wheel resolution="highest" link_mode="": (venv ("test-dist-" + resolution) python wheel)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
-    rm -f \
-        "{{ justfile_directory() }}\
-        /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements.txt" \
-        "{{ justfile_directory() }}\
-        /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements-dev.txt"
     @just requirements-dev " \
-        --output-file '\
-            {{ justfile_directory() }}\
-            /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements-dev.txt\
-        ' \
-    "
-    @just requirements " \
-        --resolution={{ resolution }} \
-        --constraints='\
-            {{ justfile_directory() }}\
-            /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements-dev.txt\
-        ' \
         --output-file='\
             {{ justfile_directory() }}\
-            /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements.txt\
-        ' \
-        pyproject.toml \
-    "
-    @TMPDIR="\
-        {{ justfile_directory() }}/.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/tmp\
-    " \
-    PYTHONOPTIMIZE=0 \
-    COVERAGE_FILE="\
-        {{ justfile_directory() }}/\
-        .just/.coverage.wheel.{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}\
-    " \
-    just uvr " \
-        --no-sync \
-        --with={{ wheel }} \
-        --with-requirements='\
-            {{ justfile_directory() }}\
             /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements-dev.txt\
-        ' \
-        --with-requirements='\
-            {{ justfile_directory() }}\
-            /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements.txt\
         ' \
         --python='\
             {{ justfile_directory() }}\
             /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
         ' \
-    pytest \
+    "
+    @just uv " \
+        pip install {{ wheel }} \
+            --resolution={{ resolution }} \
+            {{ if link_mode == '' { '' } else { '--link-mode=' + link_mode } }} \
+            --requirements='\
+                {{ justfile_directory() }}\
+                /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements-dev.txt\
+            ' \
+            --prefix='\
+                {{ justfile_directory() }}\
+                /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
+            ' \
+            --python='\
+                {{ justfile_directory() }}\
+                /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
+            ' \
+    "
+    @TMPDIR="\
+        {{ justfile_directory() }}/.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/tmp\
+    " \
+    COVERAGE_FILE="\
+        {{ justfile_directory() }}/\
+        .just/.coverage.wheel.{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}\
+    " \
+    {{ justfile_directory() }}\
+    /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
+    /bin/python -m pytest \
         --html='\
             .just/.test_report.{{ python }}.html\
         ' \
@@ -212,23 +204,22 @@ test-dist python wheel resolution="highest": (venv ("test-dist-" + resolution) p
         ' \
         --cov-config='.coveragerc' \
         'src' \
-        'tests' \
-    "
+        'tests'
 
 # Run the tests with pytest for lowest and highest resolutions
-test-dist-lh python wheel:
-    @just test-dist {{ python }} {{ wheel }} lowest
-    @just test-dist {{ python }} {{ wheel }} highest
+test-dist-lh python wheel link_mode="":
+    @just test-dist {{ python }} {{ wheel }} lowest {{ link_mode }}
+    @just test-dist {{ python }} {{ wheel }} highest {{ link_mode }}
 
 # Run the tests with pytest for a given Python
 test-repository python: (venv "test-repo" python)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
     @TMPDIR="{{ justfile_directory() }}/.just/test-repo/{{ python }}/tmp/" \
-    PYTHONOPTIMIZE=0 \
     COVERAGE_FILE="\
         .just/.coverage.repository.{{ arch() }}-{{ os() }}-{{ python }}\
     " \
     just uvr " \
+        --group=tests \
         --python='\
             .just/test-repo/{{ python }}/.venv\
         ' \
@@ -247,6 +238,7 @@ test-repository python: (venv "test-repo" python)
         "src" \
         "tests" \
     "
+    @just uvx "pyclean ."
 
 alias test := test-repository
 
