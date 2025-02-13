@@ -91,7 +91,7 @@ requirements-dev args="":
         --no-emit-project \
         --quiet \
         --frozen \
-        --only-dev \
+        --no-dev \
         --only-group=tests \
         {{ args }} \
     "

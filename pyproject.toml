@@ -88,18 +88,13 @@ dev = [
 ]
 
 build-documentation = [
-    "astroid>=3.3.8",
     "myst-parser[linkify]==3.0.1",
     "pydata-sphinx-theme==0.16.1",
     "sphinx==7.4.7",
     "sphinx-autoapi==3.5.0",
     "sphinx-click==6.0.0",
     "sphinx-copybutton==0.5.2",
-    "sphinxcontrib-applehelp>=2.0.0",
-    "sphinxcontrib-devhelp>=2.0.0",
-    "sphinxcontrib-jsmath>=1.0.1",
     "sphinxcontrib-napoleon==0.7.0",
-    "sphinxcontrib-qthelp>=2.0.0",
     "sphinxcontrib-spelling==8.0.0",
     "stdlib-list==0.11.0",
 ]
@@ -115,9 +110,6 @@ tests = [
     "xdoctest[colors]==1.2.0",
 ]
 profile = [
-    "greenlet>=3.1.1; python_full_version>='3.13'",
-    "numpy>=2.2.2; python_full_version>='3.12'",
-    "pydantic>=2.10.6; python_full_version>='3.13'",
     "scalene==1.5.51",
 ]
 editor = [
@@ -136,7 +128,6 @@ coverage = [
 ]
 audit-vulnerabilities = [
     "pip-audit==2.8.0",
-    "pyparsing>=3.2.1",
 ]
 audit-maintainability = [
     "radon==6.0.1",
