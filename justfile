@@ -521,6 +521,7 @@ check-supply-chain python: (venv "check-supply-chain" python)
 # Run `sphinx-build`
 sphinx-build args="":
     @just uvr " \
+        --group=build-documentation \
         sphinx-build \
             --jobs=auto \
             --fail-on-warning \
