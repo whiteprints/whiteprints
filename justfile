@@ -33,15 +33,15 @@ all:
 
 # Create a virtual environment for a receipt, Python and optionally a wheel
 venv receipt python wheel="": init
-    [ -d ".just/{{ receipt }}/{{ wheel }}/{{ python }}" ] || \
-        mkdir -p ".just/{{ receipt }}/{{ wheel }}/{{ python }}"
-    rm -rf ".just/{{ receipt }}/{{ wheel }}/{{ python }}/tmp"
-    mkdir -p ".just/{{ receipt }}/{{ wheel }}/{{ python }}/tmp"
+    [ -d ".just/{{ receipt }}/{{ file_stem(wheel) }}/{{ python }}" ] || \
+        mkdir -p ".just/{{ receipt }}/{{ file_stem(wheel) }}/{{ python }}"
+    rm -rf ".just/{{ receipt }}/{{file_stem( wheel) }}/{{ python }}/tmp"
+    mkdir -p ".just/{{ receipt }}/{{ file_stem(wheel) }}/{{ python }}/tmp"
     uv venv \
         --no-project \
         --no-config \
         --python={{ python }} \
-        ".just/{{ receipt }}/{{ wheel }}/{{ python }}/.venv"
+        ".just/{{ receipt }}/{{ file_stem(wheel) }}/{{ python }}/.venv"
 
 # Run `uv`
 uv args="":
@@ -52,10 +52,10 @@ uv args="":
 uvr args="":
     @just uv " \
         run \
-        --all-extras \
         --refresh \
         --isolated \
         --no-dev \
+        --no-config \
         --no-editable \
         --frozen \
         --exact \
@@ -77,7 +77,29 @@ requirements args="":
         --quiet \
         --refresh \
         --generate-hashes \
+        --all-extras \
         {{ args }} \
+    "
+
+[private]
+requirements-dev args="":
+    @just uv " \
+        export \
+        --no-config \
+        --no-emit-project \
+        --quiet \
+        --frozen \
+        --only-dev \
+        --only-group=tests \
+        {{ args }} \
+    "
+
+# Synchronize lockfile and environment
+sync resolution="highest":
+    @just uv " \
+        sync \
+        --resolution={{ resolution }} \
+        --all-extras \
     "
 
 # Clean Python temporary files
@@ -126,24 +148,34 @@ for-all-python receipt args="":
         just {{ receipt }} $python {{ args }}; \
     done
 
-# Run the tests with pytest for a given Python and wheel
-test-dist python wheel resolution="highest": (venv ("test-" + resolution) python wheel)
+# Run the tests with pytest for a given Python and wheel for a given resolution
+test-dist python wheel resolution="highest": (venv ("test-dist-" + resolution) python wheel)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
-    rm -f '\
-        {{ justfile_directory() }}\
-        /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements.txt\
-    '
-    @just requirements " \
-        --resolution={{ resolution }} \
-        --all-extras \
+    rm -f \
+        "{{ justfile_directory() }}\
+        /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements.txt" \
+        "{{ justfile_directory() }}\
+        /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements-dev.txt"
+    @just requirements-dev " \
         --output-file '\
             {{ justfile_directory() }}\
-            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements.txt\
+            /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements-dev.txt\
+        ' \
+    "
+    @just requirements " \
+        --resolution={{ resolution }} \
+        --constraints='\
+            {{ justfile_directory() }}\
+            /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements-dev.txt\
+        ' \
+        --output-file='\
+            {{ justfile_directory() }}\
+            /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements.txt\
         ' \
         pyproject.toml \
     "
     @TMPDIR="\
-        {{ justfile_directory() }}/.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/tmp\
+        {{ justfile_directory() }}/.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/tmp\
     " \
     PYTHONOPTIMIZE=0 \
     COVERAGE_FILE="\
@@ -155,11 +187,15 @@ test-dist python wheel resolution="highest": (venv ("test-" + resolution) python
         --with={{ wheel }} \
         --with-requirements='\
             {{ justfile_directory() }}\
-            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/requirements.txt\
+            /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements-dev.txt\
+        ' \
+        --with-requirements='\
+            {{ justfile_directory() }}\
+            /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements.txt\
         ' \
         --python='\
             {{ justfile_directory() }}\
-            /.just/test-{{ resolution }}/{{ wheel }}/{{ python }}/.venv\
+            /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
         ' \
     pytest \
         --html='\
@@ -172,24 +208,29 @@ test-dist python wheel resolution="highest": (venv ("test-" + resolution) python
             .just/.test_report{{ python }}.md\
         ' \
         --basetemp='\
-            .just/test-{{ resolution }}/{{ wheel }}/{{ python }}/tmp\
+            .just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/tmp\
         ' \
         --cov-config='.coveragerc' \
         'src' \
         'tests' \
     "
 
+# Run the tests with pytest for lowest and highest resolutions
+test-dist-lh python wheel:
+    @just test-dist {{ python }} {{ wheel }} lowest
+    @just test-dist {{ python }} {{ wheel }} highest
+
 # Run the tests with pytest for a given Python
-test-repository python: (venv "test" python)
+test-repository python: (venv "test-repo" python)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
-    @TMPDIR="{{ justfile_directory() }}/.just/test/{{ python }}/tmp/" \
+    @TMPDIR="{{ justfile_directory() }}/.just/test-repo/{{ python }}/tmp/" \
     PYTHONOPTIMIZE=0 \
     COVERAGE_FILE="\
         .just/.coverage.repository.{{ arch() }}-{{ os() }}-{{ python }}\
     " \
     just uvr " \
         --python='\
-            .just/test/{{ python }}/.venv\
+            .just/test-repo/{{ python }}/.venv\
         ' \
     pytest \
         --html='\
@@ -201,7 +242,7 @@ test-repository python: (venv "test" python)
         --md-report-output='\
             .just/.test_report{{ python }}.md\
         ' \
-        --basetemp=".just/test/{{ python }}/tmp" \
+        --basetemp=".just/test-repo/{{ python }}/tmp" \
         --cov-config=".coveragerc" \
         "src" \
         "tests" \
@@ -259,6 +300,17 @@ print-dependency-tree python: (venv "print-dependency-tree" python)
         " \
         --frozen \
         --no-dev
+
+# Print the outdated dependencies for a given Python
+print-outdated-direct-dependencies python: (venv "print-outdated-direct-dependencies" python)
+    uv tree \
+        --python="\
+            {{ justfile_directory() }}/\
+            .just/print-dependency-tree/{{ python }}/.venv\
+        " \
+        --frozen \
+        --outdated \
+        --depth 1
 
 # Build the project sdist and wheel
 build:
