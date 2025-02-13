@@ -298,7 +298,7 @@ print-outdated-direct-dependencies python: (venv "print-outdated-direct-dependen
     uv tree \
         --python="\
             {{ justfile_directory() }}/\
-            .just/print-dependency-tree/{{ python }}/.venv\
+            .just/print-outdated-direct-dependencies/{{ python }}/.venv\
         " \
         --frozen \
         --outdated \
