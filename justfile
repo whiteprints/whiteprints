@@ -194,8 +194,8 @@ freeze receipt python dist resolution:
         | tee .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements.txt \
     "
 
-# pip install
-[private]
+# pip install in the virtualenv '.just/{{ receipt }}/{{ python }}/.venv'
+[group("virtualenv")]
 install receipt python group link_mode = "":
     rm -f .just/{{ receipt }}/{{ python }}/requirements.txt
     @just requirements {{ group }}" \
@@ -224,8 +224,8 @@ install receipt python group link_mode = "":
             ' \
     "
 
-# pip install distribution
-[private]
+# pip install in the virtualenv '.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv'
+[group("virtualenv")]
 install-dist receipt python group dist resolution="highest" link_mode="":
     rm -f .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements-dev.txt
     @just requirements-dev {{ group }}" \

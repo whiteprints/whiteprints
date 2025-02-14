@@ -100,10 +100,19 @@ jobs:
         with:
           version: "latest"
           enable-cache: true
+      - name: Install just
+        uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
+      - name: Initialize virtualenv
+        run: |
+            just install check-types "${{ matrix.python }}" tests
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
         with:
           python-version: "${{ matrix.python }}"
+          venv-path: ".just/check-types/${{ matrix.python }}"
+          warnings: true
+          project: "pyrightconfig.json"
+          extra-args: src/ tests/ docs/
 
   check-code:
     name: just ${{ matrix.receipt }}
