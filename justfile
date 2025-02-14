@@ -340,7 +340,13 @@ print-outdated-direct-dependencies python: (venv "print-outdated-direct-dependen
 
 # Build the project sdist and wheel
 build:
-    uv build
+    @just uv build
+
+
+# Check the given wheel
+check-dist wheel="dist/":
+    @[ ! -e {{ wheel }} ] || just uvx "check-wheel-contents {{ wheel }} --src-dir=src/ --package-omit=\*.pyc,\*.pot,\*.po"
+
 
 # Combine coverage files
 coverage-combine:
