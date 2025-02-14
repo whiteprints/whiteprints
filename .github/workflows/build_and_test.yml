@@ -112,7 +112,6 @@ jobs:
           python-version: "${{ matrix.python }}"
           venv-path: ".just/check-types/${{ matrix.python }}"
           warnings: true
-          project: "pyrightconfig.json"
           extra-args: src/ tests/ docs/
 
   check-code:
