@@ -110,7 +110,6 @@ jobs:
         uses: jakebailey/pyright-action@v2
         with:
           python-version: "${{ matrix.python }}"
-          venv-path: ".just/check-types/${{ matrix.python }}"
           warnings: true
           extra-args: src/ tests/ docs/
 
