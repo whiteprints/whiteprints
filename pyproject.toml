@@ -76,7 +76,6 @@ dev = [
     { include-group = "build-documentation" },
     { include-group = "check-exceptions" },
     { include-group = "check-maintainability" },
-    { include-group = "check-types" },
     { include-group = "check-vulnerabilities" },
     { include-group = "coverage" },
     { include-group = "editor" },
@@ -118,9 +117,6 @@ editor = [
 lint = [
     "pylint==3.3.4",
     { include-group = "tests" },
-]
-check-types = [
-    "pyright==1.1.394",
 ]
 coverage = [
     "coverage==7.6.12",

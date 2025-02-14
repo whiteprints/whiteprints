@@ -365,7 +365,7 @@ check-types-repository python link_mode="": (venv "check-types" python)
             ' \
     "
     uvx pyright \
-        --pythonversion={{ python }} \
+        --pythonversion=$(uv run --no-project --python {{ python }} python --version | cut -d' ' -f2) \
         --venvpath=.just/check-types/{{ python }} \
         --project='pyrightconfig.json' \
         src/ tests/ docs/
@@ -723,3 +723,4 @@ dev-tools-upgrade:
     @just uv "tool install --upgrade pip-audit"
     @just uv "tool install --upgrade ruff"
     @just uv "tool install --upgrade cyclonedx-bom"
+    @just uv "tool install --upgrade pyright"
