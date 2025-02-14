@@ -164,7 +164,7 @@ clean-all:
 # Run a receipt for all Python versions (found in the .python-versions file). Works for all receipt whose first argument is a Python version
 [group("tests")]
 for-all-python receipt args="":
-    for python in `grep -v '^#' {{ justfile_directory() }}/.python-versions`; do \
+    for python in $(grep -v '^#' .python-versions); do \
         just {{ receipt }} $python {{ args }}; \
     done
 
@@ -175,10 +175,9 @@ freeze receipt python dist resolution:
         pip freeze \
             --system \
             --python='\
-                {{ justfile_directory() }}\
-                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
+                .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
             ' \
-        | tee {{ justfile_directory() }}/.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements.txt \
+        | tee .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements.txt \
     "
 
 # pip install
@@ -186,12 +185,10 @@ freeze receipt python dist resolution:
 install receipt python group dist resolution="highest" link_mode="":
     @just requirements-dev {{ group }}" \
         --output-file='\
-            {{ justfile_directory() }}\
-            /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements-dev.txt\
+            .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements-dev.txt\
         ' \
         --python='\
-            {{ justfile_directory() }}\
-            /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
+            .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
         ' \
     "
     @just uv " \
@@ -202,16 +199,13 @@ install receipt python group dist resolution="highest" link_mode="":
             --resolution={{ resolution }} \
             {{ if link_mode == '' { '' } else { '--link-mode=' + link_mode } }} \
             --requirements='\
-                {{ justfile_directory() }}\
-                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements-dev.txt\
+                .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements-dev.txt\
             ' \
             --prefix='\
-                {{ justfile_directory() }}\
-                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
+                .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
             ' \
             --python='\
-                {{ justfile_directory() }}\
-                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
+                .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
             ' \
     "
     @just freeze {{ receipt }} {{ python }} {{ dist }} {{ resolution }}
@@ -225,11 +219,9 @@ test-dist python dist resolution="highest" link_mode="": (venv ("test-dist-" + r
         {{ justfile_directory() }}/.just/test-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/tmp\
     " \
     COVERAGE_FILE="\
-        {{ justfile_directory() }}/\
         .just/.coverage.dist.{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}\
     " \
-    {{ justfile_directory() }}\
-    /.just/test-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
+    .just/test-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
     /bin/python -m pytest \
         --html='\
             .just/.test_report.{{ python }}.html\
@@ -287,8 +279,12 @@ alias test := test-repository
 
 # Open a test report in a web browser
 [group("report")]
-test-report python:
-    $BROWSER "{{ justfile_directory() }}/.just/.test_report.{{ python }}.html"
+open-test-report python:
+    $BROWSER ".just/.test_report.{{ python }}.html"
+
+[group("report")]
+open-coverage-report python:
+    $BROWSER ".just/coverage/htmlcov/index.html"
 
 # Run pre-commit
 [private]
@@ -307,25 +303,24 @@ lint:
     @just uvr " \
         --group=lint \
     pylint \
-        --rcfile '{{ justfile_directory() }}/.pylintrc' \
-        '{{ justfile_directory() }}/src' \
-        '{{ justfile_directory() }}/tests' \
-        '{{ justfile_directory() }}/docs' \
+        --rcfile '.pylintrc' \
+        'src' \
+        'tests' \
+        'docs' \
     "
 
 # Check the types corectness with Pyright for a given Python
 [group("tests")]
 check-types-dist python dist resolution="highest" link_mode="": (venv ("check-types-dist-" + resolution) python dist)
     @just install check-types-dist {{ python }} check-types {{ dist }} {{ resolution }} {{ link_mode }}
-    {{ justfile_directory() }}\
-    /.just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
+    .just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
     /bin/python -m pyright \
         --pythonpath=$( \
             uv python find \
-            {{ justfile_directory() }}/.just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv \
+            .just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv \
         ) \
-        --project='{{ justfile_directory() }}/pyrightconfig.json' \
-        $(uv run --no-project --python {{ justfile_directory() }}/.just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv  python -c "import sys,re,os,importlib.metadata as m; w=sys.argv[1]; d=re.match(r'(.*)-\d',os.path.basename(w)).group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''),t)))" {{ dist }})
+        --project='pyrightconfig.json' \
+        $(uv run --no-project --python .just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv  python -c "import sys,re,os,importlib.metadata as m; w=sys.argv[1]; d=re.match(r'(.*)-\d',os.path.basename(w)).group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''),t)))" {{ dist }})
 
 # Check the types corectness with Pyright for a given Python
 [group("tests")]
@@ -333,12 +328,8 @@ check-types-repository python: (venv "check-types" python)
     @just uvr " \
         --group=check-types \
     python -m pyright \
-        --pythonpath='$( \
-            uv python find \
-            {{ justfile_directory() }}/.just/check-types/{{ python }}/.venv \
-        )' \
-        --project='{{ justfile_directory() }}/pyrightconfig.json' \
-        {{ justfile_directory() }}/\
+        --pythonpath=$(uv python find .just/check-types/{{ python }}/.venv) \
+        --project='pyrightconfig.json' \
         src/ tests/ docs/ \
     "
 
@@ -348,10 +339,7 @@ alias check-types := check-types-repository
 [group("dependencies")]
 print-dependency-tree python: (venv "print-dependency-tree" python)
     uv tree \
-        --python="\
-            {{ justfile_directory() }}/\
-            .just/print-dependency-tree/{{ python }}/.venv\
-        " \
+        --python=".just/print-dependency-tree/{{ python }}/.venv" \
         --frozen \
         --no-dev
 
@@ -359,10 +347,7 @@ print-dependency-tree python: (venv "print-dependency-tree" python)
 [group("dependencies")]
 print-outdated-direct-dependencies python: (venv "print-outdated-direct-dependencies" python)
     uv tree \
-        --python="\
-            {{ justfile_directory() }}/\
-            .just/print-outdated-direct-dependencies/{{ python }}/.venv\
-        " \
+        --python=".just/print-outdated-direct-dependencies/{{ python }}/.venv" \
         --frozen \
         --outdated \
         --depth 1
@@ -388,47 +373,47 @@ coverage-combine:
         --directory='.just' \
         --only-group=coverage \
     coverage combine \
-        --rcfile='{{ justfile_directory() }}/.coveragerc' \
+        --rcfile='.coveragerc' \
         --data-file=.coverage \
     "
 
 # Report coverage in various formats (lcov, html, xml)
 [group("report")]
 coverage-report:
-    @[ -f "{{ justfile_directory() }}/.just/.coverage" ] || \
+    @[ -f ".just/.coverage" ] || \
         just coverage-combine
     @just uvr " \
         --only-group=coverage \
     coverage html \
-        --rcfile='{{ justfile_directory() }}/.coveragerc' \
-        --directory='{{ justfile_directory() }}/.just/coverage/htmlcov' \
-        --data-file='{{ justfile_directory() }}/.just/.coverage' \
+        --rcfile='.coveragerc' \
+        --directory='.just/coverage/htmlcov' \
+        --data-file='.just/.coverage' \
     "
     @just uvr " \
         --only-group=coverage \
     coverage lcov \
-        --rcfile='{{ justfile_directory() }}/.coveragerc' \
-        -o='{{ justfile_directory() }}/.just/coverage.lcov' \
-        --data-file='{{ justfile_directory() }}/.just/.coverage' \
+        --rcfile='.coveragerc' \
+        -o='.just/coverage.lcov' \
+        --data-file='.just/.coverage' \
     "
     @just uvr " \
         --only-group=coverage \
     coverage xml \
-        --rcfile='{{ justfile_directory() }}/.coveragerc' \
-        -o='{{ justfile_directory() }}/.just/coverage.xml' \
-        --data-file='{{ justfile_directory() }}/.just/.coverage' \
+        --rcfile='.coveragerc' \
+        -o='.just/coverage.xml' \
+        --data-file='.just/.coverage' \
     "
 
 # Print coverage
 [group("coverage")]
 coverage args="":
-    @[ -f "{{ justfile_directory() }}/.just/.coverage" ] || \
+    @[ -f ".just/.coverage" ] || \
         just coverage-combine
     @just uvr " \
         --only-group=coverage \
     coverage report \
-        --rcfile='{{ justfile_directory() }}/.coveragerc' \
-        --data-file='{{ justfile_directory() }}/.just/.coverage' \
+        --rcfile='.coveragerc' \
+        --data-file='.just/.coverage' \
         --skip-covered \
         {{ args }} \
     "
@@ -527,9 +512,9 @@ check-vulnerabilities:
     @just bandit " \
         --recursive \
         --configfile=bandit.yaml \
-        {{ justfile_directory() }}/src \
-        {{ justfile_directory() }}/tests \
-        {{ justfile_directory() }}/docs \
+        src \
+        tests \
+        docs \
     "
 
 # Run `tryceratops`
@@ -598,14 +583,12 @@ check-licenses:
 check-supply-chain python: (venv "check-supply-chain" python)
     @just requirements " \
         --output-file '\
-            {{ justfile_directory() }}/.just/check-supply-chain/\
-            {{ python }}/tmp/requirements.txt\
+            .just/check-supply-chain/{{ python }}/tmp/requirements.txt\
         ' \
     "
     @just pip-audit " \
         --requirement '\
-            {{ justfile_directory() }}/.just/check-supply-chain/\
-            {{ python }}/tmp/requirements.txt\
+            .just/check-supply-chain/{{ python }}/tmp/requirements.txt\
         ' \
     "
 
@@ -642,7 +625,7 @@ sphinx-autobuild args="":
             --keep-going \
             --open-browser \
         docs \
-        '{{ justfile_directory() }}/.just/sphinx-autobuild/tmp/docs_build/' \
+        '.just/sphinx-autobuild/tmp/docs_build/' \
         {{ args }} \
     "
 
