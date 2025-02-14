@@ -79,13 +79,27 @@ uvx args="":
 
 # Export a pip requirements file
 [private]
-requirements args="":
+compile args="":
     @just uv " \
         pip compile \
         --quiet \
         --refresh \
         --generate-hashes \
         --all-extras \
+        {{ args }} \
+    "
+
+# Install dev requirements (group)
+[private]
+requirements group args="":
+    @just uv " \
+        export \
+        --no-config \
+        --no-emit-project \
+        --quiet \
+        --frozen \
+        --no-dev \
+        --group={{ group }}\
         {{ args }} \
     "
 
@@ -182,7 +196,38 @@ freeze receipt python dist resolution:
 
 # pip install
 [private]
-install receipt python group dist resolution="highest" link_mode="":
+install receipt python group link_mode = "":
+    rm -f .just/{{ receipt }}/{{ python }}/requirements.txt
+    @just requirements {{ group }}" \
+        --output-file='\
+            .just/{{ receipt }}/{{ python }}/requirements.txt\
+        ' \
+        --python='\
+            .just/{{ receipt }}/{{ python }}/.venv\
+        ' \
+    "
+    @just uv " \
+        pip install  \
+            --quiet \
+            --exact \
+            --strict \
+            --require-hashes \
+            {{ if link_mode == '' { '' } else { '--link-mode=' + link_mode } }} \
+            --requirements='\
+                .just/{{ receipt }}/{{ python }}/requirements.txt\
+            ' \
+            --prefix='\
+                .just/{{ receipt }}/{{ python }}/.venv\
+            ' \
+            --python='\
+                .just/{{ receipt }}/{{ python }}/.venv\
+            ' \
+    "
+
+# pip install distribution
+[private]
+install-dist receipt python group dist resolution="highest" link_mode="":
+    rm -f .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements-dev.txt
     @just requirements-dev {{ group }}" \
         --output-file='\
             .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements-dev.txt\
@@ -214,7 +259,7 @@ install receipt python group dist resolution="highest" link_mode="":
 [group("tests")]
 test-dist python dist resolution="highest" link_mode="": (venv ("test-dist-" + resolution) python dist)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
-    @just install test-dist {{ python }} tests {{ dist }} {{ resolution }} {{ link_mode }}
+    @just install-dist test-dist {{ python }} tests {{ dist }} {{ resolution }} {{ link_mode }}
     TMPDIR="\
         {{ justfile_directory() }}/.just/test-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/tmp\
     " \
@@ -313,18 +358,30 @@ lint:
         'docs' \
     "
 
+# Run `pyright`
+[private]
+pyright args="":
+    @just uvx " \
+        pyright \
+        {{ args }} \
+    "
+
 # Check the types correctness with Pyright for a given Python
 [group("tests")]
 check-types-dist python dist resolution="highest" link_mode="": (venv ("check-types-dist-" + resolution) python dist)
-    @just install check-types-dist {{ python }} check-types {{ dist }} {{ resolution }} {{ link_mode }}
-    .just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
-    /bin/python -m pyright \
+    @just install-dist check-types-dist {{ python }} check-types {{ dist }} {{ resolution }} {{ link_mode }}
+    @just pyright " \
         --pythonpath=$( \
             uv python find \
             .just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv \
         ) \
         --project='pyrightconfig.json' \
-        $(uv run --no-project --python .just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv  python -c "import sys,re,os,importlib.metadata as m; w=sys.argv[1]; d=re.match(r'(.*)-\d',os.path.basename(w)).group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''),t)))" {{ dist }})
+        $( \
+            uv run --no-project --python .just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv \
+            python -c "import sys,re,os,importlib.metadata as m; w=sys.argv[1]; d=re.match(r'(.*)-\d',os.path.basename(w)).group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''),t)))" \
+            {{ dist }} \
+        ) \
+    "
 
 # Run the type correctness with Pyright for a given Python for both lowest and highest resolutions
 [group("tests")]
@@ -335,40 +392,13 @@ check-types-dist-lh python dist link_mode="":
 # Check the types corectness with Pyright for a given Python
 [group("tests")]
 check-types-repository python link_mode="": (venv "check-types" python)
-    rm -f .just/check-types/{{ python }}/requirements.txt
-    uv export \
-        --quiet \
-        --no-dev \
-        --no-emit-project \
-        --group=tests \
-        --output-file='\
-            .just/check-types/{{ python }}/requirements.txt\
-        ' \
-        --python='\
-            .just/check-types/{{ python }}/.venv\
-        '
-    @just uv " \
-        pip install  \
-            --quiet \
-            --exact \
-            --strict \
-            --require-hashes \
-            {{ if link_mode == '' { '' } else { '--link-mode=' + link_mode } }} \
-            --requirements='\
-                .just/check-types/{{ python }}/requirements.txt\
-            ' \
-            --prefix='\
-                .just/check-types/{{ python }}/.venv\
-            ' \
-            --python='\
-                .just/check-types/{{ python }}/.venv\
-            ' \
-    "
-    uvx pyright \
+    @just install check-types {{ python }} tests {{ link_mode }}
+    @just pyright " \
         --pythonversion=$(uv run --no-project --python {{ python }} python --version | cut -d' ' -f2) \
         --venvpath=.just/check-types/{{ python }} \
         --project='pyrightconfig.json' \
-        src/ tests/ docs/
+        src/ tests/ docs/ \
+    "
 
 alias check-types := check-types-repository
 
@@ -488,7 +518,7 @@ pip-audit args="":
 BOM-vulnerabilities python resolution="highest":
     [ -d "BOM" ] || \
         mkdir -p "BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}"
-    @just requirements " \
+    @just compile " \
         --resolution={{ resolution }} \
         --output-file '\
             BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/\
@@ -617,15 +647,17 @@ check-licenses:
 
 # Check for vulnerabilities in the dependencies
 [group("repository analysis")]
-check-supply-chain python: (venv "check-supply-chain" python)
-    @just requirements " \
+check-supply-chain python resolution="lowest": (venv ("check-supply-chain-" + resolution) python)
+    @just compile " \
+        --resolution={{ resolution }} \
         --output-file '\
-            .just/check-supply-chain/{{ python }}/tmp/requirements.txt\
+            .just/check-supply-chain-{{ resolution }}/{{ python }}/tmp/requirements.txt\
         ' \
+        pyproject.toml \
     "
     @just pip-audit " \
         --requirement '\
-            .just/check-supply-chain/{{ python }}/tmp/requirements.txt\
+            .just/check-supply-chain-{{ resolution }}/{{ python }}/tmp/requirements.txt\
         ' \
     "
 
@@ -719,7 +751,6 @@ dev-tools-upgrade:
     @just uv "tool install --upgrade rust-just"
     @just uv "tool install --upgrade pre-commit --with=pre-commit-uv"
     @just uv "tool install --upgrade reuse"
-    @just uv "tool install --upgrade pyright"
     @just uv "tool install --upgrade pip-audit"
     @just uv "tool install --upgrade ruff"
     @just uv "tool install --upgrade cyclonedx-bom"
