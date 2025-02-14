@@ -334,14 +334,41 @@ check-types-dist-lh python dist link_mode="":
 
 # Check the types corectness with Pyright for a given Python
 [group("tests")]
-check-types-repository python: (venv "check-types" python)
-    @just uvr " \
-        --group=check-types \
-    python -m pyright \
-        --pythonpath=$(uv python find .just/check-types/{{ python }}/.venv) \
-        --project='pyrightconfig.json' \
-        src/ tests/ docs/ \
+check-types-repository python link_mode="": (venv "check-types" python)
+    rm -f .just/check-types/{{ python }}/requirements.txt
+    uv export \
+        --quiet \
+        --no-dev \
+        --no-emit-project \
+        --group=tests \
+        --output-file='\
+            .just/check-types/{{ python }}/requirements.txt\
+        ' \
+        --python='\
+            .just/check-types/{{ python }}/.venv\
+        '
+    @just uv " \
+        pip install  \
+            --quiet \
+            --exact \
+            --strict \
+            --require-hashes \
+            {{ if link_mode == '' { '' } else { '--link-mode=' + link_mode } }} \
+            --requirements='\
+                .just/check-types/{{ python }}/requirements.txt\
+            ' \
+            --prefix='\
+                .just/check-types/{{ python }}/.venv\
+            ' \
+            --python='\
+                .just/check-types/{{ python }}/.venv\
+            ' \
     "
+    uvx pyright \
+        --pythonversion={{ python }} \
+        --venvpath=.just/check-types/{{ python }} \
+        --project='pyrightconfig.json' \
+        src/ tests/ docs/
 
 alias check-types := check-types-repository
 
