@@ -215,7 +215,7 @@ install receipt python group dist resolution="highest" link_mode="":
 test-dist python dist resolution="highest" link_mode="": (venv ("test-dist-" + resolution) python dist)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
     @just install test-dist {{ python }} tests {{ dist }} {{ resolution }} {{ link_mode }}
-    @TMPDIR="\
+    TMPDIR="\
         {{ justfile_directory() }}/.just/test-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/tmp\
     " \
     COVERAGE_FILE="\
@@ -224,13 +224,13 @@ test-dist python dist resolution="highest" link_mode="": (venv ("test-dist-" + r
     .just/test-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
     /bin/python -m pytest \
         --html='\
-            .just/.test_report.{{ python }}.html\
+            .just/.test_report.{{ python }}.{{ dist }}.{{ resolution }}.html\
         ' \
         --junitxml='\
-            .just/.junit-{{ arch() }}-{{ os() }}-{{ python }}.xml\
+            .just/.junit-{{ arch() }}-{{ os() }}-{{ dist }}-{{ resolution }}-{{ python }}.xml\
         ' \
         --md-report-output='\
-            .just/.test_report{{ python }}.md\
+            .just/.test_report_{{ python }}_{{ dist }}_{{ resolution }}.md\
         ' \
         --basetemp='\
             .just/test-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/tmp\
@@ -266,7 +266,7 @@ test-repository python: (venv "test-repo" python)
             .just/.junit-{{ arch() }}-{{ os() }}-{{ python }}.xml\
         ' \
         --md-report-output='\
-            .just/.test_report{{ python }}.md\
+            .just/.test_report_{{ python }}.md\
         ' \
         --basetemp=".just/test-repo/{{ python }}/tmp" \
         --cov-config=".coveragerc" \
@@ -279,11 +279,15 @@ alias test := test-repository
 
 # Open a test report in a web browser
 [group("report")]
-open-test-report python:
+open-test-report python dist="" resolution="highest":
+    [ "{{ dist }}" = "" ] \
+        && ([ -f ".just/.test_report.{{ python }}.html" ] || just test-repository {{ python }}) \
+        || ([ -f ".just/.test_report.{{ python }}.{{ dist }}.{{ resolution }}.html" ] || just test-dist {{ python }} {{ dist }} {{ resolution }})
     $BROWSER ".just/.test_report.{{ python }}.html"
 
 [group("report")]
-open-coverage-report python:
+open-coverage-report:
+    @[ -f ".just/coverage/htmlcov/index.html" ] || just coverage-report
     $BROWSER ".just/coverage/htmlcov/index.html"
 
 # Run pre-commit
