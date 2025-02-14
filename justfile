@@ -280,7 +280,7 @@ alias test := test-repository
 # Open a test report in a web browser
 [group("report")]
 open-test-report python dist="" resolution="highest":
-    [ "{{ dist }}" = "" ] \
+    @[ "{{ dist }}" = "" ] \
         && ([ -f ".just/.test_report.{{ python }}.html" ] || just test-repository {{ python }}) \
         || ([ -f ".just/.test_report.{{ python }}.{{ dist }}.{{ resolution }}.html" ] || just test-dist {{ python }} {{ dist }} {{ resolution }})
     $BROWSER ".just/.test_report.{{ python }}.html"
@@ -313,7 +313,7 @@ lint:
         'docs' \
     "
 
-# Check the types corectness with Pyright for a given Python
+# Check the types correctness with Pyright for a given Python
 [group("tests")]
 check-types-dist python dist resolution="highest" link_mode="": (venv ("check-types-dist-" + resolution) python dist)
     @just install check-types-dist {{ python }} check-types {{ dist }} {{ resolution }} {{ link_mode }}
@@ -325,6 +325,12 @@ check-types-dist python dist resolution="highest" link_mode="": (venv ("check-ty
         ) \
         --project='pyrightconfig.json' \
         $(uv run --no-project --python .just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv  python -c "import sys,re,os,importlib.metadata as m; w=sys.argv[1]; d=re.match(r'(.*)-\d',os.path.basename(w)).group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''),t)))" {{ dist }})
+
+# Run the type correctness with Pyright for a given Python for both lowest and highest resolutions
+[group("tests")]
+check-types-dist-lh python dist link_mode="":
+    @just check-types-dist {{ python }} {{ dist }} lowest {{ link_mode }}
+    @just check-types-dist {{ python }} {{ dist }} highest {{ link_mode }}
 
 # Check the types corectness with Pyright for a given Python
 [group("tests")]

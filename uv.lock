@@ -541,7 +541,7 @@ name = "importlib-metadata"
 version = "8.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "zipp" },
+    { name = "zipp", marker = "python_full_version < '3.10'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/33/08/c1395a292bb23fd03bdf572a1357c5a733d3eecbab877641ceacab23db6e/importlib_metadata-8.6.1.tar.gz", hash = "sha256:310b41d755445d74569f993ccfc22838295d9fe005425094fad953d7f15c8580", size = 55767 }
 wheels = [
@@ -2248,16 +2248,7 @@ check-maintainability = [
     { name = "xenon" },
 ]
 check-types = [
-    { name = "beartype" },
-    { name = "hypothesis" },
     { name = "pyright" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "pytest-html" },
-    { name = "pytest-md-report" },
-    { name = "pytest-randomly" },
-    { name = "pytest-xdist" },
-    { name = "xdoctest", extra = ["colors"] },
 ]
 check-vulnerabilities = [
     { name = "bandit" },
@@ -2370,18 +2361,7 @@ build-documentation = [
 ]
 check-exceptions = [{ name = "tryceratops", specifier = "==2.4.1" }]
 check-maintainability = [{ name = "xenon", specifier = "==0.9.3" }]
-check-types = [
-    { name = "beartype", specifier = "==0.19.0" },
-    { name = "hypothesis", specifier = "==6.125.3" },
-    { name = "pyright", specifier = "==1.1.394" },
-    { name = "pytest", specifier = "==8.3.4" },
-    { name = "pytest-cov", specifier = "==6.0.0" },
-    { name = "pytest-html", specifier = "==4.1.1" },
-    { name = "pytest-md-report", specifier = "==0.6.3" },
-    { name = "pytest-randomly", specifier = "==3.16.0" },
-    { name = "pytest-xdist", specifier = "==3.6.1" },
-    { name = "xdoctest", extras = ["colors"], specifier = "==1.2.0" },
-]
+check-types = [{ name = "pyright", specifier = "==1.1.394" }]
 check-vulnerabilities = [{ name = "bandit", specifier = "==1.8.2" }]
 coverage = [{ name = "coverage", specifier = "==7.6.12" }]
 dev = [

@@ -121,7 +121,6 @@ lint = [
 ]
 check-types = [
     "pyright==1.1.394",
-    { include-group = "tests" },
 ]
 coverage = [
     "coverage==7.6.12",
