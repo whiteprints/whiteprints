@@ -100,9 +100,6 @@ jobs:
         with:
           version: "latest"
           enable-cache: true
-      - name: Install project
-        run: |
-          uv sync --no-dev --group=check-types --python ${{ matrix.python }}
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
         with:
