@@ -515,13 +515,16 @@ pip-audit args="":
 
 # Export Bill of Material of project's dependencies and vulnerabilities for a given Python
 [group("Bill of Material")]
-BOM-vulnerabilities python resolution="lowest":
+BOM-vulnerabilities python resolution="lowest": (venv ("BOM-vulnerabilities-" + resolution) python)
     [ -d "BOM" ] || \
         mkdir -p "BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}"
     @just compile " \
+        --python='\
+            .just/BOM-vulnerabilities-{{ resolution }}/{{ python }}/.venv\
+        ' \
         --resolution={{ resolution }} \
         --output-file '\
-            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/\
+            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}/\
             requirements.txt\
         ' \
         pyproject.toml \
@@ -531,22 +534,22 @@ BOM-vulnerabilities python resolution="lowest":
     cyclonedx-py requirements \
         --outfile \
             '\
-                BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/\
+                BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}/\
                 project_dependencies.cdx.json\
             ' \
         '\
-            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/\
+            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution}}/\
             requirements.txt\
         ' \
     "
     @just pip-audit " \
         --requirement '\
-            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/\
+            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}/\
             requirements.txt\
         ' \
         --format cyclonedx-json \
         --output '\
-            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/\
+            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}/\
             vulnerabilities.cdx.json\
         ' \
     "
@@ -649,6 +652,9 @@ check-licenses:
 [group("repository analysis")]
 check-supply-chain python resolution="lowest": (venv ("check-supply-chain-" + resolution) python)
     @just compile " \
+        --python='\
+            .just/check-supply-chain-{{ resolution }}/{{ python }}/.venv\
+        ' \
         --resolution={{ resolution }} \
         --output-file '\
             .just/check-supply-chain-{{ resolution }}/{{ python }}/tmp/requirements.txt\
