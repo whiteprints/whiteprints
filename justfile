@@ -15,6 +15,7 @@ default:
     @just --list
 
 # initialise Just working directory and synchronize the virtualenv
+[private]
 init:
     [ -d .just ] || mkdir -p .just
 
@@ -33,24 +34,27 @@ all:
     @just build-documentation
     @just build
 
-# Create a virtual environment for a receipt, Python and optionally a wheel
-venv receipt python wheel="": init
-    [ -d ".just/{{ receipt }}{{ if wheel == '' { '' } else { '/' + file_stem(wheel) } }}/{{ python }}" ] || \
-        mkdir -p ".just/{{ receipt }}{{ if wheel == '' { '' } else { '/'+ file_stem(wheel) } }}/{{ python }}"
-    rm -rf ".just/{{ receipt }}{{ if wheel == '' { '' } else { '/' + file_stem(wheel) } }}/{{ python }}/tmp"
-    mkdir -p ".just/{{ receipt }}{{ if wheel == '' { '' } else { '/' + file_stem(wheel) } }}/{{ python }}/tmp"
+# Create a virtual environment for a receipt, Python and optionally a dist
+[private]
+venv receipt python dist="": init
+    [ -d ".just/{{ receipt }}{{ if dist == '' { '' } else { '/' + file_stem(dist) } }}/{{ python }}" ] || \
+        mkdir -p ".just/{{ receipt }}{{ if dist == '' { '' } else { '/'+ file_stem(dist) } }}/{{ python }}"
+    rm -rf ".just/{{ receipt }}{{ if dist == '' { '' } else { '/' + file_stem(dist) } }}/{{ python }}/tmp"
+    mkdir -p ".just/{{ receipt }}{{ if dist == '' { '' } else { '/' + file_stem(dist) } }}/{{ python }}/tmp"
     uv venv \
         --no-project \
         --no-config \
         --python={{ python }} \
-        ".just/{{ receipt }}{{ if wheel == '' { '' } else { '/' + file_stem(wheel) } }}/{{ python }}/.venv"
+        ".just/{{ receipt }}{{ if dist == '' { '' } else { '/' + file_stem(dist) } }}/{{ python }}/.venv"
 
 # Run `uv`
+[private]
 uv args="":
     uv \
     {{ args }}
 
 # Run `uv run`
+[private]
 uvr args="":
     @just uv " \
         run \
@@ -65,6 +69,7 @@ uvr args="":
     "
 
 # Run `uv tool run`
+[private]
 uvx args="":
     @just uv " \
         tool run \
@@ -73,6 +78,7 @@ uvx args="":
     "
 
 # Export a pip requirements file
+[private]
 requirements args="":
     @just uv " \
         pip compile \
@@ -98,6 +104,7 @@ requirements-dev group args="":
     "
 
 # Synchronize lockfile and environment
+[group("manage project")]
 sync resolution="highest":
     @just uv " \
         sync \
@@ -106,36 +113,45 @@ sync resolution="highest":
     "
 
 # Clean Python temporary files
+[group("clean")]
 clean-python:
     @just uvx "pyclean ."
 
 # Clean the generated Bill of Material (BOM)
+[group("clean")]
 clean-BOM:
     rm -rf BOM
 
 # Clean the documentation
+[group("clean")]
 clean-docs:
     rm -rf docs_build
 
 # Clean the just working directory
+[group("clean")]
 clean-just:
     rm -rf .just
 
 # Clean the compiled translation file
+[group("clean")]
 clean-translation:
     find src/ -name *.mo -type f -delete
 
-# Clean the sdist and wheel directory
+# Clean the source distribution and wheel directory
+[group("clean")]
 clean-dist:
     rm -rf dist
 
+[group("clean")]
 clean-uv-cache:
     @just uv "cache prune"
 
+[group("clean")]
 clean-coverage:
     rm -f ".just/.coverage*"
 
 # Clean everything
+[group("clean")]
 clean-all:
     @just clean-coverage
     @just clean-python
@@ -146,6 +162,7 @@ clean-all:
     @just clean-dist
 
 # Run a receipt for all Python versions (found in the .python-versions file). Works for all receipt whose first argument is a Python version
+[group("tests")]
 for-all-python receipt args="":
     for python in `grep -v '^#' {{ justfile_directory() }}/.python-versions`; do \
         just {{ receipt }} $python {{ args }}; \
@@ -153,32 +170,32 @@ for-all-python receipt args="":
 
 # pip freeze
 [private]
-freeze receipt python wheel resolution:
+freeze receipt python dist resolution:
     @just uv " \
         pip freeze \
             --system \
             --python='\
                 {{ justfile_directory() }}\
-                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
+                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
             ' \
-        | tee {{ justfile_directory() }}/.just/{{ receipt }}-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements.txt \
+        | tee {{ justfile_directory() }}/.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements.txt \
     "
 
 # pip install
 [private]
-install receipt python group wheel resolution="highest" link_mode="":
+install receipt python group dist resolution="highest" link_mode="":
     @just requirements-dev {{ group }}" \
         --output-file='\
             {{ justfile_directory() }}\
-            /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements-dev.txt\
+            /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements-dev.txt\
         ' \
         --python='\
             {{ justfile_directory() }}\
-            /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
+            /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
         ' \
     "
     @just uv " \
-        pip install {{ wheel }} \
+        pip install {{ dist }} \
             --quiet \
             --exact \
             --strict \
@@ -186,32 +203,33 @@ install receipt python group wheel resolution="highest" link_mode="":
             {{ if link_mode == '' { '' } else { '--link-mode=' + link_mode } }} \
             --requirements='\
                 {{ justfile_directory() }}\
-                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements-dev.txt\
+                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements-dev.txt\
             ' \
             --prefix='\
                 {{ justfile_directory() }}\
-                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
+                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
             ' \
             --python='\
                 {{ justfile_directory() }}\
-                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
+                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
             ' \
     "
-    @just freeze {{ receipt }} {{ python }} {{ wheel }} {{ resolution }}
+    @just freeze {{ receipt }} {{ python }} {{ dist }} {{ resolution }}
 
-# Run the tests with pytest for a given Python and wheel for a given resolution.
-test-dist python wheel resolution="highest" link_mode="": (venv ("test-dist-" + resolution) python wheel)
+# Run the tests with pytest for a given Python and distribution for a given resolution.
+[group("tests")]
+test-dist python dist resolution="highest" link_mode="": (venv ("test-dist-" + resolution) python dist)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
-    @just install test-dist {{ python }} tests {{ wheel }} {{ resolution }} {{ link_mode }}
+    @just install test-dist {{ python }} tests {{ dist }} {{ resolution }} {{ link_mode }}
     @TMPDIR="\
-        {{ justfile_directory() }}/.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/tmp\
+        {{ justfile_directory() }}/.just/test-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/tmp\
     " \
     COVERAGE_FILE="\
         {{ justfile_directory() }}/\
-        .just/.coverage.wheel.{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}\
+        .just/.coverage.dist.{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}\
     " \
     {{ justfile_directory() }}\
-    /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
+    /.just/test-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
     /bin/python -m pytest \
         --html='\
             .just/.test_report.{{ python }}.html\
@@ -223,18 +241,20 @@ test-dist python wheel resolution="highest" link_mode="": (venv ("test-dist-" + 
             .just/.test_report{{ python }}.md\
         ' \
         --basetemp='\
-            .just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/tmp\
+            .just/test-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/tmp\
         ' \
         --cov-config='.coveragerc' \
         'src' \
         'tests'
 
 # Run the tests with pytest for lowest and highest resolutions
-test-dist-lh python wheel link_mode="":
-    @just test-dist {{ python }} {{ wheel }} lowest {{ link_mode }}
-    @just test-dist {{ python }} {{ wheel }} highest {{ link_mode }}
+[group("tests")]
+test-dist-lh python dist link_mode="":
+    @just test-dist {{ python }} {{ dist }} lowest {{ link_mode }}
+    @just test-dist {{ python }} {{ dist }} highest {{ link_mode }}
 
 # Run the tests with pytest for a given Python
+[group("tests")]
 test-repository python: (venv "test-repo" python)
     rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
     @TMPDIR="{{ justfile_directory() }}/.just/test-repo/{{ python }}/tmp/" \
@@ -266,10 +286,12 @@ test-repository python: (venv "test-repo" python)
 alias test := test-repository
 
 # Open a test report in a web browser
+[group("report")]
 test-report python:
     $BROWSER "{{ justfile_directory() }}/.just/.test_report.{{ python }}.html"
 
 # Run pre-commit
+[private]
 pre-commit args="":
     @just uvx " \
         --with pre-commit-uv \
@@ -280,6 +302,7 @@ pre-commit args="":
     "
 
 # Lint the project with pylint
+[group("repository analysis")]
 lint:
     @just uvr " \
         --group=lint \
@@ -291,20 +314,22 @@ lint:
     "
 
 # Check the types corectness with Pyright for a given Python
-check-types-dist python wheel resolution="highest" link_mode="": (venv ("check-types-dist-" + resolution) python wheel)
-    @just install check-types-dist {{ python }} check-types {{ wheel }} {{ resolution }} {{ link_mode }}
+[group("tests")]
+check-types-dist python dist resolution="highest" link_mode="": (venv ("check-types-dist-" + resolution) python dist)
+    @just install check-types-dist {{ python }} check-types {{ dist }} {{ resolution }} {{ link_mode }}
     {{ justfile_directory() }}\
-    /.just/check-types-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
+    /.just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
     /bin/python -m pyright \
         --pythonpath=$( \
             uv python find \
-            {{ justfile_directory() }}/.just/check-types-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv \
+            {{ justfile_directory() }}/.just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv \
         ) \
         --project='{{ justfile_directory() }}/pyrightconfig.json' \
-        $(uv run --no-project --python {{ justfile_directory() }}/.just/check-types-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv  python -c "import sys,re,os,importlib.metadata as m; w=sys.argv[1]; d=re.match(r'(.*)-\d',os.path.basename(w)).group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''),t)))" {{ wheel }})
+        $(uv run --no-project --python {{ justfile_directory() }}/.just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv  python -c "import sys,re,os,importlib.metadata as m; w=sys.argv[1]; d=re.match(r'(.*)-\d',os.path.basename(w)).group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''),t)))" {{ dist }})
 
 # Check the types corectness with Pyright for a given Python
-check-types python: (venv "check-types" python)
+[group("tests")]
+check-types-repository python: (venv "check-types" python)
     @just uvr " \
         --group=check-types \
     python -m pyright \
@@ -317,7 +342,10 @@ check-types python: (venv "check-types" python)
         src/ tests/ docs/ \
     "
 
+alias check-types := check-types-repository
+
 # Print the dependency tree for a given Python
+[group("dependencies")]
 print-dependency-tree python: (venv "print-dependency-tree" python)
     uv tree \
         --python="\
@@ -328,6 +356,7 @@ print-dependency-tree python: (venv "print-dependency-tree" python)
         --no-dev
 
 # Print the outdated dependencies for a given Python
+[group("dependencies")]
 print-outdated-direct-dependencies python: (venv "print-outdated-direct-dependencies" python)
     uv tree \
         --python="\
@@ -338,17 +367,20 @@ print-outdated-direct-dependencies python: (venv "print-outdated-direct-dependen
         --outdated \
         --depth 1
 
-# Build the project sdist and wheel
+# Build the project source distribution and wheel
+[group("manage project")]
 build:
     @just uv build
 
 
 # Check the given wheel
-check-dist wheel="dist/":
+[group("tests")]
+check-wheel wheel="dist/":
     @[ ! -e {{ wheel }} ] || just uvx "check-wheel-contents {{ wheel }} --src-dir=src/ --package-omit=\*.pyc,\*.pot,\*.po"
 
 
 # Combine coverage files
+[group("coverage")]
 coverage-combine:
     @[ "$(find .just -maxdepth 1 -type f -name '.coverage.*')" ] \
         || just for-all-python test-repository
@@ -361,6 +393,7 @@ coverage-combine:
     "
 
 # Report coverage in various formats (lcov, html, xml)
+[group("report")]
 coverage-report:
     @[ -f "{{ justfile_directory() }}/.just/.coverage" ] || \
         just coverage-combine
@@ -387,6 +420,7 @@ coverage-report:
     "
 
 # Print coverage
+[group("coverage")]
 coverage args="":
     @[ -f "{{ justfile_directory() }}/.just/.coverage" ] || \
         just coverage-combine
@@ -400,6 +434,7 @@ coverage args="":
     "
 
 # Run `reuse`
+[private]
 reuse args="":
     @just uvx " \
         reuse \
@@ -407,6 +442,7 @@ reuse args="":
     "
 
 # Export Bill of Material of project's files and their licenses
+[group("Bill of Material")]
 BOM-licenses:
     [ -d "BOM" ] || mkdir "BOM"
     @just reuse " \
@@ -416,6 +452,7 @@ BOM-licenses:
     "
 
 # Run `pip-audit`
+[private]
 pip-audit args="":
     @just uvx " \
         pip-audit \
@@ -425,6 +462,7 @@ pip-audit args="":
     "
 
 # Export Bill of Material of project's dependencies and vulnerabilities for a given Python
+[group("Bill of Material")]
 BOM-vulnerabilities python resolution="highest":
     [ -d "BOM" ] || \
         mkdir -p "BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}"
@@ -461,11 +499,13 @@ BOM-vulnerabilities python resolution="highest":
     "
 
 # Export a Bill of Material of project files licenses and dependencies
+[group("Bill of Material")]
 BOM:
     @just BOM-licenses
     @just for-all-python BOM-vulnerabilities
 
 # Try to autofix a maximum of errors and typos
+[group("manage project")]
 autofix:
     -@just pre-commit trailing-whitespace
     -@just pre-commit pyproject-fmt
@@ -473,13 +513,15 @@ autofix:
     -@just pre-commit ruff
 
 # Run `bandit`
+[private]
 bandit args="":
     @just uvx " \
         bandit \
         {{ args }} \
     "
 
-# Check code vulnerabilities (static analysis)
+# Check code vulnerabilities (repository analysis)
+[group("repository analysis")]
 check-vulnerabilities:
     @just bandit " \
         --recursive \
@@ -490,6 +532,7 @@ check-vulnerabilities:
     "
 
 # Run `tryceratops`
+[private]
 tryceratops args="":
     @just uvr " \
         --group=check-exceptions \
@@ -497,7 +540,8 @@ tryceratops args="":
         {{ args }} \
     "
 
-# Check code exceptions (static analysis)
+# Check code exceptions (repository analysis)
+[group("repository analysis")]
 check-exceptions:
     @just tryceratops " \
         src \
@@ -506,6 +550,7 @@ check-exceptions:
     "
 
 # Run `radon`
+[private]
 radon args="":
     @just uvx " \
         radon \
@@ -513,6 +558,7 @@ radon args="":
     "
 
 # Print a report of the project's code complexity
+[group("repository analysis")]
 audit-code-maintainability:
     @just radon " \
         mi \
@@ -522,6 +568,7 @@ audit-code-maintainability:
     "
 
 # Run `xenon`
+[private]
 xenon args="":
     @just uvx " \
         xenon \
@@ -529,6 +576,7 @@ xenon args="":
     "
 
 # Check code complexity
+[group("repository analysis")]
 check-code-maintainability:
     @just xenon " \
         --max-average=A \
@@ -540,10 +588,12 @@ check-code-maintainability:
     "
 
 # Check licenses
+[group("repository analysis")]
 check-licenses:
     @just reuse lint
 
 # Check for vulnerabilities in the dependencies
+[group("repository analysis")]
 check-supply-chain python: (venv "check-supply-chain" python)
     @just requirements " \
         --output-file '\
@@ -559,6 +609,7 @@ check-supply-chain python: (venv "check-supply-chain" python)
     "
 
 # Run `sphinx-build`
+[private]
 sphinx-build args="":
     @just uvr " \
         --group=build-documentation \
@@ -571,14 +622,17 @@ sphinx-build args="":
     "
 
 # Build the documentation
+[group("documentation")]
 build-documentation dest="docs_build":
     @just sphinx-build "--builder=html '{{ dest }}'"
 
 # Check that there are no dead links in the documentation
+[group("documentation")]
 check-documentation-links dest="docs_build":
     @just sphinx-build "--builder=linkcheck '{{ dest }}'"
 
 # Run `sphinx-autobuild`
+[private]
 sphinx-autobuild args="":
     @just uvr " \
             --group=serve-documentation \
@@ -592,10 +646,12 @@ sphinx-autobuild args="":
     "
 
 # Serve the documentation on a given port. If port=0 a random available port is set.
+[group("documentation")]
 serve-documentation port="0":
     @just sphinx-autobuild "--port={{ port }}"
 
 # Run `pybabel`
+[private]
 pybabel args="":
     @just uvr " \
         --only-group=localization \
@@ -605,6 +661,7 @@ pybabel args="":
     "
 
 # Extract the translation from the Python source files
+[group("localization")]
 translation-extract:
     @just pybabel " \
         extract \
@@ -615,6 +672,7 @@ translation-extract:
     "
 
 # Initialize a translation for a given locale (language)
+[group("localization")]
 translation-init locale:
     @just pybabel " \
         init \
@@ -624,6 +682,7 @@ translation-init locale:
     "
 
 # Update a translation for a given locale (language)
+[group("localization")]
 translation-update locale="":
     @just pybabel " \
         update \
@@ -634,6 +693,7 @@ translation-update locale="":
     "
 
 # Install or update the tools used by Just receipts
+[group("manage project")]
 dev-tools-upgrade:
     @just uv "tool install --upgrade rust-just"
     @just uv "tool install --upgrade pre-commit --with=pre-commit-uv"
