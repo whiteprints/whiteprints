@@ -515,7 +515,7 @@ pip-audit args="":
 
 # Export Bill of Material of project's dependencies and vulnerabilities for a given Python
 [group("Bill of Material")]
-BOM-vulnerabilities python resolution="highest":
+BOM-vulnerabilities python resolution="lowest":
     [ -d "BOM" ] || \
         mkdir -p "BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}"
     @just compile " \
