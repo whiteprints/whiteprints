@@ -83,8 +83,9 @@ requirements args="":
         {{ args }} \
     "
 
+# Install dev requirements (group)
 [private]
-requirements-dev args="":
+requirements-dev group args="":
     @just uv " \
         export \
         --no-config \
@@ -92,7 +93,7 @@ requirements-dev args="":
         --quiet \
         --frozen \
         --no-dev \
-        --only-group=tests \
+        --only-group={{ group }}\
         {{ args }} \
     "
 
@@ -150,36 +151,58 @@ for-all-python receipt args="":
         just {{ receipt }} $python {{ args }}; \
     done
 
-# Run the tests with pytest for a given Python and wheel for a given resolution.
-test-dist python wheel resolution="highest" link_mode="": (venv ("test-dist-" + resolution) python wheel)
-    rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
-    @just requirements-dev " \
+# pip freeze
+[private]
+freeze receipt python wheel resolution:
+    @just uv " \
+        pip freeze \
+            --system \
+            --python='\
+                {{ justfile_directory() }}\
+                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
+            ' \
+        | tee {{ justfile_directory() }}/.just/{{ receipt }}-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements.txt \
+    "
+
+# pip install
+[private]
+install receipt python group wheel resolution="highest" link_mode="":
+    @just requirements-dev {{ group }}" \
         --output-file='\
             {{ justfile_directory() }}\
-            /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements-dev.txt\
+            /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements-dev.txt\
         ' \
         --python='\
             {{ justfile_directory() }}\
-            /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
+            /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
         ' \
     "
     @just uv " \
         pip install {{ wheel }} \
+            --quiet \
+            --exact \
+            --strict \
             --resolution={{ resolution }} \
             {{ if link_mode == '' { '' } else { '--link-mode=' + link_mode } }} \
             --requirements='\
                 {{ justfile_directory() }}\
-                /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements-dev.txt\
+                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/requirements-dev.txt\
             ' \
             --prefix='\
                 {{ justfile_directory() }}\
-                /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
+                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
             ' \
             --python='\
                 {{ justfile_directory() }}\
-                /.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
+                /.just/{{ receipt }}-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
             ' \
     "
+    @just freeze {{ receipt }} {{ python }} {{ wheel }} {{ resolution }}
+
+# Run the tests with pytest for a given Python and wheel for a given resolution.
+test-dist python wheel resolution="highest" link_mode="": (venv ("test-dist-" + resolution) python wheel)
+    rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
+    @just install test-dist {{ python }} tests {{ wheel }} {{ resolution }} {{ link_mode }}
     @TMPDIR="\
         {{ justfile_directory() }}/.just/test-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/tmp\
     " \
@@ -268,19 +291,30 @@ lint:
     "
 
 # Check the types corectness with Pyright for a given Python
+check-types-dist python wheel resolution="highest" link_mode="": (venv ("check-types-dist-" + resolution) python wheel)
+    @just install check-types-dist {{ python }} check-types {{ wheel }} {{ resolution }} {{ link_mode }}
+    {{ justfile_directory() }}\
+    /.just/check-types-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv\
+    /bin/python -m pyright \
+        --pythonpath=$( \
+            uv python find \
+            {{ justfile_directory() }}/.just/check-types-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv \
+        ) \
+        --project='{{ justfile_directory() }}/pyrightconfig.json' \
+        $(uv run --no-project --python {{ justfile_directory() }}/.just/check-types-dist-{{ resolution }}/{{ file_stem(wheel) }}/{{ python }}/.venv  python -c "import sys,re,os,importlib.metadata as m; w=sys.argv[1]; d=re.match(r'(.*)-\d',os.path.basename(w)).group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''),t)))" {{ wheel }})
+
+# Check the types corectness with Pyright for a given Python
 check-types python: (venv "check-types" python)
     @just uvr " \
-        --python='\
-            {{ justfile_directory() }}/\
-            .just/check-types/{{ python }}/.venv\
-        ' \
         --group=check-types \
-    pyright \
+    python -m pyright \
         --pythonpath='$( \
             uv python find \
             {{ justfile_directory() }}/.just/check-types/{{ python }}/.venv \
         )' \
         --project='{{ justfile_directory() }}/pyrightconfig.json' \
+        {{ justfile_directory() }}/\
+        src/ tests/ docs/ \
     "
 
 # Print the dependency tree for a given Python
