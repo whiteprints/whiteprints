@@ -472,6 +472,7 @@ BOM-vulnerabilities python resolution="highest":
             BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}/\
             requirements.txt\
         ' \
+        pyproject.toml \
     "
     @just uvx " \
         --from cyclonedx-bom \
