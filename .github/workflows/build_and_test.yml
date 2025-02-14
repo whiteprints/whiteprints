@@ -106,10 +106,10 @@ jobs:
         run: |
             just venv check-types "${{ matrix.python }}"
             just install check-types "${{ matrix.python }}" tests
+            source .just/check-types/${{ matrix.python }}/.venv/bin/activate
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
         with:
-          python-version: "${{ matrix.python }}"
           warnings: true
           extra-args: src/ tests/ docs/
 
