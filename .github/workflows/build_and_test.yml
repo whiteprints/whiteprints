@@ -104,6 +104,7 @@ jobs:
         uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
       - name: Initialize virtualenv
         run: |
+            just venv check-types "${{ matrix.python }}"
             just install check-types "${{ matrix.python }}" tests
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
