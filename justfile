@@ -391,11 +391,14 @@ check-types-dist-lh python dist link_mode="":
 
 # Check the types corectness with Pyright for a given Python
 [group("tests")]
-check-types-repository python link_mode="": (venv "check-types" python)
-    @just install check-types {{ python }} tests {{ link_mode }}
+check-types-repository python link_mode="": (venv "check-types-repository" python)
+    @just install check-types-repository {{ python }} tests {{ link_mode }}
     @just pyright " \
         --pythonversion=$(uv run --no-project --python {{ python }} python --version | cut -d' ' -f2) \
-        --venvpath=.just/check-types/{{ python }} \
+        --pythonpath=$( \
+            uv python find \
+            .just/check-types-repository/{{ python }}/.venv \
+        ) \
         --project='pyrightconfig.json' \
         src/ tests/ docs/ \
     "
