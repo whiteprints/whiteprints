@@ -19,8 +19,5 @@
   "stubPath": "./src/stubs",
 
   "reportMissingImports": true,
-  "reportMissingTypeStubs": true,
-
-  "venvPath": ".",
-  "venv": ".venv"
+  "reportMissingTypeStubs": true
 }
