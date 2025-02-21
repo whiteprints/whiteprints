@@ -233,8 +233,8 @@ freeze receipt python resolution="" dist="":
 [group("virtualenv")]
 install receipt python group link_mode="":
     @just requirements {{ group }} " \
-        --output-file=\"$(just tmp-path {{ receipt }} {{ python }})/requirements.txt\" \
-        --python=\"$(just venv-path {{ receipt }} {{ python }})\" \
+        --output-file="$(just tmp-path {{ receipt }} {{ python }})/requirements.txt" \
+        --python="$(just venv-path {{ receipt }} {{ python }})" \
     "
     @just uv " \
         pip install  \
@@ -243,9 +243,9 @@ install receipt python group link_mode="":
             --strict \
             --require-hashes \
             {{ if link_mode == '' { '' } else { '--link-mode=' + link_mode } }} \
-            --requirements=\"$(just tmp-path {{ receipt }} {{ python }})/requirements.txt\" \
-            --prefix=\"$(just venv-path {{ receipt }} {{ python }})\" \
-            --python=\"$(just venv-path {{ receipt }} {{ python }})\" \
+            --requirements="$(just tmp-path {{ receipt }} {{ python }})/requirements.txt" \
+            --prefix="$(just venv-path {{ receipt }} {{ python }})" \
+            --python="$(just venv-path {{ receipt }} {{ python }})" \
     "
     @just freeze "{{ receipt }}" "{{ python }}"
 
@@ -397,19 +397,14 @@ pyright args="":
 [group("tests")]
 check-types-distribution python dist resolution="highest" link_mode="": (venv "check-types-distribution" python resolution dist)
     @just install-distribution check-types-distribution "{{ python }}" "{{ dist }}" "{{ resolution }}" "{{ link_mode }}"
-    @cp 'pyrightconfig.json' "$(just root-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")"
+    @cp 'pyrightconfig.json' "\"$(just root-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\""
     @just pyright " \
-        --project=$(just root-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/pyrightconfig.json \
-        --pythonpath=$( \
-            uv python find \
-            $(just venv-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
-        ) \
-        \$( \
-            uv run \
-                --no-project \
-                --python=\$(just venv-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
-                python -c \"import sys,re,os,importlib.metadata as m; w=sys.argv[1]; m_obj=re.match(r'(.+?)-\\d', os.path.basename(w)); assert m_obj, 'Regex did not match input: ' + os.path.basename(w); d=m_obj.group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''), t)))\" {{ dist }} \
-        ) \
+        --project=\"$(just root-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/pyrightconfig.json\" \
+        --pythonpath=\"$(uv python find \"$(just venv-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\")\" \
+        \"$(uv run \
+            --no-project \
+            --python=\"$(just venv-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
+            python -c \"import sys,re,os,importlib.metadata as m; w=sys.argv[1]; m_obj=re.match(r'(.+?)-\\d', os.path.basename(w)); assert m_obj, 'Regex did not match input: ' + os.path.basename(w); d=m_obj.group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''), t)))\" {{ dist }})\" \
     "
 
 alias check-types-dist := check-types-distribution
