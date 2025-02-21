@@ -231,7 +231,6 @@ freeze receipt python resolution="" dist="":
 
 # pip install in a virtualenv
 [group("virtualenv")]
-[group("virtualenv")]
 install receipt python group link_mode="":
     @just requirements {{ group }} " \
         --output-file=\"$(just tmp-path {{ receipt }} {{ python }})/requirements.txt\" \
