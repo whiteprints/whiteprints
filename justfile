@@ -217,7 +217,7 @@ alias ap := for-all-python
 
 # pip freeze
 [private]
-freeze receipt python resolution dist:
+freeze receipt python resolution="" dist="":
     @just uv " \
         pip freeze \
             --system \
