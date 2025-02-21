@@ -14,35 +14,34 @@ export PYTHONDONTWRITEBYTECODE := "1"
 @default:
     just --list
 
-# Print the receipt root directory
+# Uses Python to mimic `readlink -m` functionality in a cross-platform manner.
+[private]
+@canonicalize path="":
+    uvx python -c "import os, sys; print(os.path.abspath(os.path.expanduser(sys.argv[1])))" "{{ path }}"
+
 [private]
 @working-directory:
-    readlink -m "{{ justfile_directory() }}/.just"
+    just canonicalize "{{ justfile_directory() }}/.just"
 
 # Print the receipt root directory
 [private]
 @root-path receipt="" python="" resolution="" dist="":
-    readlink -m "$(just working-directory)/{{ receipt }}/{{ if dist == '' { '' } else { file_stem(dist) } }}/{{ resolution }}/{{ python }}"
+    just canonicalize "$(just working-directory)/{{ receipt }}/{{ if dist == '' { '' } else { file_stem(dist) } }}/{{ resolution }}/{{ python }}"
 
 # Print the receipt temporary directory
 [private]
 @tmp-path receipt="" python="" resolution="" dist="":
-    readlink -m "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/tmp"
+    just canonicalize "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/tmp"
 
 # Print the receipt coverage directory
 [private]
 @coverage-path receipt="" python="" resolution="" dist="":
-    readlink -m "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/coverage"
+    just canonicalize "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/coverage"
 
 # Print the receipt tests results directory
 [private]
 @tests-results-path receipt="" python="" resolution="" dist="":
-    readlink -m "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/tests-results"
-
-# Print the virtualenv path to a receipt
-[group("virtualenv")]
-@venv-path receipt="" python="" resolution="" dist="":
-    readlink -m "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/.venv"
+    just canonicalize "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/tests-results"
 
 # initialise Just working directory and synchronize the virtualenv
 [private]
