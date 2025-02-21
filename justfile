@@ -17,32 +17,32 @@ export PYTHONDONTWRITEBYTECODE := "1"
 # Print the receipt root directory
 [private]
 @working-directory:
-    readlink -f "{{ justfile_directory() }}/.just"
+    readlink -m "{{ justfile_directory() }}/.just"
 
 # Print the receipt root directory
 [private]
 @root-path receipt="" python="" resolution="" dist="":
-    readlink -f "$(just working-directory)/{{ receipt }}/{{ if dist == '' { '' } else { file_stem(dist) } }}/{{ resolution }}/{{ python }}"
+    readlink -m "$(just working-directory)/{{ receipt }}/{{ if dist == '' { '' } else { file_stem(dist) } }}/{{ resolution }}/{{ python }}"
 
 # Print the receipt temporary directory
 [private]
 @tmp-path receipt="" python="" resolution="" dist="":
-    readlink -f "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/tmp"
+    readlink -m "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/tmp"
 
 # Print the receipt coverage directory
 [private]
 @coverage-path receipt="" python="" resolution="" dist="":
-    readlink -f "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/coverage"
+    readlink -m "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/coverage"
 
 # Print the receipt tests results directory
 [private]
 @tests-results-path receipt="" python="" resolution="" dist="":
-    readlink -f "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/tests-results"
+    readlink -m "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/tests-results"
 
 # Print the virtualenv path to a receipt
 [group("virtualenv")]
 @venv-path receipt="" python="" resolution="" dist="":
-    readlink -f "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/.venv"
+    readlink -m "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/.venv"
 
 # initialise Just working directory and synchronize the virtualenv
 [private]
