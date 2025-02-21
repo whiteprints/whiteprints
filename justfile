@@ -11,13 +11,43 @@ export PYTHONDONTWRITEBYTECODE := "1"
 
 
 # list all receipts
-default:
-    @just --list
+@default:
+    just --list
+
+# Print the receipt root directory
+[private]
+@working-directory:
+    readlink --canonicalize-missing "{{ justfile_directory() }}/.just"
+
+# Print the receipt root directory
+[private]
+@root-path receipt="" python="" resolution="" dist="":
+    readlink --canonicalize-missing "$(just working-directory)/{{ receipt }}/{{ if dist == '' { '' } else { file_stem(dist) } }}/{{ resolution }}/{{ python }}"
+
+# Print the receipt temporary directory
+[private]
+@tmp-path receipt="" python="" resolution="" dist="":
+    readlink --canonicalize-missing "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/tmp"
+
+# Print the receipt coverage directory
+[private]
+@coverage-path receipt="" python="" resolution="" dist="":
+    readlink --canonicalize-missing "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/coverage"
+
+# Print the receipt tests results directory
+[private]
+@tests-results-path receipt="" python="" resolution="" dist="":
+    readlink --canonicalize-missing "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/tests-results"
+
+# Print the virtualenv path to a receipt
+[group("virtualenv")]
+@venv-path receipt="" python="" resolution="" dist="":
+    readlink --canonicalize-missing "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/.venv"
 
 # initialise Just working directory and synchronize the virtualenv
 [private]
-init:
-    [ -d .just ] || mkdir -p .just
+@init:
+    [ -d $(just working-directory) ] || mkdir -p $(just working-directory)
 
 # run all tests
 all:
@@ -36,16 +66,18 @@ all:
 
 # Create a virtual environment for a receipt, Python and optionally a dist
 [private]
-venv receipt python dist="": init
-    [ -d ".just/{{ receipt }}{{ if dist == '' { '' } else { '/' + file_stem(dist) } }}/{{ python }}" ] || \
-        mkdir -p ".just/{{ receipt }}{{ if dist == '' { '' } else { '/'+ file_stem(dist) } }}/{{ python }}"
-    rm -rf ".just/{{ receipt }}{{ if dist == '' { '' } else { '/' + file_stem(dist) } }}/{{ python }}/tmp"
-    mkdir -p ".just/{{ receipt }}{{ if dist == '' { '' } else { '/' + file_stem(dist) } }}/{{ python }}/tmp"
+@venv receipt python resolution="" dist="": init
+    [ -d "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")" ] || \
+        mkdir -p "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")"
+    rm -rf "$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")"
+    mkdir -p "$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")"
     uv venv \
+        --relocatable \
         --no-project \
         --no-config \
         --python={{ python }} \
-        ".just/{{ receipt }}{{ if dist == '' { '' } else { '/' + file_stem(dist) } }}/{{ python }}/.venv"
+        --prompt={{ receipt }} \
+        "$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")"
 
 # Run `uv`
 [private]
@@ -99,13 +131,13 @@ requirements group args="":
         --quiet \
         --frozen \
         --no-dev \
-        --group={{ group }}\
+        {{ if group == '' { '' } else { '--group=' + group } }} \
         {{ args }} \
     "
 
 # Install dev requirements (group)
 [private]
-requirements-dev group args="":
+requirements-dev args="":
     @just uv " \
         export \
         --no-config \
@@ -113,7 +145,6 @@ requirements-dev group args="":
         --quiet \
         --frozen \
         --no-dev \
-        --only-group={{ group }}\
         {{ args }} \
     "
 
@@ -144,7 +175,7 @@ clean-docs:
 # Clean the just working directory
 [group("clean")]
 clean-just:
-    rm -rf .just
+    rm -rf $(just working-directory)
 
 # Clean the compiled translation file
 [group("clean")]
@@ -162,7 +193,7 @@ clean-uv-cache:
 
 [group("clean")]
 clean-coverage:
-    rm -f ".just/.coverage*"
+    find $(just working-directory) -name "coverage" -type d -exec rm -r {} +
 
 # Clean everything
 [group("clean")]
@@ -184,27 +215,20 @@ for-all-python receipt args="":
 
 # pip freeze
 [private]
-freeze receipt python dist resolution:
+freeze receipt python resolution dist:
     @just uv " \
         pip freeze \
             --system \
-            --python='\
-                .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
-            ' \
-        | tee .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements.txt \
+            --python="$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")" \
+        | tee "$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements.txt" \
     "
 
-# pip install in the virtualenv '.just/{{ receipt }}/{{ python }}/.venv'
+# pip install in a virtualenv
 [group("virtualenv")]
-install receipt python group link_mode = "":
-    rm -f .just/{{ receipt }}/{{ python }}/requirements.txt
+install receipt python group link_mode="":
     @just requirements {{ group }}" \
-        --output-file='\
-            .just/{{ receipt }}/{{ python }}/requirements.txt\
-        ' \
-        --python='\
-            .just/{{ receipt }}/{{ python }}/.venv\
-        ' \
+        --output-file=$(just tmp-path {{ receipt }} {{ python }})/requirements.txt \
+        --python=$(just venv-path {{ receipt }} {{ python }}) \
     "
     @just uv " \
         pip install  \
@@ -213,28 +237,18 @@ install receipt python group link_mode = "":
             --strict \
             --require-hashes \
             {{ if link_mode == '' { '' } else { '--link-mode=' + link_mode } }} \
-            --requirements='\
-                .just/{{ receipt }}/{{ python }}/requirements.txt\
-            ' \
-            --prefix='\
-                .just/{{ receipt }}/{{ python }}/.venv\
-            ' \
-            --python='\
-                .just/{{ receipt }}/{{ python }}/.venv\
-            ' \
+            --requirements=$(just tmp-path {{ receipt }} {{ python }})/requirements.txt \
+            --prefix=$(just venv-path {{ receipt }} {{ python }}) \
+            --python=$(just venv-path {{ receipt }} {{ python }}) \
     "
 
-# pip install in the virtualenv '.just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv'
+# pip install in a virtualenv
 [group("virtualenv")]
-install-dist receipt python group dist resolution="highest" link_mode="":
-    rm -f .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements-dev.txt
-    @just requirements-dev {{ group }}" \
-        --output-file='\
-            .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements-dev.txt\
-        ' \
-        --python='\
-            .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
-        ' \
+install-dist receipt python dist resolution="highest" link_mode="" group="":
+    @just requirements-dev " \
+        {{ if group == '' { '' } else { '--group=' + group } }} \
+        --output-file=$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt \
+        --python=$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
     "
     @just uv " \
         pip install {{ dist }} \
@@ -243,97 +257,98 @@ install-dist receipt python group dist resolution="highest" link_mode="":
             --strict \
             --resolution={{ resolution }} \
             {{ if link_mode == '' { '' } else { '--link-mode=' + link_mode } }} \
-            --requirements='\
-                .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/requirements-dev.txt\
-            ' \
-            --prefix='\
-                .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
-            ' \
-            --python='\
-                .just/{{ receipt }}-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
-            ' \
+            --requirements=$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt \
+            --prefix=$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
+            --python=$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
     "
-    @just freeze {{ receipt }} {{ python }} {{ dist }} {{ resolution }}
+    @just freeze \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\"
 
-# Run the tests with pytest for a given Python and distribution for a given resolution.
-[group("tests")]
-test-dist python dist resolution="highest" link_mode="": (venv ("test-dist-" + resolution) python dist)
-    rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
-    @just install-dist test-dist {{ python }} tests {{ dist }} {{ resolution }} {{ link_mode }}
-    TMPDIR="\
-        {{ justfile_directory() }}/.just/test-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/tmp\
-    " \
-    COVERAGE_FILE="\
-        .just/.coverage.dist.{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}\
-    " \
-    .just/test-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv\
-    /bin/python -m pytest \
-        --html='\
-            .just/.test_report.{{ python }}.{{ dist }}.{{ resolution }}.html\
-        ' \
-        --junitxml='\
-            .just/.junit-{{ arch() }}-{{ os() }}-{{ dist }}-{{ resolution }}-{{ python }}.xml\
-        ' \
-        --md-report-output='\
-            .just/.test_report_{{ python }}_{{ dist }}_{{ resolution }}.md\
-        ' \
-        --basetemp='\
-            .just/test-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/tmp\
-        ' \
-        --cov-config='.coveragerc' \
+# Run pytest from a given python interpreter
+[private]
+pytest-from-venv python-path tmp-path coverage-path tests-results-path:
+    TMPDIR="{{ tmp-path }}" \
+    COVERAGE_FILE="${{ coverage-path }}/coverage.{{ arch() }}-{{ os() }}" \
+    {{ python-path }} -m pytest \
+        --html="{{ tests-results-path }}/test_report.{{ arch() }}.{{ os() }}.html" \
+        --junitxml="{{ tests-results-path }}/.junit-{{ arch() }}-{{ os() }}.xml" \
+        --md-report-output="{{ tests-results-path }}/test_report_{{ arch() }}_{{ os() }}.md" \
+        --basetemp="{{ tmp-path }}" \
+        --cov-config=".coveragerc" \
         'src' \
         'tests'
 
+# Run the tests with pytest for a given Python and distribution for a given resolution.
+[group("tests")]
+test-distribution python dist resolution="highest" link_mode="": (venv "test-distribution" python resolution dist)
+    @just install-dist test-distribution {{ python }} {{ dist }} {{ resolution }} "{{ link_mode }}" tests
+    @just pytest-from-venv \
+        "$(just venv-path test-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/bin/python" \
+        "$(just tmp-path test-distribution \"{{ python }}\" \"{{ resolution}}\" \"{{ dist }}\")" \
+        "$(just coverage-path test-distribution \"{{ python }}\" \"{{ resolution}}\" \"{{ dist }}\")" \
+        "$(just tests-results-path test-distribution \"{{ python }}\" \"{{ resolution}}\" \"{{ dist }}\")"
+
+alias test-dist := test-distribution
+
 # Run the tests with pytest for lowest and highest resolutions
 [group("tests")]
-test-dist-lh python dist link_mode="":
-    @just test-dist {{ python }} {{ dist }} lowest {{ link_mode }}
-    @just test-dist {{ python }} {{ dist }} highest {{ link_mode }}
+test-distribution-low-high python dist link_mode="":
+    @just test-distribution {{ python }} {{ dist }} lowest "{{ link_mode }}"
+    @just test-distribution {{ python }} {{ dist }} highest "{{ link_mode }}"
+
+
+alias test-dist-lh := test-distribution-low-high
 
 # Run the tests with pytest for a given Python
 [group("tests")]
-test-repository python: (venv "test-repo" python)
-    rm -f ".just/.coverage.{{ arch() }}-{{ os() }}-{{ python }} .just/.coverage"
-    @TMPDIR="{{ justfile_directory() }}/.just/test-repo/{{ python }}/tmp/" \
-    COVERAGE_FILE="\
-        .just/.coverage.repository.{{ arch() }}-{{ os() }}-{{ python }}\
-    " \
+test-repository python: (venv "test-repository" python)
+    @TMPDIR="$(just tmp-path test-repository {{ python }})" \
+    COVERAGE_FILE="$(just coverage-path test-repository {{ python }})/coverage.{{ arch() }}-{{ os() }}" \
     just uvr " \
         --group=tests \
-        --python='\
-            .just/test-repo/{{ python }}/.venv\
-        ' \
+        --python=$(just venv-path test-repository {{ python }}) \
     pytest \
-        --html='\
-            .just/.test_report.{{ python }}.html\
-        ' \
-        --junitxml='\
-            .just/.junit-{{ arch() }}-{{ os() }}-{{ python }}.xml\
-        ' \
-        --md-report-output='\
-            .just/.test_report_{{ python }}.md\
-        ' \
-        --basetemp=".just/test-repo/{{ python }}/tmp" \
+        --html=$(just tests-results-path test-repository {{ python }})/test_report.{{ arch() }}.{{ os() }}.html \
+        --junitxml=$(just tests-results-path test-repository {{ python }})/.junit-{{ arch() }}-{{ os() }}.xml \
+        --md-report-output=$(just tests-results-path test-repository {{ python }})/test_report_{{ arch() }}_{{ os() }}.md \
+        --basetemp="$(just tmp-path test-repository {{ python }})" \
         --cov-config=".coveragerc" \
         "src" \
         "tests" \
     "
     @just uvx "pyclean ."
 
-alias test := test-repository
+alias test-repo := test-repository
+
+# Run the tests with pytest
+[group("tests")]
+@test python dist="" resolution="highest" link_mode="":
+    [ -z "{{ dist }}" ] && (just test-repository "{{ python }}") || (just test-distribution "{{ python }}" "{{ dist }}" "{{ resolution }}" "{{ link_mode }}")
+
+[private]
+open-in-browser path:
+    $BROWSER {{ path }}
 
 # Open a test report in a web browser
 [group("report")]
 open-test-report python dist="" resolution="highest":
-    @[ "{{ dist }}" = "" ] \
-        && ([ -f ".just/.test_report.{{ python }}.html" ] || just test-repository {{ python }}) \
-        || ([ -f ".just/.test_report.{{ python }}.{{ dist }}.{{ resolution }}.html" ] || just test-dist {{ python }} {{ dist }} {{ resolution }})
-    $BROWSER ".just/.test_report.{{ python }}.html"
+    @[ -z "{{ dist }}" ] \
+        && ([ -f "$(just tests-results-path test-repository {{ python }})/test_report.{{ arch() }}.{{ os() }}.html" ] || just test-repository {{ python }}) \
+        || ([ -f "$(just tests-results-path test-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/test_report.{{ arch() }}.{{ os() }}.html" ] || just test-distribution {{ python }} {{ dist }} {{ resolution }})
+    @[ -z "{{ dist }}" ] \
+        && ([ -f "$(just tests-results-path test-repository {{ python }})/test_report.{{ arch() }}.{{ os() }}.html" ] && just open-in-browser "$(just tests-results-path test-repository {{ python }})/test_report.{{ arch() }}.{{ os() }}.html") \
+        || ([ -f "$(just tests-results-path test-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/test_report.{{ arch() }}.{{ os() }}.html" ] && just open-in-browser "$(just tests-results-path test-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/test_report.{{ arch() }}.{{ os() }}.html")
+
+# Open repository test reports for all pythons
+[group("report")]
+open-all-tests-reports dist="":
+    @[ -z "{{ dist }}" ] \
+        && (just open-in-browser "$(find $(just root-path test-repository) -name 'test_report.*.*.html' -printf '\\"%p\\"\n' | xargs echo)") \
+        || (just open-in-browser "$(find $(just root-path test-distribution \"\" \"\" {{ dist }}) -name 'test_report.*.*.html' -printf '\\"%p\\"\n' | xargs echo)")
 
 [group("report")]
 open-coverage-report:
-    @[ -f ".just/coverage/htmlcov/index.html" ] || just coverage-report
-    $BROWSER ".just/coverage/htmlcov/index.html"
+    @[ -f "$(just coverage-path test-repository)/htmlcov/index.html" ] || just coverage-report
+    @just open-in-browser "$(just coverage-path test-repository)/htmlcov/index.html"
 
 # Run pre-commit
 [private]
@@ -368,36 +383,35 @@ pyright args="":
 
 # Check the types correctness with Pyright for a given Python
 [group("tests")]
-check-types-dist python dist resolution="highest" link_mode="": (venv ("check-types-dist-" + resolution) python dist)
-    @just install-dist check-types-dist {{ python }} check-types {{ dist }} {{ resolution }} {{ link_mode }}
+check-types-dist python dist resolution="highest" link_mode="": (venv "check-types-dist" python dist resolution)
+    @just install-dist check-types-dist \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\" "{{ link_mode }}"
     @just pyright " \
-        --pythonpath=$( \
-            uv python find \
-            .just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv \
-        ) \
+        --venvpath=\$(just root-path check-types-dist \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
         --project='pyrightconfig.json' \
-        $( \
-            uv run --no-project --python .just/check-types-dist-{{ resolution }}/{{ file_stem(dist) }}/{{ python }}/.venv \
-            python -c "import sys,re,os,importlib.metadata as m; w=sys.argv[1]; d=re.match(r'(.*)-\d',os.path.basename(w)).group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''),t)))" \
-            {{ dist }} \
+        \$( \
+            uv run \
+                --no-project \
+                --python=\$( \
+                    just venv-path check-types-dist \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\" \
+                ) \
+                python -c \"import sys,re,os,importlib.metadata as m; w=sys.argv[1]; m_obj=re.match(r'(.+?)-\\d', os.path.basename(w)); assert m_obj, 'Regex did not match input: ' + os.path.basename(w); d=m_obj.group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''), t)))\" {{ dist }} \
         ) \
     "
 
 # Run the type correctness with Pyright for a given Python for both lowest and highest resolutions
 [group("tests")]
 check-types-dist-lh python dist link_mode="":
-    @just check-types-dist {{ python }} {{ dist }} lowest {{ link_mode }}
-    @just check-types-dist {{ python }} {{ dist }} highest {{ link_mode }}
+    @just check-types-dist {{ python }} {{ dist }} lowest "{{ link_mode }}"
+    @just check-types-dist {{ python }} {{ dist }} highest "{{ link_mode }}"
 
 # Check the types corectness with Pyright for a given Python
 [group("tests")]
 check-types-repository python link_mode="": (venv "check-types-repository" python)
-    @just install check-types-repository {{ python }} tests {{ link_mode }}
+    @just install check-types-repository {{ python }} tests "{{ link_mode }}"
     @just pyright " \
-        --pythonversion=$(uv run --no-project --python {{ python }} python --version | cut -d' ' -f2) \
         --pythonpath=$( \
             uv python find \
-            .just/check-types-repository/{{ python }}/.venv \
+            $(just venv-path check-types-repository {{ python }}) \
         ) \
         --project='pyrightconfig.json' \
         src/ tests/ docs/ \
@@ -409,7 +423,7 @@ alias check-types := check-types-repository
 [group("dependencies")]
 print-dependency-tree python: (venv "print-dependency-tree" python)
     uv tree \
-        --python=".just/print-dependency-tree/{{ python }}/.venv" \
+        --python="$(just venv-path check-types-repository {{ python }})" \
         --frozen \
         --no-dev
 
@@ -417,7 +431,7 @@ print-dependency-tree python: (venv "print-dependency-tree" python)
 [group("dependencies")]
 print-outdated-direct-dependencies python: (venv "print-outdated-direct-dependencies" python)
     uv tree \
-        --python=".just/print-outdated-direct-dependencies/{{ python }}/.venv" \
+        --python="$(just venv-path print-outdated-direct-dependencies {{ python }})" \
         --frozen \
         --outdated \
         --depth 1
@@ -437,53 +451,55 @@ check-wheel wheel="dist/":
 # Combine coverage files
 [group("coverage")]
 coverage-combine:
-    @[ "$(find .just -maxdepth 1 -type f -name '.coverage.*')" ] \
+    @[ "$(find $(just root-path test-repository) -type f -name 'coverage.*-*')" ] \
         || just for-all-python test-repository
-    @just uvr " \
-        --directory='.just' \
+    just uvr " \
         --only-group=coverage \
     coverage combine \
         --rcfile='.coveragerc' \
-        --data-file=.coverage \
+        --data-file=$(just coverage-path test-repository)/coverage-combined \
+        $(find $(just root-path test-repository) -type f -name 'coverage.*-*' | xargs echo) \
     "
 
 # Report coverage in various formats (lcov, html, xml)
 [group("report")]
 coverage-report:
-    @[ -f ".just/.coverage" ] || \
+    @[ -d "$(just coverage-path test-repository)" ] || \
         just coverage-combine
-    @just uvr " \
+    just uvr " \
         --only-group=coverage \
     coverage html \
         --rcfile='.coveragerc' \
-        --directory='.just/coverage/htmlcov' \
-        --data-file='.just/.coverage' \
+        --directory=$(just coverage-path test-repository)/htmlcov \
+        --data-file=$(just coverage-path test-repository)/coverage-combined \
     "
-    @just uvr " \
+    @COVERAGE_FILE="$(just coverage-path test-repository)/coverage-combine" \
+    just uvr " \
         --only-group=coverage \
     coverage lcov \
         --rcfile='.coveragerc' \
-        -o='.just/coverage.lcov' \
-        --data-file='.just/.coverage' \
+        -o$(just coverage-path test-repository)/coverage.lcov \
+        --data-file=$(just coverage-path test-repository)/coverage-combined \
     "
-    @just uvr " \
+    @COVERAGE_FILE="$(just coverage-path test-repository)/coverage-combine" \
+    just uvr " \
         --only-group=coverage \
     coverage xml \
         --rcfile='.coveragerc' \
-        -o='.just/coverage.xml' \
-        --data-file='.just/.coverage' \
+        -o$(just coverage-path test-repository)/coverage.xml \
+        --data-file=$(just coverage-path test-repository)/coverage-combined \
     "
 
 # Print coverage
 [group("coverage")]
 coverage args="":
-    @[ -f ".just/.coverage" ] || \
+    @[ -d "$(just coverage-path test-repository)" ] || \
         just coverage-combine
-    @just uvr " \
+    just uvr " \
         --only-group=coverage \
     coverage report \
         --rcfile='.coveragerc' \
-        --data-file='.just/.coverage' \
+        --data-file=$(just coverage-path test-repository)/coverage-combined \
         --skip-covered \
         {{ args }} \
     "
@@ -518,13 +534,11 @@ pip-audit args="":
 
 # Export Bill of Material of project's dependencies and vulnerabilities for a given Python
 [group("Bill of Material")]
-BOM-vulnerabilities python resolution="lowest": (venv ("BOM-vulnerabilities-" + resolution) python)
+BOM-vulnerabilities python resolution="lowest": (venv "BOM-vulnerabilities" python resolution)
     [ -d "BOM" ] || \
         mkdir -p "BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}"
     @just compile " \
-        --python='\
-            .just/BOM-vulnerabilities-{{ resolution }}/{{ python }}/.venv\
-        ' \
+        --python=$(just venv-path BOM-vulnerabilities {{ python }} {{ resolution }}) \
         --resolution={{ resolution }} \
         --output-file '\
             BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}/\
@@ -656,17 +670,17 @@ check-licenses:
 check-supply-chain python resolution="lowest": (venv ("check-supply-chain-" + resolution) python)
     @just compile " \
         --python='\
-            .just/check-supply-chain-{{ resolution }}/{{ python }}/.venv\
+            $(just venv-path check-supply-chain {{ python }} {{ resolution }}) \
         ' \
         --resolution={{ resolution }} \
         --output-file '\
-            .just/check-supply-chain-{{ resolution }}/{{ python }}/tmp/requirements.txt\
+            $(just tmp-path check-supply-chain {{ python }} {{ resolution }})/requirements.txt \
         ' \
         pyproject.toml \
     "
     @just pip-audit " \
         --requirement '\
-            .just/check-supply-chain-{{ resolution }}/{{ python }}/tmp/requirements.txt\
+            $(just tmp-path check-supply-chain {{ python }} {{ resolution }})/requirements.txt \
         ' \
     "
 
@@ -703,7 +717,7 @@ sphinx-autobuild args="":
             --keep-going \
             --open-browser \
         docs \
-        '.just/sphinx-autobuild/tmp/docs_build/' \
+        $(just tmp-path sphinx-autobuild)/docs_build \
         {{ args }} \
     "
 
