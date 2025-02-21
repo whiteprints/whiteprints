@@ -116,7 +116,7 @@ jobs:
         with:
           warnings: true
           extra-args: src/ tests/ docs/
-          venv-path: .just/check-types/${{ matrix.python }}/.venv
+          pythonpath: .just/check-types/${{ matrix.python }}/.venv/bin/python
 
   check-code:
     name: just ${{ matrix.receipt }}
