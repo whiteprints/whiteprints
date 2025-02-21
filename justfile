@@ -43,6 +43,11 @@ export PYTHONDONTWRITEBYTECODE := "1"
 @tests-results-path receipt="" python="" resolution="" dist="":
     just canonicalize "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/tests-results"
 
+# Print the virtualenv path to a receipt
+[group("virtualenv")]
+@venv-path receipt="" python="" resolution="" dist="":
+    just canonicalize "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/.venv"
+
 # initialise Just working directory and synchronize the virtualenv
 [private]
 @init:
