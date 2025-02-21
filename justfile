@@ -231,10 +231,11 @@ freeze receipt python resolution="" dist="":
 
 # pip install in a virtualenv
 [group("virtualenv")]
+[group("virtualenv")]
 install receipt python group link_mode="":
-    @just requirements {{ group }}" \
-        --output-file=$(just tmp-path {{ receipt }} {{ python }})/requirements.txt \
-        --python=$(just venv-path {{ receipt }} {{ python }}) \
+    @just requirements {{ group }} " \
+        --output-file=\"$(just tmp-path {{ receipt }} {{ python }})/requirements.txt\" \
+        --python=\"$(just venv-path {{ receipt }} {{ python }})\" \
     "
     @just uv " \
         pip install  \
@@ -243,9 +244,9 @@ install receipt python group link_mode="":
             --strict \
             --require-hashes \
             {{ if link_mode == '' { '' } else { '--link-mode=' + link_mode } }} \
-            --requirements=$(just tmp-path {{ receipt }} {{ python }})/requirements.txt \
-            --prefix=$(just venv-path {{ receipt }} {{ python }}) \
-            --python=$(just venv-path {{ receipt }} {{ python }}) \
+            --requirements=\"$(just tmp-path {{ receipt }} {{ python }})/requirements.txt\" \
+            --prefix=\"$(just venv-path {{ receipt }} {{ python }})\" \
+            --python=\"$(just venv-path {{ receipt }} {{ python }})\" \
     "
     @just freeze "{{ receipt }}" "{{ python }}"
 
@@ -256,8 +257,8 @@ install-distribution receipt python dist resolution="highest" link_mode="" group
         touch "$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt" || \
         just requirements-dev " \
             {{ if group == '' { '' } else { '--only-group=' + group } }} \
-            --output-file=$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt \
-            --python=$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
+            --output-file=\"$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt\" \
+            --python=\"$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
         "
     @just uv " \
         pip install {{ dist }} \
@@ -266,9 +267,9 @@ install-distribution receipt python dist resolution="highest" link_mode="" group
             --strict \
             --resolution={{ resolution }} \
             {{ if link_mode == '' { '' } else { '--link-mode=' + link_mode } }} \
-            --requirements=$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt \
-            --prefix=$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
-            --python=$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
+            --requirements=\"$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt\" \
+            --prefix=\"$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
+            --python=\"$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
     "
     @just freeze "{{ receipt }}" "{{ python }}" "{{ resolution }}" "{{ dist }}"
 
@@ -316,15 +317,15 @@ test-repository python: (venv "test-repository" python)
     COVERAGE_FILE="$(just coverage-path test-repository {{ python }})/coverage.{{ arch() }}-{{ os() }}" \
     just uvr " \
         --group=tests \
-        --python=$(just venv-path test-repository {{ python }}) \
+        --python=\"$(just venv-path test-repository {{ python }})\" \
     pytest \
-        --html=$(just tests-results-path test-repository {{ python }})/test_report.{{ arch() }}.{{ os() }}.html \
-        --junitxml=$(just tests-results-path test-repository {{ python }})/.junit-{{ arch() }}-{{ os() }}.xml \
-        --md-report-output=$(just tests-results-path test-repository {{ python }})/test_report_{{ arch() }}_{{ os() }}.md \
-        --basetemp="$(just tmp-path test-repository {{ python }})" \
+        --html=\"$(just tests-results-path test-repository {{ python }})/test_report.{{ arch() }}.{{ os() }}.html\" \
+        --junitxml=\"$(just tests-results-path test-repository {{ python }})/.junit-{{ arch() }}-{{ os() }}.xml\" \
+        --md-report-output=\"$(just tests-results-path test-repository {{ python }})/test_report_{{ arch() }}_{{ os() }}.md\" \
+        --basetemp=\"$(just tmp-path test-repository {{ python }})\" \
         --cov-config=".coveragerc" \
-        "src" \
-        "tests" \
+        'src' \
+        'tests' \
     "
     @just uvx "pyclean ."
 
@@ -429,10 +430,7 @@ alias ctdlh := check-types-distribution-lh
 check-types-repository python link_mode="": (venv "check-types-repository" python)
     @just install check-types-repository {{ python }} tests "{{ link_mode }}"
     @just pyright " \
-        --pythonpath=$( \
-            uv python find \
-            $(just venv-path check-types-repository {{ python }}) \
-        ) \
+        --pythonpath=\"$(uv python find \"$(just venv-path check-types-repository {{ python }})\")\" \
         --project='pyrightconfig.json' \
         src/ tests/ docs/ \
     "
