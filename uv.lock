@@ -2319,7 +2319,7 @@ requires-dist = [
     { name = "rich", specifier = ">=13.9.4" },
     { name = "rich-click", specifier = "==1.8.6" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'", specifier = "==4.12.2" },
-    { name = "uv", specifier = "==0.6.2" },
+    { name = "uv", specifier = ">=0.6.2" },
 ]
 
 [package.metadata.requires-dev]

@@ -144,7 +144,7 @@ requirements-dev args="":
         --no-emit-project \
         --quiet \
         --frozen \
-        --no-dev \
+        --only-dev \
         {{ args }} \
     "
 
@@ -184,7 +184,7 @@ clean-translation:
 
 # Clean the source distribution and wheel directory
 [group("clean")]
-clean-dist:
+clean-distribution:
     rm -rf dist
 
 [group("clean")]
@@ -204,7 +204,7 @@ clean-all:
     @just clean-just
     @just clean-docs
     @just clean-translation
-    @just clean-dist
+    @just clean-distribution
 
 # Run a receipt for all Python versions (found in the .python-versions file). Works for all receipt whose first argument is a Python version
 [group("tests")]
@@ -222,7 +222,7 @@ freeze receipt python resolution dist:
         pip freeze \
             --system \
             --python="$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")" \
-        | tee "$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements.txt" \
+        | tee "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt" \
     "
 
 # pip install in a virtualenv
@@ -243,15 +243,18 @@ install receipt python group link_mode="":
             --prefix=$(just venv-path {{ receipt }} {{ python }}) \
             --python=$(just venv-path {{ receipt }} {{ python }}) \
     "
+    @just freeze "{{ receipt }}" "{{ python }}"
 
 # pip install in a virtualenv
 [group("virtualenv")]
-install-dist receipt python dist resolution="highest" link_mode="" group="":
-    @just requirements-dev " \
-        {{ if group == '' { '' } else { '--group=' + group } }} \
-        --output-file=$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt \
-        --python=$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
-    "
+install-distribution receipt python dist resolution="highest" link_mode="" group="":
+    @[ -z "{{ group }}" ] && \
+        touch "$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt" || \
+        just requirements-dev " \
+            {{ if group == '' { '' } else { '--only-group=' + group } }} \
+            --output-file=$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt \
+            --python=$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
+        "
     @just uv " \
         pip install {{ dist }} \
             --quiet \
@@ -263,7 +266,7 @@ install-dist receipt python dist resolution="highest" link_mode="" group="":
             --prefix=$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
             --python=$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
     "
-    @just freeze \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\"
+    @just freeze "{{ receipt }}" "{{ python }}" "{{ resolution }}" "{{ dist }}"
 
 # Run pytest from a given python interpreter
 [private]
@@ -282,7 +285,7 @@ pytest-from-venv python-path tmp-path coverage-path tests-results-path:
 # Run the tests with pytest for a given Python and distribution for a given resolution.
 [group("tests")]
 test-distribution python dist resolution="highest" link_mode="": (venv "test-distribution" python resolution dist)
-    @just install-dist test-distribution {{ python }} {{ dist }} {{ resolution }} "{{ link_mode }}" tests
+    @just install-distribution test-distribution {{ python }} {{ dist }} {{ resolution }} "{{ link_mode }}" tests
     @just pytest-from-venv \
         "$(just venv-path test-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/bin/python" \
         "$(just tmp-path test-distribution \"{{ python }}\" \"{{ resolution}}\" \"{{ dist }}\")" \
@@ -348,7 +351,7 @@ open-test-report python dist="" resolution="highest":
 open-all-tests-reports dist="":
     @[ -z "{{ dist }}" ] \
         && (just open-in-browser "$(find $(just root-path test-repository) -name 'test_report.*.*.html' -printf '\\"%p\\"\n' | xargs echo)") \
-        || (just open-in-browser "$(find $(just root-path test-distribution \"\" \"\" {{ dist }}) -name 'test_report.*.*.html' -printf '\\"%p\\"\n' | xargs echo)")
+        || (just open-in-browser "$(find $(just root-path test-distribution \"\" \"\" \"{{ dist }}\") -name 'test_report.*.*.html' -printf '\\"%p\\"\n' | xargs echo)")
 
 [group("report")]
 open-coverage-report:
@@ -388,26 +391,34 @@ pyright args="":
 
 # Check the types correctness with Pyright for a given Python
 [group("tests")]
-check-types-dist python dist resolution="highest" link_mode="": (venv "check-types-dist" python dist resolution)
-    @just install-dist check-types-dist \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\" "{{ link_mode }}"
+check-types-distribution python dist resolution="highest" link_mode="": (venv "check-types-distribution" python resolution dist)
+    @just install-distribution check-types-distribution "{{ python }}" "{{ dist }}" "{{ resolution }}" "{{ link_mode }}"
+    @cp 'pyrightconfig.json' "$(just root-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")"
     @just pyright " \
-        --venvpath=\$(just root-path check-types-dist \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
-        --project='pyrightconfig.json' \
+        --project=$(just root-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/pyrightconfig.json \
+        --pythonpath=$( \
+            uv python find \
+            $(just venv-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
+        ) \
         \$( \
             uv run \
                 --no-project \
-                --python=\$( \
-                    just venv-path check-types-dist \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\" \
-                ) \
+                --python=\$(just venv-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") \
                 python -c \"import sys,re,os,importlib.metadata as m; w=sys.argv[1]; m_obj=re.match(r'(.+?)-\\d', os.path.basename(w)); assert m_obj, 'Regex did not match input: ' + os.path.basename(w); d=m_obj.group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''), t)))\" {{ dist }} \
         ) \
     "
 
+alias check-types-dist := check-types-distribution
+alias ctd := check-types-distribution
+
 # Run the type correctness with Pyright for a given Python for both lowest and highest resolutions
 [group("tests")]
-check-types-dist-lh python dist link_mode="":
-    @just check-types-dist {{ python }} {{ dist }} lowest "{{ link_mode }}"
-    @just check-types-dist {{ python }} {{ dist }} highest "{{ link_mode }}"
+check-types-distribution-lh python dist link_mode="":
+    @just check-types-distribution {{ python }} {{ dist }} lowest "{{ link_mode }}"
+    @just check-types-distribution {{ python }} {{ dist }} highest "{{ link_mode }}"
+
+alias check-types-dist-lh := check-types-distribution-lh
+alias ctdlh := check-types-distribution-lh
 
 # Check the types corectness with Pyright for a given Python
 [group("tests")]
@@ -679,13 +690,13 @@ check-supply-chain python resolution="lowest": (venv ("check-supply-chain-" + re
         ' \
         --resolution={{ resolution }} \
         --output-file '\
-            $(just tmp-path check-supply-chain {{ python }} {{ resolution }})/requirements.txt \
+            $(just root-path check-supply-chain {{ python }} {{ resolution }})/requirements.txt \
         ' \
         pyproject.toml \
     "
     @just pip-audit " \
         --requirement '\
-            $(just tmp-path check-supply-chain {{ python }} {{ resolution }})/requirements.txt \
+            $(just root-path check-supply-chain {{ python }} {{ resolution }})/requirements.txt \
         ' \
     "
 
