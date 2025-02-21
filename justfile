@@ -213,6 +213,8 @@ for-all-python receipt args="":
         just {{ receipt }} $python {{ args }}; \
     done
 
+alias ap := for-all-python
+
 # pip freeze
 [private]
 freeze receipt python resolution dist:
@@ -288,6 +290,7 @@ test-distribution python dist resolution="highest" link_mode="": (venv "test-dis
         "$(just tests-results-path test-distribution \"{{ python }}\" \"{{ resolution}}\" \"{{ dist }}\")"
 
 alias test-dist := test-distribution
+alias td := test-distribution
 
 # Run the tests with pytest for lowest and highest resolutions
 [group("tests")]
@@ -297,6 +300,7 @@ test-distribution-low-high python dist link_mode="":
 
 
 alias test-dist-lh := test-distribution-low-high
+alias tdlh := test-distribution-low-high
 
 # Run the tests with pytest for a given Python
 [group("tests")]
@@ -318,6 +322,7 @@ test-repository python: (venv "test-repository" python)
     @just uvx "pyclean ."
 
 alias test-repo := test-repository
+alias tr := test-repository
 
 # Run the tests with pytest
 [group("tests")]
