@@ -50,7 +50,7 @@ export PYTHONDONTWRITEBYTECODE := "1"
 
 [private]
 @venv-python receipt="" python="" resolution="" dist="":
-    just canonicalize "$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/{{ if os() == 'windows' { 'Scripts/python.exe' } else { 'bin/python' } }}"
+    uv python find "$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")"
 
 # initialise Just working directory and synchronize the virtualenv
 [private]
@@ -404,7 +404,7 @@ check-types-distribution python dist resolution="highest" link_mode="": (venv "c
     @cp 'pyrightconfig.json' "\"$(just root-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\""
     @just pyright " \
         --project=\"$(just root-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/pyrightconfig.json\" \
-        --pythonpath=\"$(uv python find $(just venv-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\") \
+        --pythonpath=\"$(uv python-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
         $(uv run \
             --no-project \
             --python=\"$(just venv-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
@@ -429,7 +429,7 @@ alias ctdlh := check-types-distribution-lh
 check-types-repository python link_mode="": (venv "check-types-repository" python)
     @just install check-types-repository {{ python }} tests "{{ link_mode }}"
     @just pyright " \
-        --pythonpath=\"$(uv python find $(just venv-path check-types-repository {{ python }}))\" \
+        --pythonpath=\"$(uv python-path check-types-distribution \"{{ python }}\")\" \
         --project='pyrightconfig.json' \
         src/ tests/ docs/ \
     "
