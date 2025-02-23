@@ -16,4 +16,4 @@ def fixture_depending_on_default_gitconfig(
 ) -> None:
     """Default git configuration."""
     if sys.platform == "win32":
-        default_gitconfig.set({"core.longpat core.longpaths truehs": True})
+        default_gitconfig.set({"core.longpaths": True})
