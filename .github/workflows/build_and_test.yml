@@ -191,10 +191,12 @@ jobs:
         with:
           name: Packages
           path: dist
+      - name: Support longpaths
+        if: runner.os == 'Windows'
+        run: git config --system core.longpaths true
       - name: Run the test suite
         shell: bash
         run: |
-          git config --system core.longpaths true
           echo "REPORT_FILE=.just/test_report_${{ matrix.python }}_*_${{ matrix.strategy }}.md" >> "$GITHUB_ENV"
           just test-dist ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }}
       - name: Output reports to the job summary when tests fail
@@ -258,7 +260,6 @@ jobs:
       - name: Run the test suite
         shell: bash
         run: |
-          git config --system core.longpaths true
           echo "REPORT_FILE=.just/test_report_${{ matrix.python }}_*_${{ matrix.strategy }}.md" >> "$GITHUB_ENV"
           just test-dist ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }} clone
       - name: Output reports to the job summary when tests fail
@@ -316,7 +317,6 @@ jobs:
       - name: Run the test suite
         shell: bash
         run: |
-          git config --system core.longpaths true
           echo "REPORT_FILE=.just/test_report_${{ matrix.python }}.md" >> "$GITHUB_ENV"
           just test-repository ${{ matrix.python }}
       - name: Output reports to the job summary when tests fail
