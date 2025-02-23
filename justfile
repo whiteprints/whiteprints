@@ -297,7 +297,7 @@ pytest-from-venv python-path tmp-path coverage-path tests-results-path:
 test-distribution python dist resolution="highest" link_mode="": (venv "test-distribution" python resolution dist)
     @just install-distribution test-distribution {{ python }} {{ dist }} {{ resolution }} "{{ link_mode }}" tests
     @just pytest-from-venv \
-        "$(just venv-path test-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/bin/python" \
+        "$(just python-path test-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")" \
         "$(just tmp-path test-distribution \"{{ python }}\" \"{{ resolution}}\" \"{{ dist }}\")" \
         "$(just coverage-path test-distribution \"{{ python }}\" \"{{ resolution}}\" \"{{ dist }}\")" \
         "$(just tests-results-path test-distribution \"{{ python }}\" \"{{ resolution}}\" \"{{ dist }}\")"
