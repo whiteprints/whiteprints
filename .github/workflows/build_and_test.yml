@@ -108,19 +108,11 @@ jobs:
       - name: Install depdencies
         run: |
           just install check-types "${{ matrix.python }}" tests
-      - name: Export virtual environment
-        run: |
-          echo "PATH=$(just venv-path check-types ${{ matrix.python }})/bin" >> $GITHUB_PATH
-      - name: Debug virtual environment 1
-        run: |
-          echo "PATH=$(just venv-path check-types ${{ matrix.python }})/bin"
-      - name: Debug virtual environment 2
-        run: |
-          echo $GITHUB_PATH
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
         with:
-          python-path: ${{ env.PYTHON_BIN }}
+          python-path: "$(just python-path check-types ${{ matrix.python }})"
+          verbose: true
           extra-args: src/ tests/ docs/
 
   check-code:
