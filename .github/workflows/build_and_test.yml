@@ -108,9 +108,6 @@ jobs:
       - name: Install depdencies
         run: |
             just install check-types "${{ matrix.python }}" tests
-      - name: Activate virtual environement
-        run: |
-            source .just/check-types/${{ matrix.python }}/.venv/bin/activate
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
         with:
