@@ -404,11 +404,12 @@ check-types-distribution python dist resolution="highest" link_mode="": (venv "c
     @cp 'pyrightconfig.json' "\"$(just root-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\""
     @just pyright " \
         --project=\"$(just root-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/pyrightconfig.json\" \
-        --pythonpath=\"$(uv python find \"$(just venv-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\")\" \
-        \"$(uv run \
+        --pythonpath=\"$(uv python find $(just venv-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\") \
+        $(uv run \
             --no-project \
             --python=\"$(just venv-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
-            python -c \"import sys,re,os,importlib.metadata as m; w=sys.argv[1]; m_obj=re.match(r'(.+?)-\\d', os.path.basename(w)); assert m_obj, 'Regex did not match input: ' + os.path.basename(w); d=m_obj.group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''), t)))\" {{ dist }})\" \
+            python -c \"import sys,re,os,importlib.metadata as m; w=sys.argv[1]; m_obj=re.match(r'(.+?)-\\d', os.path.basename(w)); assert m_obj, 'Regex did not match input: ' + os.path.basename(w); d=m_obj.group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''), t)))\" {{ dist }} \
+        ) \
     "
 
 alias check-types-dist := check-types-distribution
@@ -428,7 +429,7 @@ alias ctdlh := check-types-distribution-lh
 check-types-repository python link_mode="": (venv "check-types-repository" python)
     @just install check-types-repository {{ python }} tests "{{ link_mode }}"
     @just pyright " \
-        --pythonpath=\"$(uv python find \"$(just venv-path check-types-repository {{ python }})\")\" \
+        --pythonpath=\"$(uv python find $(just venv-path check-types-repository {{ python }}))\" \
         --project='pyrightconfig.json' \
         src/ tests/ docs/ \
     "
