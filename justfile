@@ -280,16 +280,17 @@ install-distribution receipt python dist resolution="highest" link_mode="" group
 # Run pytest from a given python interpreter
 [private]
 pytest-from-venv python-path tmp-path coverage-path tests-results-path:
-    TMPDIR="{{ tmp-path }}" \
-    COVERAGE_FILE="${{ coverage-path }}/coverage.{{ arch() }}-{{ os() }}" \
-    {{ python-path }} -m pytest \
+    env TMPDIR="{{ tmp-path }}" \
+    COVERAGE_FILE="{{ coverage-path }}/coverage.{{ arch() }}-{{ os() }}" \
+    "{{ python-path }}" -m pytest \
+        -n="auto" \
         --html="{{ tests-results-path }}/test_report.{{ arch() }}.{{ os() }}.html" \
         --junitxml="{{ tests-results-path }}/.junit-{{ arch() }}-{{ os() }}.xml" \
         --md-report-output="{{ tests-results-path }}/test_report_{{ arch() }}_{{ os() }}.md" \
         --basetemp="{{ tmp-path }}" \
         --cov-config=".coveragerc" \
-        'src' \
-        'tests'
+        "src" \
+        "tests"
 
 # Run the tests with pytest for a given Python and distribution for a given resolution.
 [group("tests")]
@@ -300,6 +301,7 @@ test-distribution python dist resolution="highest" link_mode="": (venv "test-dis
         "$(just tmp-path test-distribution \"{{ python }}\" \"{{ resolution}}\" \"{{ dist }}\")" \
         "$(just coverage-path test-distribution \"{{ python }}\" \"{{ resolution}}\" \"{{ dist }}\")" \
         "$(just tests-results-path test-distribution \"{{ python }}\" \"{{ resolution}}\" \"{{ dist }}\")"
+    @just uvx "pyclean ."
 
 alias test-dist := test-distribution
 alias td := test-distribution
@@ -323,6 +325,7 @@ test-repository python: (venv "test-repository" python)
         --group=tests \
         --python=\"$(just venv-path test-repository {{ python }})\" \
     pytest \
+        -n="auto" \
         --html=\"$(just tests-results-path test-repository {{ python }})/test_report.{{ arch() }}.{{ os() }}.html\" \
         --junitxml=\"$(just tests-results-path test-repository {{ python }})/.junit-{{ arch() }}-{{ os() }}.xml\" \
         --md-report-output=\"$(just tests-results-path test-repository {{ python }})/test_report_{{ arch() }}_{{ os() }}.md\" \
