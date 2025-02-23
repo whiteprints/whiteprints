@@ -70,6 +70,7 @@ all:
     @just BOM
     @just check-documentation-links
     @just build-documentation
+    @just check-sdist
     @just build
 
 # Create a virtual environment for a receipt, Python and optionally a dist
