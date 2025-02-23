@@ -48,6 +48,10 @@ export PYTHONDONTWRITEBYTECODE := "1"
 @venv-path receipt="" python="" resolution="" dist="":
     just canonicalize "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/.venv"
 
+[private]
+@venv-python receipt="" python="" resolution="" dist="":
+    just canonicalize "$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/{{ if os() == 'windows' { 'Scripts/python.exe' } else { 'bin/python' } }}"
+
 # initialise Just working directory and synchronize the virtualenv
 [private]
 @init:
@@ -225,7 +229,7 @@ freeze receipt python resolution="" dist="":
     @just uv " \
         pip freeze \
             --system \
-            --python="$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")" \
+            --python="$(just venv-python \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")" \
         | tee "$(just root-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt" \
     "
 
@@ -245,7 +249,7 @@ install receipt python group link_mode="":
             {{ if link_mode == '' { '' } else { '--link-mode=' + link_mode } }} \
             --requirements="$(just tmp-path {{ receipt }} {{ python }})/requirements.txt" \
             --prefix="$(just venv-path {{ receipt }} {{ python }})" \
-            --python="$(just venv-path {{ receipt }} {{ python }})" \
+            --python="$(just venv-python {{ receipt }} {{ python }})" \
     "
     @just freeze "{{ receipt }}" "{{ python }}"
 
@@ -257,7 +261,7 @@ install-distribution receipt python dist resolution="highest" link_mode="" group
         just requirements-dev " \
             {{ if group == '' { '' } else { '--only-group=' + group } }} \
             --output-file=\"$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt\" \
-            --python=\"$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
+            --python=\"$(just venv-python \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
         "
     @just uv " \
         pip install {{ dist }} \
@@ -268,7 +272,7 @@ install-distribution receipt python dist resolution="highest" link_mode="" group
             {{ if link_mode == '' { '' } else { '--link-mode=' + link_mode } }} \
             --requirements=\"$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt\" \
             --prefix=\"$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
-            --python=\"$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
+            --python=\"$(just venv-python \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
     "
     @just freeze "{{ receipt }}" "{{ python }}" "{{ resolution }}" "{{ dist }}"
 
@@ -316,7 +320,7 @@ test-repository python: (venv "test-repository" python)
     COVERAGE_FILE="$(just coverage-path test-repository {{ python }})/coverage.{{ arch() }}-{{ os() }}" \
     just uvr " \
         --group=tests \
-        --python=\"$(just venv-path test-repository {{ python }})\" \
+        --python=\"$(just venv-python test-repository {{ python }})\" \
     pytest \
         --html=\"$(just tests-results-path test-repository {{ python }})/test_report.{{ arch() }}.{{ os() }}.html\" \
         --junitxml=\"$(just tests-results-path test-repository {{ python }})/.junit-{{ arch() }}-{{ os() }}.xml\" \
@@ -403,7 +407,7 @@ check-types-distribution python dist resolution="highest" link_mode="": (venv "c
         --pythonpath=\"$(uv python find \"$(just venv-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\")\" \
         \"$(uv run \
             --no-project \
-            --python=\"$(just venv-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
+            --python=\"$(just venv-python check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
             python -c \"import sys,re,os,importlib.metadata as m; w=sys.argv[1]; m_obj=re.match(r'(.+?)-\\d', os.path.basename(w)); assert m_obj, 'Regex did not match input: ' + os.path.basename(w); d=m_obj.group(1); dist=m.distribution(d); t=(dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''), t)))\" {{ dist }})\" \
     "
 
@@ -435,7 +439,7 @@ alias check-types := check-types-repository
 [group("dependencies")]
 print-dependency-tree python: (venv "print-dependency-tree" python)
     uv tree \
-        --python="$(just venv-path check-types-repository {{ python }})" \
+        --python="$(just venv-python check-types-repository {{ python }})" \
         --frozen \
         --no-dev
 
@@ -443,7 +447,7 @@ print-dependency-tree python: (venv "print-dependency-tree" python)
 [group("dependencies")]
 print-outdated-direct-dependencies python: (venv "print-outdated-direct-dependencies" python)
     uv tree \
-        --python="$(just venv-path print-outdated-direct-dependencies {{ python }})" \
+        --python="$(just venv-python print-outdated-direct-dependencies {{ python }})" \
         --frozen \
         --outdated \
         --depth 1
@@ -550,7 +554,7 @@ BOM-vulnerabilities python resolution="lowest": (venv "BOM-vulnerabilities" pyth
     [ -d "BOM" ] || \
         mkdir -p "BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}"
     @just compile " \
-        --python=$(just venv-path BOM-vulnerabilities {{ python }} {{ resolution }}) \
+        --python=$(just venv-python BOM-vulnerabilities {{ python }} {{ resolution }}) \
         --resolution={{ resolution }} \
         --output-file '\
             BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}/\
@@ -682,7 +686,7 @@ check-licenses:
 check-supply-chain python resolution="lowest": (venv ("check-supply-chain-" + resolution) python)
     @just compile " \
         --python='\
-            $(just venv-path check-supply-chain {{ python }} {{ resolution }}) \
+            $(just venv-python check-supply-chain {{ python }} {{ resolution }}) \
         ' \
         --resolution={{ resolution }} \
         --output-file '\
