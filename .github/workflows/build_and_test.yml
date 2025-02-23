@@ -108,10 +108,10 @@ jobs:
       - name: Install depdencies
         run: |
           just install check-types "${{ matrix.python }}" tests
+          mv $(just venv-path "${{ matrix.python }}") .venv
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
         with:
-          python-path: "$(just python-path check-types ${{ matrix.python }})"
           verbose: true
           extra-args: src/ tests/ docs/
 

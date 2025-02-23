@@ -14,5 +14,8 @@
 
   "defineConstant": {
     "DEBUG": true
-  }
+  },
+
+  "venvPath": ".",
+  "venv": ".venv"
 }
