@@ -1344,6 +1344,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pytest-gitconfig"
+version = "0.7.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8a/de/12698500b6f0b4aacfb590ea13e994939463dbe751d9c478a36dd801f6a7/pytest_gitconfig-0.7.0.tar.gz", hash = "sha256:7d8a49747c09da0416704e911d4eccecbae11a28f997cdeba77aab9ab4975b1f", size = 9007 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ea/0c/b4756aa29968b64d1d6c8edc4f22ce1225957717309d3b8a8231675bd796/pytest_gitconfig-0.7.0-py3-none-any.whl", hash = "sha256:7be768b98399817262aff65a1a695a4a441c889e6bd260643ea7beb46619c9d7", size = 6639 },
+]
+
+[[package]]
 name = "pytest-html"
 version = "4.1.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2246,6 +2258,7 @@ dev = [
     { name = "pynvim" },
     { name = "pytest" },
     { name = "pytest-cov" },
+    { name = "pytest-gitconfig" },
     { name = "pytest-html" },
     { name = "pytest-md-report" },
     { name = "pytest-randomly" },
@@ -2273,6 +2286,7 @@ lint = [
     { name = "pylint" },
     { name = "pytest" },
     { name = "pytest-cov" },
+    { name = "pytest-gitconfig" },
     { name = "pytest-html" },
     { name = "pytest-md-report" },
     { name = "pytest-randomly" },
@@ -2302,6 +2316,7 @@ tests = [
     { name = "hypothesis" },
     { name = "pytest" },
     { name = "pytest-cov" },
+    { name = "pytest-gitconfig" },
     { name = "pytest-html" },
     { name = "pytest-md-report" },
     { name = "pytest-randomly" },
@@ -2353,6 +2368,7 @@ dev = [
     { name = "pynvim", specifier = "==0.5.2" },
     { name = "pytest", specifier = "==8.3.4" },
     { name = "pytest-cov", specifier = "==6.0.0" },
+    { name = "pytest-gitconfig", specifier = "==0.7.0" },
     { name = "pytest-html", specifier = "==4.1.1" },
     { name = "pytest-md-report", specifier = "==0.6.3" },
     { name = "pytest-randomly", specifier = "==3.16.0" },
@@ -2378,6 +2394,7 @@ lint = [
     { name = "pylint", specifier = "==3.3.4" },
     { name = "pytest", specifier = "==8.3.4" },
     { name = "pytest-cov", specifier = "==6.0.0" },
+    { name = "pytest-gitconfig", specifier = "==0.7.0" },
     { name = "pytest-html", specifier = "==4.1.1" },
     { name = "pytest-md-report", specifier = "==0.6.3" },
     { name = "pytest-randomly", specifier = "==3.16.0" },
@@ -2403,6 +2420,7 @@ tests = [
     { name = "hypothesis", specifier = "==6.126.0" },
     { name = "pytest", specifier = "==8.3.4" },
     { name = "pytest-cov", specifier = "==6.0.0" },
+    { name = "pytest-gitconfig", specifier = "==0.7.0" },
     { name = "pytest-html", specifier = "==4.1.1" },
     { name = "pytest-md-report", specifier = "==0.6.3" },
     { name = "pytest-randomly", specifier = "==3.16.0" },

@@ -103,6 +103,7 @@ tests = [
     "hypothesis==6.126.0",
     "pytest==8.3.4",
     "pytest-cov==6.0.0",
+    "pytest-gitconfig==0.7.0",
     "pytest-html==4.1.1",
     "pytest-md-report==0.6.3",
     "pytest-randomly==3.16.0",
