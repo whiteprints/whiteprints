@@ -28,7 +28,7 @@ pattern = "\\]\\(docs/_static/banner.svg\\)"
 replacement = "](https://raw.githubusercontent.com/whiteprints/whiteprints/refs/heads/main/docs/_static/banner.svg)"
 
 [build.targets.sdist]
-only-include = [
+include = [
     "justfile",
     "src/whiteprints",
     "docs",
@@ -44,9 +44,13 @@ only-include = [
     "*.toml",
     "*.yaml",
     "*.yml",
+    "*.txt",
     "*.json",
     "*.license",
     ".gitattributes",
+    ".all-contributorsrc",
+    ".editorconfig",
+    "LICENSE.GPL-3.0-or-later",
 ]
 
 [build.targets.wheel]
