@@ -111,7 +111,10 @@ jobs:
       - name: Export virtual environment
         run: |
           echo "PATH=$(just venv-path check-types ${{ matrix.python }})/bin" >> $GITHUB_PATH
-      - name: Debug virtual environment
+      - name: Debug virtual environment 1
+        run: |
+          echo "PATH=$(just venv-path check-types ${{ matrix.python }})/bin"
+      - name: Debug virtual environment 2
         run: |
           echo $GITHUB_PATH
       - name: Run Pyright
