@@ -461,9 +461,13 @@ build:
 
 # Check the given wheel
 [group("tests")]
-check-distribution wheel="dist/":
+check-wheel wheel="dist/":
     @[ ! -e {{ wheel }} ] || just uvx "check-wheel-contents {{ wheel }} --src-dir=src/ --package-omit=\*.pyc,\*.pot,\*.po"
 
+# Check that the sdist and vcs match
+[group("tests")]
+check-sdist:
+    @just uvx "check-sdist --installer=uv"
 
 # Combine coverage files
 [group("coverage")]
@@ -796,3 +800,4 @@ dev-tools-upgrade:
     @just uv "tool install --upgrade cyclonedx-bom"
     @just uv "tool install --upgrade pyright"
     @just uv "tool install --upgrade check-wheel-contents"
+    @just uv "tool install --upgrade check-sdist"
