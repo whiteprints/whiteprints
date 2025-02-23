@@ -110,7 +110,7 @@ jobs:
           just install check-types "${{ matrix.python }}" tests
       - name: Export virtual environment
         run: |
-          echo "$(just venv-path check-types ${{ matrix.python }})/bin" >> $GITHUB_PATH
+          echo "PATH=$(just venv-path check-types ${{ matrix.python }})/bin" >> $GITHUB_PATH
       - name: Debug virtual environment
         run: |
           echo $GITHUB_PATH
