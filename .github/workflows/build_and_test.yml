@@ -113,6 +113,7 @@ jobs:
         uses: jakebailey/pyright-action@v2
         with:
           verbose: true
+          python-path: ".venv/bin/python"
           extra-args: src/ tests/ docs/
 
   check-code:
