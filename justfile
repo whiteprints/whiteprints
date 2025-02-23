@@ -461,7 +461,7 @@ build:
 
 # Check the given wheel
 [group("tests")]
-check-wheel wheel="dist/":
+check-distribution wheel="dist/":
     @[ ! -e {{ wheel }} ] || just uvx "check-wheel-contents {{ wheel }} --src-dir=src/ --package-omit=\*.pyc,\*.pot,\*.po"
 
 
@@ -795,3 +795,4 @@ dev-tools-upgrade:
     @just uv "tool install --upgrade ruff"
     @just uv "tool install --upgrade cyclonedx-bom"
     @just uv "tool install --upgrade pyright"
+    @just uv "tool install --upgrade check-wheel-contents"

@@ -21,6 +21,10 @@ repos:
     hooks:
       - id: pyproject-fmt
         args: ["--column-width", "79", "--indent", "4", "--no-print-diff"]
+  - repo: https://github.com/henryiii/check-sdist
+    rev: v1.2.0
+    hooks:
+      - id: check-sdist-isolated
   - repo: https://github.com/fsfe/reuse-tool
     rev: v5.0.2
     hooks:
