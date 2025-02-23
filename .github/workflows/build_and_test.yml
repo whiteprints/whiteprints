@@ -104,11 +104,14 @@ jobs:
         uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
       - name: Initialize virtualenv
         run: |
-            just venv check-types "${{ matrix.python }}"
+          just venv check-types "${{ matrix.python }}"
       - name: Install depdencies
         run: |
-            just install check-types "${{ matrix.python }}" tests
-      - run: echo "$(just venv-path check-types ${{ matrix.python }})/bin" >> $GITHUB_PATH
+          just install check-types "${{ matrix.python }}" tests
+      - name: Export virtual environment
+        run: |
+          echo "$(just venv-path check-types ${{ matrix.python }})/bin" >> $GITHUB_PATH
+          echo $GITHUB_PATH
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
         with:
