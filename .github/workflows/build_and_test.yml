@@ -108,6 +108,7 @@ jobs:
       - name: Install depdencies
         run: |
             just install check-types "${{ matrix.python }}" tests
+      - run: echo "$(just venv-path check-types ${{ matrix.python }})" >> $GITHUB_PATH
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
         with:
