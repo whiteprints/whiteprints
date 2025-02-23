@@ -25,7 +25,7 @@ else:
 __all__: Final = ["CopierCopyError", "init"]
 
 
-WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.5.0"
+WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.6.0"
 """The whiteprints-template-context version pin."""
 
 
