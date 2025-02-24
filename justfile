@@ -285,7 +285,7 @@ pytest-from-venv python-path tmp-path coverage-path tests-results-path:
     "{{ python-path }}" -m pytest \
         -n="auto" \
         --html="{{ tests-results-path }}/test_report.{{ arch() }}.{{ os() }}.html" \
-        --junitxml="{{ tests-results-path }}/.junit-{{ arch() }}-{{ os() }}.xml" \
+        --junitxml="{{ tests-results-path }}/junit-{{ arch() }}-{{ os() }}.xml" \
         --md-report-output="{{ tests-results-path }}/test_report_{{ arch() }}_{{ os() }}.md" \
         --basetemp="{{ tmp-path }}" \
         --cov-config=".coveragerc" \
@@ -327,7 +327,7 @@ test-repository python: (venv "test-repository" python)
     pytest \
         -n="auto" \
         --html=\"$(just tests-results-path test-repository {{ python }})/test_report.{{ arch() }}.{{ os() }}.html\" \
-        --junitxml=\"$(just tests-results-path test-repository {{ python }})/.junit-{{ arch() }}-{{ os() }}.xml\" \
+        --junitxml=\"$(just tests-results-path test-repository {{ python }})/junit-{{ arch() }}-{{ os() }}.xml\" \
         --md-report-output=\"$(just tests-results-path test-repository {{ python }})/test_report_{{ arch() }}_{{ os() }}.md\" \
         --basetemp=\"$(just tmp-path test-repository {{ python }})\" \
         --cov-config=".coveragerc" \

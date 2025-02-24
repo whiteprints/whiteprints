@@ -194,11 +194,14 @@ jobs:
       - name: Support longpaths
         if: runner.os == 'Windows'
         run: git config --system core.longpaths true
-      - name: Run the test suite
-        shell: bash
+      - name: Setup environment variables
         run: |
           echo "RECEIPT_PATH=$(just root-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
           echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
+          echo "TESTS_RESULTS_PATH=$(just tests-results-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
+      - name: Run the test suite
+        shell: bash
+        run: |
           echo "REPORT_FILE=${{ env.RECEIPT_PATH }}/test_report_*.md" >> "$GITHUB_ENV"
           just test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }}
       - name: Output reports to the job summary when tests fail
@@ -217,7 +220,7 @@ jobs:
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
           name: coverage-data-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
-          path: "${{ env.COVERAGE_PATH }}/.coverage.*"
+          path: "${{ env.COVERAGE_PATH }}/coverage.*"
           overwrite: true
           include-hidden-files: true
       - name: Upload test results
@@ -225,7 +228,7 @@ jobs:
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
           name: test-results-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
-          path: .just/.junit-*.xml
+          path: "${{ env.TESTS_RESULTS_PATH}}/junit-*.xml"
           overwrite: true
           include-hidden-files: true
 
@@ -259,11 +262,14 @@ jobs:
         with:
           name: Packages
           path: dist
-      - name: Run the test suite
-        shell: bash
+      - name: Setup environment variables
         run: |
           echo "RECEIPT_PATH=$(just root-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
           echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
+          echo "TESTS_RESULTS_PATH=$(just tests-results-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
+      - name: Run the test suite
+        shell: bash
+        run: |
           echo "REPORT_FILE=${{ env.RECEIPT_PATH }}/test_report_*.md" >> "$GITHUB_ENV"
           just test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }} clone
       - name: Output reports to the job summary when tests fail
@@ -282,7 +288,7 @@ jobs:
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
           name: coverage-data-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
-          path: "${{ env.COVERAGE_PATH }}/.coverage.*"
+          path: "${{ env.COVERAGE_PATH }}/coverage.*"
           overwrite: true
           include-hidden-files: true
       - name: Upload test results
@@ -290,7 +296,7 @@ jobs:
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
           name: test-results-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
-          path: .just/.junit-*.xml
+          path: "${{ env.TESTS_RESULTS_PATH}}/junit-*.xml"
           overwrite: true
           include-hidden-files: true
 
@@ -318,11 +324,14 @@ jobs:
           enable-cache: true
       - name: Install just
         uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
+      - name: Setup environment variables
+        run: |
+          echo "RECEIPT_PATH=$(just root-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
+          echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
+          echo "TESTS_RESULTS_PATH=$(just tests-results-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
       - name: Run the test suite
         shell: bash
         run: |
-          echo "RECEIPT_PATH=$(just root-path test-repository ${{ matrix.python }})" >> $GITHUB_ENV
-          echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }})" >> $GITHUB_ENV
           echo "REPORT_FILE=${{ env.RECEIPT_PATH }}/test_report_*.md" >> "$GITHUB_ENV"
           just test-repository ${{ matrix.python }}
       - name: Output reports to the job summary when tests fail
@@ -341,7 +350,7 @@ jobs:
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
           name: coverage-data-test-repository-${{ matrix.os }}-${{ matrix.python }}
-          path: "${{ env.COVERAGE_PATH }}/.coverage.*"
+          path: "${{ env.COVERAGE_PATH }}/coverage.*"
           overwrite: true
           include-hidden-files: true
       - name: Upload test results
@@ -349,7 +358,7 @@ jobs:
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
           name: test-results-test-repository-${{ matrix.os }}-${{ matrix.python }}
-          path: .just/.junit-*.xml
+          path: "${{ env.TESTS_RESULTS_PATH}}/junit-*.xml"
           overwrite: true
           include-hidden-files: true
 
