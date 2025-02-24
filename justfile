@@ -476,8 +476,8 @@ check-sdist:
 # Combine coverage files
 [group("coverage")]
 coverage-combine receipt="":
-    @[ "$(find $(just root-path {{ receipt }}) -type f -name 'coverage.*')" ] \
-        || just for-all-python {{ receipt }}
+    @[ "$(find $(just coverage-path {{ receipt }}) -type f -name 'coverage.*')" ] \
+        || just for-all-python test-repository
     just uvr " \
         --only-group=coverage \
     coverage combine \
