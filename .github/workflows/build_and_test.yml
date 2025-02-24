@@ -202,7 +202,7 @@ jobs:
       - name: Run the test suite
         shell: bash
         run: |
-          echo "REPORT_FILE=${{ env.RECEIPT_PATH }}/test_report_*.md" >> "$GITHUB_ENV"
+          echo "REPORT_FILE=${{ env.TESTS_RESULTS_PATH }}/test_report_*.md" >> "$GITHUB_ENV"
           just test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }}
       - name: Output reports to the job summary when tests fail
         if: failure()
@@ -270,7 +270,7 @@ jobs:
       - name: Run the test suite
         shell: bash
         run: |
-          echo "REPORT_FILE=${{ env.RECEIPT_PATH }}/test_report_*.md" >> "$GITHUB_ENV"
+          echo "REPORT_FILE=${{ env.TESTS_RESULTS_PATH }}/test_report_*.md" >> "$GITHUB_ENV"
           just test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }} clone
       - name: Output reports to the job summary when tests fail
         if: failure()
@@ -325,6 +325,7 @@ jobs:
       - name: Install just
         uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
       - name: Setup environment variables
+        shell: bash
         run: |
           echo "RECEIPT_PATH=$(just root-path test-repository ${{ matrix.python }})" >> $GITHUB_ENV
           echo "COVERAGE_PATH=$(just coverage-path test-repository ${{ matrix.python }})" >> $GITHUB_ENV
@@ -332,7 +333,7 @@ jobs:
       - name: Run the test suite
         shell: bash
         run: |
-          echo "REPORT_FILE=${{ env.RECEIPT_PATH }}/test_report_*.md" >> "$GITHUB_ENV"
+          echo "REPORT_FILE=${{ env.TESTS_RESULTS_PATH }}/test_report_*.md" >> "$GITHUB_ENV"
           just test-repository ${{ matrix.python }}
       - name: Output reports to the job summary when tests fail
         if: failure()
