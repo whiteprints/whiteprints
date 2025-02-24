@@ -195,6 +195,7 @@ jobs:
         if: runner.os == 'Windows'
         run: git config --system core.longpaths true
       - name: Setup environment variables
+        shell: bash
         run: |
           echo "RECEIPT_PATH=$(just root-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
           echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
@@ -263,6 +264,7 @@ jobs:
           name: Packages
           path: dist
       - name: Setup environment variables
+        shell: bash
         run: |
           echo "RECEIPT_PATH=$(just root-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
           echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
