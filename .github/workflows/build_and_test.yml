@@ -446,8 +446,8 @@ jobs:
         with:
           pattern: coverage.*
           merge-multiple: true
-          path: .just/
-      - name: Run coverage
+          path: .just/coverage/
+      - name: Combine coverage
         run: |
           just coverage-combine
       - name: Setup environment variables
