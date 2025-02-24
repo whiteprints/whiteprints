@@ -197,9 +197,9 @@ jobs:
       - name: Setup environment variables
         shell: bash
         run: |
-          echo "RECEIPT_PATH=$(just root-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
-          echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
-          echo "TESTS_RESULTS_PATH=$(just tests-results-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
+          echo "RECEIPT_PATH=$(just root-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/*.whl)" >> $GITHUB_ENV
+          echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/*.whl)" >> $GITHUB_ENV
+          echo "TESTS_RESULTS_PATH=$(just tests-results-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/*.whl)" >> $GITHUB_ENV
       - name: Run the test suite
         shell: bash
         run: |
@@ -266,9 +266,9 @@ jobs:
       - name: Setup environment variables
         shell: bash
         run: |
-          echo "RECEIPT_PATH=$(just root-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
-          echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
-          echo "TESTS_RESULTS_PATH=$(just tests-results-path test-distribution ${{ matrix.python }} dist/*.whl ${{ matrix.strategy }})" >> $GITHUB_ENV
+          echo "RECEIPT_PATH=$(just root-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/*.whl)" >> $GITHUB_ENV
+          echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/*.whl)" >> $GITHUB_ENV
+          echo "TESTS_RESULTS_PATH=$(just tests-results-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/*.whl)" >> $GITHUB_ENV
       - name: Run the test suite
         shell: bash
         run: |

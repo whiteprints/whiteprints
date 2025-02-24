@@ -366,9 +366,9 @@ open-all-tests-reports dist="":
         || (just open-in-browser "$(find $(just root-path test-distribution \"\" \"\" \"{{ dist }}\") -name 'test_report.*.*.html' -printf '\\"%p\\"\n' | xargs echo)")
 
 [group("report")]
-open-coverage-report:
-    @[ -f "$(just coverage-path test-repository)/htmlcov/index.html" ] || just coverage-report
-    @just open-in-browser "$(just coverage-path test-repository)/htmlcov/index.html"
+open-coverage-report receipt="":
+    @[ -f "$(just coverage-path {{ receipt }})/htmlcov/index.html" ] || just coverage-report
+    @just open-in-browser "$(just coverage-path {{ receipt }})/htmlcov/index.html"
 
 # Run pre-commit
 [private]
@@ -475,56 +475,56 @@ check-sdist:
 
 # Combine coverage files
 [group("coverage")]
-coverage-combine:
-    @[ "$(find $(just root-path test-repository) -type f -name 'coverage.*-*')" ] \
-        || just for-all-python test-repository
+coverage-combine receipt="":
+    @[ "$(find $(just root-path {{ receipt }}) -type f -name 'coverage.*-*')" ] \
+        || just for-all-python {{ receipt }}
     just uvr " \
         --only-group=coverage \
     coverage combine \
         --rcfile='.coveragerc' \
-        --data-file=$(just coverage-path test-repository)/coverage-combined \
-        $(find $(just root-path test-repository) -type f -name 'coverage.*-*' | xargs echo) \
+        --data-file=$(just coverage-path {{ receipt }})/coverage-combined \
+        $(find $(just root-path {{ receipt }}) -type f -name 'coverage.*-*' | xargs echo) \
     "
 
 # Report coverage in various formats (lcov, html, xml)
 [group("report")]
-coverage-report:
-    @[ -d "$(just coverage-path test-repository)" ] || \
+coverage-report receipt="":
+    @[ -d "$(just coverage-path {{ receipt }})" ] || \
         just coverage-combine
     just uvr " \
         --only-group=coverage \
     coverage html \
         --rcfile='.coveragerc' \
-        --directory=$(just coverage-path test-repository)/htmlcov \
-        --data-file=$(just coverage-path test-repository)/coverage-combined \
+        --directory=$(just coverage-path {{ receipt }})/htmlcov \
+        --data-file=$(just coverage-path {{ receipt }})/coverage-combined \
     "
-    @COVERAGE_FILE="$(just coverage-path test-repository)/coverage-combine" \
+    @COVERAGE_FILE="$(just coverage-path {{ receipt }})/coverage-combine" \
     just uvr " \
         --only-group=coverage \
     coverage lcov \
         --rcfile='.coveragerc' \
-        -o$(just coverage-path test-repository)/coverage.lcov \
-        --data-file=$(just coverage-path test-repository)/coverage-combined \
+        -o$(just coverage-path {{ receipt }})/coverage.lcov \
+        --data-file=$(just coverage-path {{ receipt }})/coverage-combined \
     "
-    @COVERAGE_FILE="$(just coverage-path test-repository)/coverage-combine" \
+    @COVERAGE_FILE="$(just coverage-path {{ receipt }})/coverage-combine" \
     just uvr " \
         --only-group=coverage \
     coverage xml \
         --rcfile='.coveragerc' \
-        -o$(just coverage-path test-repository)/coverage.xml \
-        --data-file=$(just coverage-path test-repository)/coverage-combined \
+        -o$(just coverage-path {{ receipt }})/coverage.xml \
+        --data-file=$(just coverage-path {{ receipt }})/coverage-combined \
     "
 
 # Print coverage
 [group("coverage")]
-coverage args="":
-    @[ -d "$(just coverage-path test-repository)" ] || \
+coverage receipt="" args="":
+    @[ -d "$(just coverage-path {{ receipt }})" ] || \
         just coverage-combine
     just uvr " \
         --only-group=coverage \
     coverage report \
         --rcfile='.coveragerc' \
-        --data-file=$(just coverage-path test-repository)/coverage-combined \
+        --data-file=$(just coverage-path {{ receipt }})/coverage-combined \
         --skip-covered \
         {{ args }} \
     "
