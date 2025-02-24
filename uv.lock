@@ -100,11 +100,11 @@ wheels = [
 
 [[package]]
 name = "beartype"
-version = "0.19.0"
+version = "0.20.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/6f/e1/00515b97afa3993b4a314e4bc168fbde0917fd5845435cb6f16a19770746/beartype-0.19.0.tar.gz", hash = "sha256:de42dfc1ba5c3710fde6c3002e3bd2cad236ed4d2aabe876345ab0b4234a6573", size = 1294480 }
+sdist = { url = "https://files.pythonhosted.org/packages/7d/48/fe1177f4272a1bc344f3371414aa5b76e19c30d7280d711ce90c5335a6f5/beartype-0.20.0.tar.gz", hash = "sha256:599ecc86b88549bcb6d1af626f44d85ffbb9151ace5d7f9f3b493dce2ffee529", size = 1390635 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/64/69/f6db6e4cb2fe2f887dead40b76caa91af4844cb647dd2c7223bb010aa416/beartype-0.19.0-py3-none-any.whl", hash = "sha256:33b2694eda0daf052eb2aff623ed9a8a586703bbf0a90bbc475a83bbf427f699", size = 1039760 },
+    { url = "https://files.pythonhosted.org/packages/61/ce/9cf60b72e3fbd36a6dd16e31ecbe9ae137a8ead77cb24a5f75302adfc9a9/beartype-0.20.0-py3-none-any.whl", hash = "sha256:090d10e3540b3fca209a0ab5f1c15f9652a075da0a7249c2e6713011e9e5f6ef", size = 1139097 },
 ]
 
 [[package]]
@@ -507,16 +507,16 @@ wheels = [
 
 [[package]]
 name = "hypothesis"
-version = "6.126.0"
+version = "6.127.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
     { name = "exceptiongroup", marker = "python_full_version < '3.11'" },
     { name = "sortedcontainers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a5/8c/8281dd1408dd8374b0ed0528e63fb53a556b3d4f901382f51148345ec9fb/hypothesis-6.126.0.tar.gz", hash = "sha256:648b6215ee0468fa85eaee9dceb5b7766a5861c20ee4801bd904a2c02f1a6c9b", size = 420895 }
+sdist = { url = "https://files.pythonhosted.org/packages/92/2b/c8559a4d75409976ef275f06c4c5d98470ada07af932ace0caf0068aaac9/hypothesis-6.127.1.tar.gz", hash = "sha256:9cf339b28e5c394f811eaa43023a118e7c4d384102b7b06bab91b6d06cc0437f", size = 421269 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/98/fc/8e1749aa79631952bf70e57913626fb0a0556eb2ad3c530c5526f6e5ba13/hypothesis-6.126.0-py3-none-any.whl", hash = "sha256:323c58a773482a2b4ba4e35202560cfcba45e8a8e09e7ffb83c0f9bac5b544da", size = 483657 },
+    { url = "https://files.pythonhosted.org/packages/1a/aa/af754d9e1a7334d9919b486880601684819b9900250755ad95e1eb878598/hypothesis-6.127.1-py3-none-any.whl", hash = "sha256:6600a03dfe5406bee9a74eb0b92f0aa40b5b7f3df84ae6bc2a564edc3bb6168b", size = 484140 },
 ]
 
 [[package]]
@@ -2192,6 +2192,7 @@ wheels = [
 name = "whiteprints"
 source = { editable = "." }
 dependencies = [
+    { name = "beartype" },
     { name = "click" },
     { name = "distro" },
     { name = "importlib-metadata", marker = "python_full_version < '3.10'" },
@@ -2236,7 +2237,6 @@ coverage = [
 dev = [
     { name = "babel" },
     { name = "bandit" },
-    { name = "beartype" },
     { name = "coverage" },
     { name = "hypothesis" },
     { name = "myst-parser", extra = ["linkify"] },
@@ -2268,7 +2268,6 @@ editor = [
     { name = "pynvim" },
 ]
 lint = [
-    { name = "beartype" },
     { name = "hypothesis" },
     { name = "pylint" },
     { name = "pytest" },
@@ -2298,7 +2297,6 @@ serve-documentation = [
     { name = "stdlib-list" },
 ]
 tests = [
-    { name = "beartype" },
     { name = "hypothesis" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -2311,6 +2309,7 @@ tests = [
 
 [package.metadata]
 requires-dist = [
+    { name = "beartype", specifier = "==0.20.0" },
     { name = "click", specifier = ">=8.1.8" },
     { name = "distro", specifier = "==1.9.0" },
     { name = "importlib-metadata", marker = "python_full_version < '3.10'", specifier = "==8.6.1" },
@@ -2343,9 +2342,8 @@ coverage = [{ name = "coverage", specifier = "==7.6.12" }]
 dev = [
     { name = "babel", specifier = "==2.17.0" },
     { name = "bandit", specifier = "==1.8.3" },
-    { name = "beartype", specifier = "==0.19.0" },
     { name = "coverage", specifier = "==7.6.12" },
-    { name = "hypothesis", specifier = "==6.126.0" },
+    { name = "hypothesis", specifier = "==6.127.1" },
     { name = "myst-parser", extras = ["linkify"], specifier = "==3.0.1" },
     { name = "pip-audit", specifier = "==2.8.0" },
     { name = "pydata-sphinx-theme", specifier = "==0.16.1" },
@@ -2373,8 +2371,7 @@ dev = [
 ]
 editor = [{ name = "pynvim", specifier = "==0.5.2" }]
 lint = [
-    { name = "beartype", specifier = "==0.19.0" },
-    { name = "hypothesis", specifier = "==6.126.0" },
+    { name = "hypothesis", specifier = "==6.127.1" },
     { name = "pylint", specifier = "==3.3.4" },
     { name = "pytest", specifier = "==8.3.4" },
     { name = "pytest-cov", specifier = "==6.0.0" },
@@ -2399,8 +2396,7 @@ serve-documentation = [
     { name = "stdlib-list", specifier = ">=0.11.1" },
 ]
 tests = [
-    { name = "beartype", specifier = "==0.19.0" },
-    { name = "hypothesis", specifier = "==6.126.0" },
+    { name = "hypothesis", specifier = "==6.127.1" },
     { name = "pytest", specifier = "==8.3.4" },
     { name = "pytest-cov", specifier = "==6.0.0" },
     { name = "pytest-html", specifier = "==4.1.1" },
