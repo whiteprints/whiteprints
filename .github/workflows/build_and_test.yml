@@ -220,7 +220,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
-          name: coverage-data-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
           path: "${{ env.COVERAGE_PATH }}/coverage.*"
           overwrite: true
           include-hidden-files: true
@@ -228,7 +227,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
-          name: test-results-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
           path: "${{ env.TESTS_RESULTS_PATH}}/junit-*.xml"
           overwrite: true
           include-hidden-files: true
@@ -289,7 +287,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
-          name: coverage-data-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
           path: "${{ env.COVERAGE_PATH }}/coverage.*"
           overwrite: true
           include-hidden-files: true
@@ -297,7 +294,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
-          name: test-results-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
           path: "${{ env.TESTS_RESULTS_PATH}}/junit-*.xml"
           overwrite: true
           include-hidden-files: true
@@ -352,7 +348,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
-          name: coverage-data-test-repository-${{ matrix.os }}-${{ matrix.python }}
           path: "${{ env.COVERAGE_PATH }}/coverage.*"
           overwrite: true
           include-hidden-files: true
