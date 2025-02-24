@@ -450,11 +450,14 @@ jobs:
       - name: Run coverage
         run: |
           just coverage-combine
+      - name: Setup environment variables
+        shell: bash
+        run: |
+          echo "COVERAGE_PATH=$(just coverage-path)" >> $GITHUB_ENV
       - name: Upload coverage
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
           name: .coverage
-          path: |
-            .just/.coverage
+          path: "${{ env.COVERAGE_PATH }}/coverage-combined"
           overwrite: true
           include-hidden-files: true
