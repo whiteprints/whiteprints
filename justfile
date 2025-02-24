@@ -281,7 +281,7 @@ install-distribution receipt python dist resolution="highest" link_mode="" group
 [private]
 pytest-from-venv python-path tmp-path coverage-path tests-results-path:
     env TMPDIR="{{ tmp-path }}" \
-    COVERAGE_FILE="{{ coverage-path }}/coverage.{{ arch() }}-{{ os() }}" \
+    COVERAGE_FILE="{{ coverage-path }}/.coverage.{{ arch() }}-{{ os() }}" \
     "{{ python-path }}" -m pytest \
         -n="auto" \
         --html="{{ tests-results-path }}/test_report.{{ arch() }}.{{ os() }}.html" \
@@ -320,7 +320,7 @@ alias tdlh := test-distribution-low-high
 [group("tests")]
 test-repository python: (venv "test-repository" python)
     @TMPDIR="$(just tmp-path test-repository {{ python }})" \
-    COVERAGE_FILE="$(just coverage-path test-repository {{ python }})/coverage.{{ arch() }}-{{ os() }}" \
+    COVERAGE_FILE="$(just coverage-path test-repository {{ python }})/.coverage.{{ arch() }}-{{ os() }}" \
     just uvr " \
         --group=tests \
         --python=\"$(just venv-path test-repository {{ python }})\" \
@@ -476,14 +476,14 @@ check-sdist:
 # Combine coverage files
 [group("coverage")]
 coverage-combine receipt="":
-    @[ "$(find $(just coverage-path {{ receipt }}) -type f -name 'coverage.*')" ] \
+    @[ "$(find $(just coverage-path {{ receipt }}) -type f -name '.coverage.*')" ] \
         || just for-all-python test-repository
     just uvr " \
         --only-group=coverage \
     coverage combine \
         --rcfile='.coveragerc' \
         --data-file=$(just coverage-path {{ receipt }})/coverage-combined \
-        $(find $(just root-path {{ receipt }}) -type f -name 'coverage.*' | xargs echo) \
+        $(find $(just root-path {{ receipt }}) -type f -name '.coverage.*' | xargs echo) \
     "
 
 # Report coverage in various formats (lcov, html, xml)
