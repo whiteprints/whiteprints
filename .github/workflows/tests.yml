@@ -51,7 +51,7 @@ jobs:
         run: |
           just coverage
           just coverage-report
-          just coverage --format=markdown >> $GITHUB_STEP_SUMMARY
+          just coverage "" --format=markdown >> $GITHUB_STEP_SUMMARY
       - name: Upload coverage report to CodeCov
         if: always()
         uses: codecov/codecov-action@0da7aa657d958d32c117fc47e1f977e7524753c7 # v5
