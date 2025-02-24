@@ -476,14 +476,14 @@ check-sdist:
 # Combine coverage files
 [group("coverage")]
 coverage-combine receipt="":
-    @[ "$(find $(just root-path {{ receipt }}) -type f -name 'coverage.*-*')" ] \
+    @[ "$(find $(just root-path {{ receipt }}) -type f -name 'coverage.*')" ] \
         || just for-all-python {{ receipt }}
     just uvr " \
         --only-group=coverage \
     coverage combine \
         --rcfile='.coveragerc' \
         --data-file=$(just coverage-path {{ receipt }})/coverage-combined \
-        $(find $(just root-path {{ receipt }}) -type f -name 'coverage.*-*' | xargs echo) \
+        $(find $(just root-path {{ receipt }}) -type f -name 'coverage.*' | xargs echo) \
     "
 
 # Report coverage in various formats (lcov, html, xml)
