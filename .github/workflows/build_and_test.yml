@@ -87,7 +87,7 @@ jobs:
       python-oldest-latest: ${{ steps.baipp-latest.outputs.supported_python_oldest_latest }}
 
   check-types-from-strategy:
-    name: Run type checker under Python ${{ matrix.python }} on ${{ matrix.os }}
+    name: Run type checker against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
     if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel-python-version == 'from-strategy' }}
     needs:
       - build-package
@@ -113,22 +113,12 @@ jobs:
           enable-cache: true
       - name: Install just
         uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
-      - name: Initialize virtualenv
+      - name: Check types on wheel
         run: |
-          just venv check-types-distribution "${{ matrix.python }}"
-      - name: Install depdencies
-        run: |
-          just install check-types-distribution "${{ matrix.python }}" tests
-          mv $(just venv-path check-types-distribution "${{ matrix.python }}") .venv
-      - name: Run Pyright
-        uses: jakebailey/pyright-action@v2
-        with:
-          verbose: true
-          python-path: ".venv/bin/python"
-          extra-args: src/ tests/ docs/
+          just check-types-distribution "${{ matrix.python }}" dist/*.whl "${{ matrix.strategy }}"
 
   check-types-wheel:
-    name: Run type checker under Python ${{ matrix.python }} on ${{ matrix.os }}
+    name: Run type checker against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
     if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel-python-version != 'from-strategy' }}
     needs:
       - build-package
@@ -150,21 +140,13 @@ jobs:
           enable-cache: true
       - name: Install just
         uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
-      - name: Initialize virtualenv
+      - name: Check types on wheel
         run: |
-          just venv check-types-distribution "${{ matrix.python }}"
-      - name: Install depdencies
-        run: |
-          just install check-types-distribution "${{ matrix.python }}" tests
-          mv $(just venv-path check-types-distribution "${{ matrix.python }}") .venv
-      - name: Run Pyright
-        uses: jakebailey/pyright-action@v2
-        with:
-          verbose: true
-          python-path: ".venv/bin/python"
-          extra-args: src/ tests/ docs/
+          just check-types-distribution "${{ matrix.python }}" dist/*.whl "${{ matrix.strategy }}"
 
   check-types-repository:
+    # Here we use the pyright action rather than just to annotate the source
+    # code in the PR
     name: Run type checker under Python ${{ matrix.python }} on ${{ matrix.os }}
     if: ${{ contains(fromJson(inputs.target), 'test-repository') }}
     needs:
