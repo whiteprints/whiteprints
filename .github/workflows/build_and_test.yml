@@ -127,6 +127,43 @@ jobs:
           python-path: ".venv/bin/python"
           extra-args: src/ tests/ docs/
 
+  check-types-wheel:
+    name: Run type checker under Python ${{ matrix.python }} on ${{ matrix.os }}
+    if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel-python-version != 'from-strategy' }}
+    needs:
+      - build-package
+    runs-on: ${{ matrix.os }}
+    environment:
+      name: tests
+    strategy:
+      matrix:
+        os: ${{ fromJson(inputs.test-wheel-os) }}
+        python: ${{ inputs.test-wheel-python-version != 'from-trove' && fromJson(inputs.test-wheel-python-version) || fromJson(needs.build-package.outputs.python-versions) }}
+        strategy: ${{ fromJson(inputs.test-wheel-strategy )}}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Install just
+        uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
+      - name: Initialize virtualenv
+        run: |
+          just venv check-types-distribution "${{ matrix.python }}"
+      - name: Install depdencies
+        run: |
+          just install check-types-distribution "${{ matrix.python }}" tests
+          mv $(just venv-path check-types-distribution "${{ matrix.python }}") .venv
+      - name: Run Pyright
+        uses: jakebailey/pyright-action@v2
+        with:
+          verbose: true
+          python-path: ".venv/bin/python"
+          extra-args: src/ tests/ docs/
+
   check-types-repository:
     name: Run type checker under Python ${{ matrix.python }} on ${{ matrix.os }}
     if: ${{ contains(fromJson(inputs.target), 'test-repository') }}
