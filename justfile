@@ -478,7 +478,7 @@ check-sdist:
 coverage-combine receipt="":
     @[ "$(find $(just coverage-path {{ receipt }}) -type f -name '.coverage.*')" ] \
         || just for-all-python test-repository
-    just uvr " \
+    @just uvr " \
         --only-group=coverage \
     coverage combine \
         --rcfile='.coveragerc' \
@@ -491,7 +491,7 @@ coverage-combine receipt="":
 coverage-report receipt="":
     @[ -d "$(just coverage-path {{ receipt }})" ] || \
         just coverage-combine
-    just uvr " \
+    @just uvr " \
         --only-group=coverage \
     coverage html \
         --rcfile='.coveragerc' \
@@ -520,7 +520,7 @@ coverage-report receipt="":
 coverage receipt="" args="":
     @[ -d "$(just coverage-path {{ receipt }})" ] || \
         just coverage-combine
-    just uvr " \
+    @just uvr " \
         --only-group=coverage \
     coverage report \
         --rcfile='.coveragerc' \
