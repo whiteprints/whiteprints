@@ -86,8 +86,50 @@ jobs:
       python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
       python-oldest-latest: ${{ steps.baipp-latest.outputs.supported_python_oldest_latest }}
 
-  check-types:
+  check-types-from-strategy:
     name: Run type checker under Python ${{ matrix.python }} on ${{ matrix.os }}
+    if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel-python-version == 'from-strategy' }}
+    needs:
+      - build-package
+    runs-on: ${{ matrix.os }}
+    environment:
+      name: tests
+    strategy:
+      matrix:
+        os: ${{ fromJson(inputs.test-wheel-os) }}
+        strategy: ${{ fromJson(inputs.test-wheel-strategy )}}
+        include:
+          - strategy: "lowest"
+            python: ${{ fromJson(needs.build-package.outputs.python-oldest-latest)[0] }}
+          - strategy: "highest"
+            python: ${{ fromJson(needs.build-package.outputs.python-oldest-latest)[1] }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Install just
+        uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
+      - name: Initialize virtualenv
+        run: |
+          just venv check-types-distribution "${{ matrix.python }}"
+      - name: Install depdencies
+        run: |
+          just install check-types-distribution "${{ matrix.python }}" tests
+          mv $(just venv-path check-types-distribution "${{ matrix.python }}") .venv
+      - name: Run Pyright
+        uses: jakebailey/pyright-action@v2
+        with:
+          verbose: true
+          python-path: ".venv/bin/python"
+          extra-args: src/ tests/ docs/
+
+  check-types-repository:
+    name: Run type checker under Python ${{ matrix.python }} on ${{ matrix.os }}
+    if: ${{ contains(fromJson(inputs.target), 'test-repository') }}
     needs:
       - build-package
     runs-on: ${{ matrix.os }}
@@ -109,11 +151,11 @@ jobs:
         uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
       - name: Initialize virtualenv
         run: |
-          just venv check-types "${{ matrix.python }}"
+          just venv check-types-repository "${{ matrix.python }}"
       - name: Install depdencies
         run: |
-          just install check-types "${{ matrix.python }}" tests
-          mv $(just venv-path check-types "${{ matrix.python }}") .venv
+          just install check-types-repository "${{ matrix.python }}" tests
+          mv $(just venv-path check-types-repository "${{ matrix.python }}") .venv
       - name: Run Pyright
         uses: jakebailey/pyright-action@v2
         with:
@@ -162,7 +204,7 @@ jobs:
     if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel-python-version == 'from-strategy' }}
     needs:
       - check-code
-      - check-types
+      - check-types-from-strategy
       - build-package
     runs-on: ${{ matrix.os }}
     environment:
@@ -238,7 +280,7 @@ jobs:
     if: ${{ contains(fromJson(inputs.target), 'test-wheel') && inputs.test-wheel-python-version != 'from-strategy' }}
     needs:
       - check-code
-      - check-types
+      - check-types-wheel
       - build-package
     runs-on: ${{ matrix.os }}
     environment:
@@ -307,7 +349,7 @@ jobs:
     if: ${{ contains(fromJson(inputs.target), 'test-repository') }}
     needs:
       - check-code
-      - check-types
+      - check-types-repository
       - build-package
     runs-on: ${{ matrix.os }}
     environment:
