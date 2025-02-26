@@ -495,7 +495,7 @@ jobs:
         run: |
           docker save ${{ steps.meta.outputs.tags }}-${{ matrix.image }} | gzip > container-${{ matrix.image }}.tar.gz
       - name: Upload container artifact
-        uses: actions/upload-artifact@v34
+        uses: actions/upload-artifact@v4
         with:
           name: container-${{ matrix.image }}
           path: container-${{ matrix.image }}.tar.gz
