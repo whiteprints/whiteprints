@@ -519,11 +519,16 @@ jobs:
         run: gunzip container-${{ matrix.image }}.tar.gz
       - name: Load container image
         run: docker load -i container-${{ matrix.image }}.tar
+      - name: Extract image tag
+        id: extract_tag
+        run: |
+          tag=$(docker image inspect --format '{{index .RepoTags 0}}' $(docker images --quiet | head -n1))
+          echo "IMAGE_TAG=${tag}" >> $GITHUB_ENV
       - name: Run tests
-        run: docker run --rm ${{ steps.meta.outputs.tags }}-${{ matrix.image }} --version
+        run: docker run --rm ${{ env.IMAGE_TAG }} --version
 
   coverage:
-    name: Merge coverage
+    name: Combine and print coverage
     if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
     environment:
@@ -549,14 +554,14 @@ jobs:
           pattern: .coverage.*
           merge-multiple: true
           path: .just/coverage/
-      - name: Combine coverage
+      - name: Combine and print coverage
         run: |
-          just coverage-combine
+          just coverage
       - name: Setup environment variables
         shell: bash
         run: |
           echo "COVERAGE_PATH=$(just coverage-path)" >> $GITHUB_ENV
-      - name: Upload coverage
+      - name: Upload combined coverage
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
           name: coverage-combined
