@@ -50,7 +50,8 @@ export PYTHONDONTWRITEBYTECODE := "1"
 
 [private]
 @python-path receipt="" python="" resolution="" dist="":
-    uv python find "$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")"
+    uvx python -c "from pathlib import Path; import sys; print(Path(' '.join(sys.argv[1:])).expanduser().as_posix())" \
+        $(uv python find "$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")")
 
 # initialise Just working directory and synchronize the virtualenv
 [private]
