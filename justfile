@@ -405,7 +405,7 @@ pyright args="":
 [private]
 wheel-source-path receipt python resolution dist:
     @$(just python-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\") -c \
-        "import sys, re, os, importlib.metadata as m; w = sys.argv[1]; m_obj = re.match(r'(.+?)-\d', os.path.basename(w)); assert m_obj, 'Regex did not match input: ' + os.path.basename(w); d = m_obj.group(1); dist = m.distribution(d); t = (dist.read_text('top_level.txt') or d).splitlines()[0]; print(os.path.abspath(os.path.join(dist.locate_file(''), t)))" \
+        "import sys, re, importlib.metadata as m; from pathlib import Path; w = sys.argv[1]; m_obj = re.match(r'(.+?)-\d', Path(w).name); assert m_obj, 'Regex did not match input: ' + Path(w).name; d = m_obj.group(1); dist = m.distribution(d); t = (dist.read_text('top_level.txt') or d).splitlines()[0]; print((Path(dist.locate_file('')) / t).resolve().as_posix())" \
         "{{ dist }}"
 
 # Check the types correctness with Pyright for a given Python
