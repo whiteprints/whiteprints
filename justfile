@@ -405,7 +405,7 @@ pyright args="":
 [group("tests")]
 check-types-distribution python dist resolution="highest" link_mode="": (venv "check-types-distribution" python resolution dist)
     @just install-distribution check-types-distribution "{{ python }}" "{{ dist }}" "{{ resolution }}" "{{ link_mode }}"
-    @cp 'pyrightconfig.json' "$(just root-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/pyrightconfig.json"
+    @cp 'pyrightconfig.json' "$(just root-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")"
     @just pyright " \
         --project=\"$(just root-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/pyrightconfig.json\" \
         --pythonpath=\"$(just python-path check-types-distribution \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
