@@ -120,13 +120,7 @@ jobs:
           path: dist
       - name: Check types on wheel
         run: |
-          WHL_FILE=$(ls dist/*.whl)
-          if [ $(echo "$WHL_FILE" | wc -l) -ne 1 ]; then
-            echo "Error: Expected exactly one .whl file, but found multiple or none."
-            exit 1
-          fi
-          just check-types-distribution "${{ matrix.python }}" "$WHL_FILE" "${{ matrix.strategy }}"
-
+          just check-types-distribution "${{ matrix.python }}" "dist/*.whl" "${{ matrix.strategy }}"
 
   check-types-wheel:
     name: Run type checker against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
@@ -158,12 +152,7 @@ jobs:
           path: dist
       - name: Check types on wheel
         run: |
-          WHL_FILE=$(ls dist/*.whl)
-          if [ $(echo "$WHL_FILE" | wc -l) -ne 1 ]; then
-            echo "Error: Expected exactly one .whl file, but found multiple or none."
-            exit 1
-          fi
-          just check-types-distribution "${{ matrix.python }}" "$WHL_FILE" "${{ matrix.strategy }}"
+          just check-types-distribution "${{ matrix.python }}" "dist/*.whl" "${{ matrix.strategy }}"
 
   check-types-repository:
     # Here we use the pyright action rather than just to annotate the source
@@ -282,15 +271,11 @@ jobs:
           echo "RECEIPT_PATH=$(just root-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/*.whl)" >> $GITHUB_ENV
           echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/*.whl)" >> $GITHUB_ENV
           echo "TESTS_RESULTS_PATH=$(just tests-results-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/*.whl)" >> $GITHUB_ENV
-      - name: Check tests on wheel
+      - name: Run the test suite
+        shell: bash
         run: |
           echo "REPORT_FILE=${{ env.TESTS_RESULTS_PATH }}/test_report_*.md" >> "$GITHUB_ENV"
-          WHL_FILE=$(ls dist/*.whl)
-          if [ $(echo "$WHL_FILE" | wc -l) -ne 1 ]; then
-            echo "Error: Expected exactly one .whl file, but found multiple or none."
-            exit 1
-          fi
-          just test-distribution "${{ matrix.python }}" "$WHL_FILE" "${{ matrix.strategy }}"
+          just test-distribution "${{ matrix.python }}" "dist/*.whl" "${{ matrix.strategy }}"
       - name: Output reports to the job summary when tests fail
         if: failure()
         shell: bash
@@ -355,15 +340,11 @@ jobs:
           echo "RECEIPT_PATH=$(just root-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/*.whl)" >> $GITHUB_ENV
           echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/*.whl)" >> $GITHUB_ENV
           echo "TESTS_RESULTS_PATH=$(just tests-results-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/*.whl)" >> $GITHUB_ENV
-      - name: Check tests on wheel
+      - name: Run the test suite
+        shell: bash
         run: |
           echo "REPORT_FILE=${{ env.TESTS_RESULTS_PATH }}/test_report_*.md" >> "$GITHUB_ENV"
-          WHL_FILE=$(ls dist/*.whl)
-          if [ $(echo "$WHL_FILE" | wc -l) -ne 1 ]; then
-            echo "Error: Expected exactly one .whl file, but found multiple or none."
-            exit 1
-          fi
-          just test-distribution "${{ matrix.python }}" "$WHL_FILE" "${{ matrix.strategy }}"
+          just test-distribution "${{ matrix.python }}" "dist/*.whl" "${{ matrix.strategy }}"
       - name: Output reports to the job summary when tests fail
         if: failure()
         shell: bash
