@@ -85,6 +85,7 @@ jobs:
     outputs:
       python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
       python-oldest-latest: ${{ steps.baipp-latest.outputs.supported_python_oldest_latest }}
+      artifact-name: ${{ steps.baipp.outputs.artifact-name }}
 
   check-types-from-strategy:
     name: Run type checker against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
