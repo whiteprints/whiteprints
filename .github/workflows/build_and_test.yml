@@ -84,11 +84,9 @@ jobs:
           oldest=$(echo "$sorted_versions" | jq -r '.[0]')
           latest=$(echo "$sorted_versions" | jq -r '.[-1]')
           echo "supported_python_oldest_latest=[\"$oldest\",\"$latest\"]" >> "$GITHUB_OUTPUT"
-          echo "wheel_name=$(ls dist/*.whl)" >> "$GITHUB_OUTPUT"
     outputs:
       python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
       python-oldest-latest: ${{ steps.baipp-latest.outputs.supported_python_oldest_latest }}
-      wheel_name: ${{ steps.baipp.outputs.wheel_name }}
 
   check-types-from-strategy:
     name: Run type checker against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
@@ -122,9 +120,13 @@ jobs:
         with:
           name: Packages
           path: dist
+      - name: Setup environment variables
+        shell: bash
+        run: |
+          echo "WHEEL_NAME=$(ls dist/*.whl)" >> $GITHUB_ENV
       - name: Check types on wheel
         run: |
-          just check-types-distribution "${{ matrix.python }}" "dist/${{ needs.build-package.outputs.wheel_name }}" "${{ matrix.strategy }}"
+          just check-types-distribution "${{ matrix.python }}" "${{ env.WHEEL_NAME }}" "${{ matrix.strategy }}"
 
   check-types-wheel:
     name: Run type checker against wheel under Python ${{ matrix.python }} on ${{ matrix.os }} with dependency resolution strategy ${{ matrix.strategy }}
@@ -154,9 +156,13 @@ jobs:
         with:
           name: Packages
           path: dist
+      - name: Setup environment variables
+        shell: bash
+        run: |
+          echo "WHEEL_NAME=$(ls dist/*.whl)" >> $GITHUB_ENV
       - name: Check types on wheel
         run: |
-          just check-types-distribution "${{ matrix.python }}" "dist/${{ needs.build-package.outputs.wheel_name }}" "${{ matrix.strategy }}"
+          just check-types-distribution "${{ matrix.python }}" "${{ env.WHEEL_NAME }}" "${{ matrix.strategy }}"
 
   check-types-repository:
     # Here we use the pyright action rather than just to annotate the source
@@ -272,14 +278,15 @@ jobs:
       - name: Setup environment variables
         shell: bash
         run: |
-          echo "RECEIPT_PATH=$(just root-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/${{ needs.build-package.outputs.wheel_name }})" >> $GITHUB_ENV
-          echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/${{ needs.build-package.outputs.wheel_name }})" >> $GITHUB_ENV
-          echo "TESTS_RESULTS_PATH=$(just tests-results-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/${{ needs.build-package.outputs.wheel_name }})" >> $GITHUB_ENV
+          echo "WHEEL_NAME=$(ls dist/*.whl)" >> $GITHUB_ENV
+          echo "RECEIPT_PATH=$(just root-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} ${{ env.WHEEL_NAME }})" >> $GITHUB_ENV
+          echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} ${{ env.WHEEL_NAME }})" >> $GITHUB_ENV
+          echo "TESTS_RESULTS_PATH=$(just tests-results-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} ${{ env.WHEEL_NAME }})" >> $GITHUB_ENV
       - name: Run the test suite
         shell: bash
         run: |
           echo "REPORT_FILE=${{ env.TESTS_RESULTS_PATH }}/test_report_*.md" >> "$GITHUB_ENV"
-          just test-distribution "${{ matrix.python }}" "dist/${{ needs.build-package.outputs.wheel_name }}" "${{ matrix.strategy }}"
+          just test-distribution "${{ matrix.python }}" "${{ env.WHEEL_NAME }}" "${{ matrix.strategy }}"
       - name: Output reports to the job summary when tests fail
         if: failure()
         shell: bash
@@ -341,14 +348,15 @@ jobs:
       - name: Setup environment variables
         shell: bash
         run: |
-          echo "RECEIPT_PATH=$(just root-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/${{ needs.build-package.outputs.wheel_name }})" >> $GITHUB_ENV
-          echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/${{ needs.build-package.outputs.wheel_name }})" >> $GITHUB_ENV
-          echo "TESTS_RESULTS_PATH=$(just tests-results-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} dist/${{ needs.build-package.outputs.wheel_name }})" >> $GITHUB_ENV
+          echo "WHEEL_NAME=$(ls dist/*.whl)" >> $GITHUB_ENV
+          echo "RECEIPT_PATH=$(just root-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} ${{ env.WHEEL_NAME }})" >> $GITHUB_ENV
+          echo "COVERAGE_PATH=$(just coverage-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} ${{ env.WHEEL_NAME }})" >> $GITHUB_ENV
+          echo "TESTS_RESULTS_PATH=$(just tests-results-path test-distribution ${{ matrix.python }} ${{ matrix.strategy }} ${{ env.WHEEL_NAME }})" >> $GITHUB_ENV
       - name: Run the test suite
         shell: bash
         run: |
           echo "REPORT_FILE=${{ env.TESTS_RESULTS_PATH }}/test_report_*.md" >> "$GITHUB_ENV"
-          just test-distribution "${{ matrix.python }}" "dist/${{ needs.build-package.outputs.wheel_name }}" "${{ matrix.strategy }}"
+          just test-distribution "${{ matrix.python }}" "${{ env.WHEEL_NAME }}" "${{ matrix.strategy }}"
       - name: Output reports to the job summary when tests fail
         if: failure()
         shell: bash
