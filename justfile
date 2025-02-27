@@ -17,7 +17,7 @@ export PYTHONDONTWRITEBYTECODE := "1"
 # Uses Python to mimic `readlink -m` functionality in a cross-platform manner.
 [private]
 @canonicalize path="":
-    uvx python -c "from pathlib import Path; import sys; print(Path(sys.argv[1]).expanduser().resolve().as_posix())" "{{ path }}"
+    uvx --python=3.13 python -c "from pathlib import Path; import sys; print(Path(sys.argv[1]).expanduser().resolve().as_posix())" "{{ path }}"
 
 [private]
 @working-directory:
