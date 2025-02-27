@@ -53,9 +53,6 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: tests
-    permissions:
-      id-token: write
-      attestations: write
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4

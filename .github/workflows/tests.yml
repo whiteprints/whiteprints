@@ -15,6 +15,9 @@ on:
 
 jobs:
   build-and-test:
+    permissions:
+      attestations: write
+      id-token: write
     name: Build and Test
     uses: ./.github/workflows/build_and_test.yml
     with:
