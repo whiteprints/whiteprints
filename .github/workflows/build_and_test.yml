@@ -55,7 +55,7 @@ jobs:
       name: tests
     permissions:
       id-token: write
-      attestation: write
+      attestations: write
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
