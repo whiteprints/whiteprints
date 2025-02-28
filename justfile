@@ -258,7 +258,7 @@ install receipt python group link_mode="":
 # pip install in a virtualenv
 [group("virtualenv")]
 install-distribution receipt python dist resolution="highest" link_mode="" group="":
-    @[ -z "{{ group }}" ] && \
+    @[ ! -z "{{ group }}" ] || \
         touch "$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt" || \
         just requirements-dev " \
             {{ if group == '' { '' } else { '--only-group=' + group } }} \
@@ -479,8 +479,8 @@ check-sdist:
 # Combine coverage files
 [group("coverage")]
 coverage-combine receipt="":
-    @[ -z "$(find $(just coverage-path {{ receipt }}) -type f -name '.coverage.*')" ] \
-        && just for-all-python test-repository
+    @[ ! -z "$(find $(just root-path {{ receipt }}) -type f -name '.coverage.*')" ] || \
+        just for-all-python test-repository
     @just uvr " \
         --only-group=coverage \
     coverage combine \

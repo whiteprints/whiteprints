@@ -60,9 +60,7 @@ class LazyCommandLoader(Group):
         Returns:
             True if the object is recognized as a Command, False otherwise.
         """
-        return isinstance(obj, Command) or isinstance(
-            getattr(obj, "__self__", None), Command
-        )
+        return isinstance(obj, Command)
 
     @cached_property
     def command_lookup(self) -> dict[str, dict[str, str]]:
