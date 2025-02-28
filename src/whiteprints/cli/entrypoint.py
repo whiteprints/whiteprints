@@ -9,7 +9,7 @@ import os
 import sys
 from functools import cached_property
 from pathlib import Path
-from typing import Final, Optional, TextIO, TypedDict
+from typing import Final, Optional, TextIO, TypedDict, get_args
 
 import rich_click as click
 from rich_click import Context, File, Option
@@ -81,7 +81,7 @@ class LazyCommandLoader(Group):
                 importlib.import_module(module, __package__),
                 LazyCommandLoader._is_command,
             ):
-                command_lookup[command[1].__self__.name] = {
+                command_lookup[command[1].name] = {
                     "module": module,
                     "function_name": command[0],
                 }
@@ -127,7 +127,7 @@ class LazyCommandLoader(Group):
                 __package__,
             ),
             command["function_name"],
-        ).__self__
+        )
 
 
 @override
@@ -233,7 +233,7 @@ class CLIArgsType(TypedDict):
     "-l",
     "--log-level",
     type=click.Choice(
-        list(LogLevel.__members__.keys()),
+        get_args(LogLevel),
         case_sensitive=False,
     ),
     help=_("Logging verbosity."),
