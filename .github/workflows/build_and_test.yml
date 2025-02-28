@@ -216,7 +216,6 @@ jobs:
           - check-exceptions
           - check-code-maintainability
           - check-documentation-links
-          - build-documentation
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -230,9 +229,29 @@ jobs:
       - name: Run the test suite
         run: |
           just ${{ matrix.receipt }}
+
+  build-documentation:
+    name: Build the documentation
+    needs:
+      - check-code
+    runs-on: ubuntu-latest
+    environment:
+      name: tests
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Install just
+        uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
+      - name: Run the test suite
+        run: |
+          just build-documentation
       - name: Upload documentation
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
-        if: "${{ matrix.receipt == 'build-documentation' }}"
         with:
           name: documentation
           path: docs_build/
@@ -514,6 +533,7 @@ jobs:
       - test-wheel
       - test-wheel-from-strategy
       - build-container
+      - build-documentation
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
