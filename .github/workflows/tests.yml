@@ -10,14 +10,23 @@ on:
     branches: ["main"]
     tags-ignore: ["**"]
   pull_request:
+  schedule:
+    - cron: "0 3 * * *"
 
 jobs:
   build-and-test:
+    permissions:
+      attestations: write
+      id-token: write
     name: Build and Test
     uses: ./.github/workflows/build_and_test.yml
+    with:
+      target: ${{ github.event_name == 'schedule' && '["test-wheel"]' || '["test-wheel", "test-repository"]' }}
+      test-wheel-python-version: "from-strategy"
+      test-wheel-strategy: ${{ github.event_name == 'schedule' && '["highest"]' || '["lowest", "highest"]' }}
 
   coverage:
-    name: Coverage
+    name: Upload coverage
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -28,18 +37,12 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: Download coverage data
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
-        with:
-          pattern: coverage-data-*
-          merge-multiple: true
-          path: .just/
       - name: Download coverage
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
-          name: .coverage
+          name: coverage-combined
           merge-multiple: true
-          path: .just/
+          path: .just/coverage/
       - name: Install uv
         uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5
         with:
@@ -49,9 +52,8 @@ jobs:
         uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
       - name: Report coverage
         run: |
-          just coverage
           just coverage-report
-          just coverage --format=markdown >> $GITHUB_STEP_SUMMARY
+          just coverage "" --format=markdown >> $GITHUB_STEP_SUMMARY
       - name: Upload coverage report to CodeCov
         if: always()
         uses: codecov/codecov-action@0da7aa657d958d32c117fc47e1f977e7524753c7 # v5
@@ -59,5 +61,5 @@ jobs:
           name: codecov-umbrella
           verbose: true
           flags: pytest
-          files: .just/.coverage.xml
+          files: .just/coverage/coverage.xml
           use_oidc: true

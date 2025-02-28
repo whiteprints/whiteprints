@@ -4,14 +4,12 @@
 
 """Command Line Interface app entrypoint."""
 
-from __future__ import annotations
-
 import importlib
 import os
 import sys
 from functools import cached_property
 from pathlib import Path
-from typing import Final, TextIO, TypedDict, get_args
+from typing import Final, Optional, TextIO, TypedDict, get_args
 
 import rich_click as click
 from rich_click import Context, File, Option
@@ -52,13 +50,15 @@ class LazyCommandLoader(Group):
 
     @staticmethod
     def _is_command(obj: object) -> bool:
-        """Check if an object is a command.
+        """Check whether an object represents a Click Command.
 
-        Args:
-            obj: a Python object.
+        This function first tries to unwrap the object (if wrapped by beartype)
+        and then returns True if the unwrapped object is an instance of
+        Command. If that fails, it also checks whether the object is callable
+        and has a __self__ attribute that is an instance of Command.
 
         Returns:
-            True if the object is a Command, False otherwise.
+            True if the object is recognized as a Command, False otherwise.
         """
         return isinstance(obj, Command)
 
@@ -104,7 +104,7 @@ class LazyCommandLoader(Group):
         return self._list_commands
 
     @override
-    def get_command(self, ctx: Context, cmd_name: str) -> Command | None:
+    def get_command(self, ctx: Context, cmd_name: str) -> Optional[Command]:
         """Invoke a command.
 
         The command must have the name of the module.
@@ -125,7 +125,6 @@ class LazyCommandLoader(Group):
                 __package__,
             ),
             command["function_name"],
-            None,
         )
 
 

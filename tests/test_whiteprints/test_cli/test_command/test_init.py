@@ -101,6 +101,8 @@ class TestCLI:
                 "--data",
                 "target_python_version=py39",
             ],
+            # Note: do not remove as tests will run if run in parallel on
+            # windows GitHub actions.
             env={"UV_NO_CACHE": "true"},
         )
         assert result.exit_code == 0, "The CLI did not exit properly."

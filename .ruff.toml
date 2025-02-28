@@ -101,11 +101,12 @@ select = [
 ]
 # We ignore
 #  - ANN101: deprecated
+#  - FA101: never use from __future__ import annotations
 #  - COM812: conflict when use with the formatter
 #  - CPY: copyright are checked with REUSE
 #  - ISC001: conflict when use with the formatter
 #  - S: safety is checked directly with Bandit
-ignore = ["ANN101", "COM812", "CPY", "ISC001", "S", "TC001", "TC002", "TC003"]
+ignore = ["COM812", "FA100", "CPY", "ISC001", "S", "TC001", "TC002", "TC003"]
 # Allow autofix for all enabled rules (when `--fix`) is provided.
 fixable = [
     "F",     # pyflakes

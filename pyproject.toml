@@ -49,14 +49,16 @@ dynamic = [
     "version",
 ]
 dependencies = [
+    "click>=8.1.8",
     "distro==1.9.0",
     "importlib-metadata==8.6.1; python_full_version<'3.10.0'",
+    "pygments>=2.15.1",
     "python-dotenv==1.0.1",
-    "rich-click==1.8.5",
+    "rich>=13.9.4",
+    "rich-click==1.8.6",
     "typing-extensions==4.12.2; python_full_version<'3.12.0'",
-    "uv==0.5.30",
+    "uv>=0.6.3",
 ]
-
 urls.changelog = "https://github.com/whiteprints/whiteprints/releases"
 urls.discussions = "https://github.com/whiteprints/whiteprints/discussions"
 urls.documentation = "https://github.com/whiteprints/whiteprints"
@@ -72,9 +74,9 @@ scripts.whiteprints = "whiteprints.cli.entrypoint:whiteprints"
 dev = [
     { include-group = "audit-maintainability" },
     { include-group = "audit-vulnerabilities" },
+    { include-group = "build-documentation" },
     { include-group = "check-exceptions" },
     { include-group = "check-maintainability" },
-    { include-group = "check-types" },
     { include-group = "check-vulnerabilities" },
     { include-group = "coverage" },
     { include-group = "editor" },
@@ -85,65 +87,62 @@ dev = [
     { include-group = "tests" },
 ]
 
-tests = [
-    "beartype>=0.18.5",
-    "hypothesis>=6.110.1",
-    "pytest>=8.3.2",
-    "pytest-cov>=5.0.0",
-    "pytest-html>=4.1.1",
-    "pytest-md-report>=0.6.2",
-    "pytest-randomly>=3.15.0",
-    "pytest-xdist>=3.6.1",
-    "xdoctest[colors]>=1.2.0",
+build-documentation = [
+    "myst-parser[linkify]==3.0.1",
+    "pydata-sphinx-theme==0.16.1",
+    "sphinx==7.4.7",
+    "sphinx-autoapi==3.6.0",
+    "sphinx-click==6.0.0",
+    "sphinx-copybutton==0.5.2",
+    "sphinxcontrib-napoleon==0.7.0",
+    "sphinxcontrib-spelling==8.0.0",
+    "stdlib-list>=0.11.1",
 ]
-editor = [
-    "pynvim>=0.4.3",
+tests = [
+    "beartype==0.20.0",
+    "hypothesis==6.127.3",
+    "pytest==8.3.4",
+    "pytest-cov==6.0.0",
+    "pytest-html==4.1.1",
+    "pytest-md-report==0.6.3",
+    "pytest-randomly==3.16.0",
+    "pytest-xdist==3.6.1",
+    "xdoctest[colors]==1.2.0",
 ]
 profile = [
-    "scalene>=1.5.19",
+    "scalene==1.5.51",
+]
+editor = [
+    "pynvim==0.5.2",
 ]
 lint = [
-    "pylint>=3.2.6",
-    { include-group = "tests" },
-]
-check-types = [
-    "pyright>=1.1.386",
+    "pylint==3.3.4",
     { include-group = "tests" },
 ]
 coverage = [
-    "coverage>=7.6.1",
+    "coverage==7.6.12",
 ]
 audit-vulnerabilities = [
-    "pip-audit>=2.7.3",
+    "pip-audit==2.8.0",
 ]
 audit-maintainability = [
-    "radon>=6.0.1",
+    "radon==6.0.1",
 ]
 check-exceptions = [
-    "tryceratops>=2.4",
+    "tryceratops==2.4.1",
 ]
 check-maintainability = [
-    "xenon>=0.9.3",
+    "xenon==0.9.3",
 ]
 check-vulnerabilities = [
-    "bandit>=1.7.10",
-]
-build-documentation = [
-    "myst-parser[linkify]>=3.0.1",
-    "pydata-sphinx-theme>=0.16.0",
-    "sphinx>=7.4.7",
-    "sphinx-autoapi>=3.3.3",
-    "sphinx-click>=6.0.0",
-    "sphinx-copybutton>=0.5.2",
-    "sphinxcontrib-napoleon>=0.7.0",
-    "sphinxcontrib-spelling>=8.0.0",
+    "bandit==1.8.3",
 ]
 serve-documentation = [
-    "sphinx-autobuild>=2024.10.3",
+    "sphinx-autobuild==2024.10.3",
     { include-group = "build-documentation" },
 ]
 localization = [
-    "babel>=2.16.0",
+    "babel==2.17.0",
 ]
 
 [tool.pyproject-fmt]

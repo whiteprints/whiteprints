@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-required-version = ">=0.5.16"
+required-version = ">=0.6.2"
 cache-keys = [
     { git = { commit = true, tags = true } },
     { file = "pyproject.toml" },
