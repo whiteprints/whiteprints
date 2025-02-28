@@ -50,15 +50,17 @@ class LazyCommandLoader(Group):
 
     @staticmethod
     def _is_command(obj: object) -> bool:
-        """Check if an object is a command.
+        """Check whether an object represents a Click Command.
 
-        Args:
-            obj: a Python object.
+        This function first tries to unwrap the object (if wrapped by beartype)
+        and then returns True if the unwrapped object is an instance of
+        Command. If that fails, it also checks whether the object is callable
+        and has a __self__ attribute that is an instance of Command.
 
         Returns:
-            True if the object is a Command, False otherwise.
+            True if the object is recognized as a Command, False otherwise.
         """
-        return isinstance(obj, Command)
+        return isinstance(obj, Command) or isinstance(obj.__self__, Command)
 
     @cached_property
     def command_lookup(self) -> dict[str, dict[str, str]]:
@@ -77,7 +79,7 @@ class LazyCommandLoader(Group):
                 importlib.import_module(module, __package__),
                 LazyCommandLoader._is_command,
             ):
-                command_lookup[command[1].name] = {
+                command_lookup[command[1].__self__.name] = {
                     "module": module,
                     "function_name": command[0],
                 }
