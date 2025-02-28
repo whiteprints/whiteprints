@@ -522,7 +522,7 @@ coverage-report receipt="":
 # Print coverage
 [group("coverage")]
 coverage receipt="" args="":
-    @[ -d "$(just coverage-path {{ receipt }})" ] || \
+    @[ ! -z "$(find $(just coverage-path {{ receipt }}) -type f -name 'coverage-combined')" ] || \
         just coverage-combine
     @just uvr " \
         --only-group=coverage \
