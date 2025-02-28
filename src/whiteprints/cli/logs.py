@@ -71,7 +71,7 @@ def configure_logging(
     logging.basicConfig(
         format=f"{log_format}",
         handlers=handlers,
-        level=level.upper(),
+        level=level.name,
         datefmt=date_format,
         style="{",
     )
