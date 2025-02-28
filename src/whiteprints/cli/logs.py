@@ -6,8 +6,8 @@
 
 import importlib
 import logging
-import sys
-from typing import Final, Literal, TextIO
+from enum import Enum, auto
+from typing import Final, TextIO
 
 from whiteprints import console
 from whiteprints.loc import _
@@ -16,20 +16,15 @@ from whiteprints.loc import _
 __all__: Final = ["LogLevel", "configure_logging"]
 
 
-if sys.version_info >= (3, 10):
-    from typing import TypeAlias
-else:
-    from typing_extensions import TypeAlias
+class LogLevel(Enum):
+    """List possible log levels."""
 
-
-LogLevel: TypeAlias = Literal[
-    "CRITICAL",
-    "ERROR",
-    "WARNING",
-    "INFO",
-    "DEBUG",
-    "NOTSET",
-]
+    CRITICAL = auto()
+    ERROR = auto()
+    WARNING = auto()
+    INFO = auto()
+    DEBUG = auto()
+    NOTSET = auto()
 
 
 def configure_logging(

@@ -49,6 +49,7 @@ dynamic = [
     "version",
 ]
 dependencies = [
+    "beartype==0.20.0",
     "click>=8.1.8",
     "distro==1.9.0",
     "importlib-metadata==8.6.1; python_full_version<'3.10.0'",
@@ -99,7 +100,6 @@ build-documentation = [
     "stdlib-list>=0.11.1",
 ]
 tests = [
-    "beartype==0.20.0",
     "hypothesis==6.127.1",
     "pytest==8.3.4",
     "pytest-cov==6.0.0",

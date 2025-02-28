@@ -4,14 +4,12 @@
 
 """Command Line Interface app entrypoint."""
 
-from __future__ import annotations
-
 import importlib
 import os
 import sys
 from functools import cached_property
 from pathlib import Path
-from typing import Final, TextIO, TypedDict, get_args
+from typing import Final, Optional, TextIO, TypedDict
 
 import rich_click as click
 from rich_click import Context, File, Option
@@ -104,7 +102,7 @@ class LazyCommandLoader(Group):
         return self._list_commands
 
     @override
-    def get_command(self, ctx: Context, cmd_name: str) -> Command | None:
+    def get_command(self, ctx: Context, cmd_name: str) -> Optional[Command]:
         """Invoke a command.
 
         The command must have the name of the module.
@@ -232,7 +230,7 @@ class CLIArgsType(TypedDict):
     "-l",
     "--log-level",
     type=click.Choice(
-        get_args(LogLevel),
+        list(LogLevel.__members__.keys()),
         case_sensitive=False,
     ),
     help=_("Logging verbosity."),
