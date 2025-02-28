@@ -557,7 +557,7 @@ jobs:
         with:
           pattern: .coverage.*
           merge-multiple: true
-          path: "${{ env.COVERAGE_PATH }}"
+          path: .just/coverage
       - name: Combine and print coverage
         run: |
           just coverage
