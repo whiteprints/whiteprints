@@ -68,7 +68,7 @@ all:
     @just for-all-python check-types
     @just for-all-python test-repository
     @just coverage
-    @just BOM
+    @just SBOM
     @just check-documentation-links
     @just build-documentation
     @just check-sdist
@@ -172,10 +172,10 @@ sync resolution="highest":
 clean-python:
     @just uvx "pyclean ."
 
-# Clean the generated Bill of Material (BOM)
+# Clean the generated Bill of Material (SBOM)
 [group("clean")]
-clean-BOM:
-    rm -rf BOM
+clean-SBOM:
+    rm -rf SBOM
 
 # Clean the documentation
 [group("clean")]
@@ -210,7 +210,7 @@ clean-coverage:
 clean-all:
     @just clean-coverage
     @just clean-python
-    @just clean-BOM
+    @just clean-SBOM
     @just clean-just
     @just clean-docs
     @just clean-translation
@@ -543,12 +543,12 @@ reuse args="":
 
 # Export Bill of Material of project's files and their licenses
 [group("Bill of Material")]
-BOM-licenses:
-    [ -d "BOM" ] || mkdir "BOM"
+SBOM-licenses:
+    [ -d "SBOM" ] || mkdir "SBOM"
     @just reuse " \
         spdx \
         --creator-organization 'whiteprints <whiteprints@pm.me>' \
-        --output BOM/project_licenses.spdx \
+        --output SBOM/project_licenses.spdx \
     "
 
 # Run `pip-audit`
@@ -563,14 +563,14 @@ pip-audit args="":
 
 # Export Bill of Material of project's dependencies and vulnerabilities for a given Python
 [group("Bill of Material")]
-BOM-vulnerabilities python resolution="lowest": (venv "BOM-vulnerabilities" python resolution)
-    [ -d "BOM" ] || \
-        mkdir -p "BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}"
+SBOM-vulnerabilities python resolution="lowest": (venv "SBOM-vulnerabilities" python resolution)
+    [ -d "SBOM" ] || \
+        mkdir -p "SBOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}"
     @just compile " \
-        --python=$(just venv-path BOM-vulnerabilities {{ python }} {{ resolution }}) \
+        --python=$(just venv-path SBOM-vulnerabilities {{ python }} {{ resolution }}) \
         --resolution={{ resolution }} \
         --output-file '\
-            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}/\
+            SBOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}/\
             requirements.txt\
         ' \
         pyproject.toml \
@@ -580,31 +580,31 @@ BOM-vulnerabilities python resolution="lowest": (venv "BOM-vulnerabilities" pyth
     cyclonedx-py requirements \
         --outfile \
             '\
-                BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}/\
+                SBOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}/\
                 project_dependencies.cdx.json\
             ' \
         '\
-            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution}}/\
+            SBOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution}}/\
             requirements.txt\
         ' \
     "
     @just pip-audit " \
         --requirement '\
-            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}/\
+            SBOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}/\
             requirements.txt\
         ' \
         --format cyclonedx-json \
         --output '\
-            BOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}/\
+            SBOM/vulnerabilities-{{ arch() }}-{{ os() }}-{{ python }}-{{ resolution }}/\
             vulnerabilities.cdx.json\
         ' \
     "
 
 # Export a Bill of Material of project files licenses and dependencies
 [group("Bill of Material")]
-BOM:
-    @just BOM-licenses
-    @just for-all-python BOM-vulnerabilities
+SBOM:
+    @just SBOM-licenses
+    @just for-all-python SBOM-vulnerabilities
 
 # Try to autofix a maximum of errors and typos
 [group("manage project")]
