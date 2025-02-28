@@ -250,11 +250,16 @@ jobs:
       - name: Run the test suite
         run: |
           just build-documentation
+          zip -r documentation.zip docs_build
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@520d128f165991a6c774bcb264f323e3d70747f4 # v2
+        with:
+          subject-path: documentation.zip*
       - name: Upload documentation
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
           name: documentation
-          path: docs_build/
+          path: documentation.zip*
           overwrite: true
 
   test-wheel-from-strategy:

@@ -29,6 +29,9 @@ jobs:
       - name: Build and Test Workflow (fallback if no artifacts available)
         if: steps.download-artifact.outcome == 'failure'
         uses: ./.github/workflows/build_and_test.yml
+        permissions:
+          attestations: write
+          id-token: write
         id: build_and_test
       - name: Retry downloading artifact after fallback build
         if: steps.download-artifact.outcome == 'failure'
