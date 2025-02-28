@@ -493,7 +493,7 @@ coverage-combine receipt="" args="":
 # Report coverage in various formats (lcov, html, xml)
 [group("report")]
 coverage-report receipt="":
-    @[ -d "$(just coverage-path {{ receipt }})" ] || \
+    @[ ! -z "$(find $(just coverage-path {{ receipt }}) -type f -name 'coverage-combined')" ] || \
         just coverage-combine
     @just uvr " \
         --only-group=coverage \
