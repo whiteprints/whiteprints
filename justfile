@@ -258,7 +258,7 @@ install receipt python group link_mode="":
 # pip install in a virtualenv
 [group("virtualenv")]
 install-distribution receipt python dist resolution="highest" link_mode="" group="":
-    @[ ! -z "{{ group }}" ] || \
+    @[ -z "{{ group }}" ] || \
         touch "$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt" || \
         just requirements-dev " \
             {{ if group == '' { '' } else { '--only-group=' + group } }} \
