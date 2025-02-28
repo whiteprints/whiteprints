@@ -50,7 +50,7 @@ node_modules
 *.old*
 
 # Generated files
-BOM/
+SBOM/
 
 # Copier
 .copier-answers.yml
