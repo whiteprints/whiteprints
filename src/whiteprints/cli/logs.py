@@ -22,24 +22,14 @@ else:
     from typing_extensions import TypeAlias
 
 
-if sys.version_info >= (3, 12):
-    type LogLevel = Literal[
-        "CRITICAL",
-        "ERROR",
-        "WARNING",
-        "INFO",
-        "DEBUG",
-        "NOTSET",
-    ]
-else:
-    LogLevel: TypeAlias = Literal[
-        "CRITICAL",
-        "ERROR",
-        "WARNING",
-        "INFO",
-        "DEBUG",
-        "NOTSET",
-    ]
+LogLevel: TypeAlias = Literal[
+    "CRITICAL",
+    "ERROR",
+    "WARNING",
+    "INFO",
+    "DEBUG",
+    "NOTSET",
+]
 
 
 def configure_logging(
