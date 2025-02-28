@@ -478,12 +478,13 @@ check-sdist:
 
 # Combine coverage files
 [group("coverage")]
-coverage-combine receipt="":
+coverage-combine receipt="" args="":
     @[ ! -z "$(find $(just root-path {{ receipt }}) -type f -name '.coverage.*')" ] || \
         just for-all-python test-repository
     @just uvr " \
         --only-group=coverage \
     coverage combine \
+        {{ args }} \
         --rcfile='.coveragerc' \
         --data-file=$(just coverage-path {{ receipt }})/coverage-combined \
         $(find $(just root-path {{ receipt }}) -type f -name '.coverage.*' | xargs echo) \
