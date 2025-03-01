@@ -43,7 +43,7 @@ jobs:
     steps:
       - name: Try to download built artifact
         id: download-artifact
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4
         with:
           name: Packages
           path: dist
@@ -57,7 +57,7 @@ jobs:
         id: build_and_test
       - name: Retry downloading artifact after fallback build
         if: steps.download-artifact.outcome == 'failure'
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4
         with:
           name: Packages
           path: dist
@@ -83,7 +83,7 @@ jobs:
     steps:
       - name: Try to download built artifact
         id: download-artifact
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4
         with:
           name: documentation
       - name: Upload docs
@@ -147,7 +147,7 @@ jobs:
       - name: Install just
         uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
       - name: Download coverage data
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4
         with:
           pattern: SBOM-vulnerabilities-*
           merge-multiple: true
@@ -185,7 +185,7 @@ jobs:
       id-token: write  # Required for trusted publishing
     steps:
       - name: Download built packages from the build-package job
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4
         with:
           name: Packages
           path: dist
@@ -231,7 +231,7 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Download built packages from the build-package job
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4
         with:
           name: Packages
           path: dist
