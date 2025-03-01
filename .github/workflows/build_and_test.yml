@@ -256,7 +256,7 @@ jobs:
         with:
           subject-path: documentation.zip*
       - name: Upload documentation
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4
         with:
           name: documentation
           path: documentation.zip*
@@ -326,7 +326,7 @@ jobs:
           fi
       - name: Upload coverage data
         if: always()
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4
         with:
           name: .coverage.test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
           path: "${{ env.COVERAGE_PATH }}/.coverage.*"
@@ -334,7 +334,7 @@ jobs:
           include-hidden-files: true
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4
         with:
           name: test-results-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
           path: "${{ env.TESTS_RESULTS_PATH }}/junit-*.xml"
@@ -398,7 +398,7 @@ jobs:
           fi
       - name: Upload coverage data
         if: always()
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4
         with:
           name: .coverage.test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
           path: "${{ env.COVERAGE_PATH }}/.coverage.*"
@@ -406,7 +406,7 @@ jobs:
           include-hidden-files: true
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4
         with:
           name: test-results-test-wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.strategy }}
           path: "${{ env.TESTS_RESULTS_PATH }}/junit-*.xml"
@@ -461,7 +461,7 @@ jobs:
           fi
       - name: Upload coverage data
         if: always()
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4
         with:
           name: .coverage.test-repository-${{ matrix.os }}-${{ matrix.python }}
           path: "${{ env.COVERAGE_PATH }}/.coverage.*"
@@ -469,7 +469,7 @@ jobs:
           include-hidden-files: true
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4
         with:
           name: test-results-test-repository-${{ matrix.os }}-${{ matrix.python }}
           path: "${{ env.TESTS_RESULTS_PATH }}/junit-*.xml"
@@ -560,7 +560,7 @@ jobs:
         run: |
           just coverage
       - name: Upload combined coverage
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4
         with:
           name: coverage-combined
           path: "${{ env.COVERAGE_PATH }}/coverage-combined"
