@@ -2192,6 +2192,7 @@ wheels = [
 name = "whiteprints"
 source = { editable = "." }
 dependencies = [
+    { name = "beartype" },
     { name = "click" },
     { name = "distro" },
     { name = "importlib-metadata", marker = "python_full_version < '3.10'" },
@@ -2236,7 +2237,6 @@ coverage = [
 dev = [
     { name = "babel" },
     { name = "bandit" },
-    { name = "beartype" },
     { name = "coverage" },
     { name = "hypothesis" },
     { name = "myst-parser", extra = ["linkify"] },
@@ -2268,7 +2268,6 @@ editor = [
     { name = "pynvim" },
 ]
 lint = [
-    { name = "beartype" },
     { name = "hypothesis" },
     { name = "pylint" },
     { name = "pytest" },
@@ -2298,7 +2297,6 @@ serve-documentation = [
     { name = "stdlib-list" },
 ]
 tests = [
-    { name = "beartype" },
     { name = "hypothesis" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -2311,6 +2309,7 @@ tests = [
 
 [package.metadata]
 requires-dist = [
+    { name = "beartype", specifier = "==0.20.0" },
     { name = "click", specifier = ">=8.1.8" },
     { name = "distro", specifier = "==1.9.0" },
     { name = "importlib-metadata", marker = "python_full_version < '3.10'", specifier = "==8.6.1" },
@@ -2343,7 +2342,6 @@ coverage = [{ name = "coverage", specifier = "==7.6.12" }]
 dev = [
     { name = "babel", specifier = "==2.17.0" },
     { name = "bandit", specifier = "==1.8.3" },
-    { name = "beartype", specifier = "==0.20.0" },
     { name = "coverage", specifier = "==7.6.12" },
     { name = "hypothesis", specifier = "==6.127.3" },
     { name = "myst-parser", extras = ["linkify"], specifier = "==3.0.1" },
@@ -2373,7 +2371,6 @@ dev = [
 ]
 editor = [{ name = "pynvim", specifier = "==0.5.2" }]
 lint = [
-    { name = "beartype", specifier = "==0.20.0" },
     { name = "hypothesis", specifier = "==6.127.3" },
     { name = "pylint", specifier = "==3.3.4" },
     { name = "pytest", specifier = "==8.3.4" },
@@ -2399,7 +2396,6 @@ serve-documentation = [
     { name = "stdlib-list", specifier = ">=0.11.1" },
 ]
 tests = [
-    { name = "beartype", specifier = "==0.20.0" },
     { name = "hypothesis", specifier = "==6.127.3" },
     { name = "pytest", specifier = "==8.3.4" },
     { name = "pytest-cov", specifier = "==6.0.0" },
