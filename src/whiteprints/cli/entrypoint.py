@@ -52,11 +52,6 @@ class LazyCommandLoader(Group):
     def _is_command(obj: object) -> bool:
         """Check whether an object represents a Click Command.
 
-        This function first tries to unwrap the object (if wrapped by beartype)
-        and then returns True if the unwrapped object is an instance of
-        Command. If that fails, it also checks whether the object is callable
-        and has a __self__ attribute that is an instance of Command.
-
         Returns:
             True if the object is recognized as a Command, False otherwise.
         """
