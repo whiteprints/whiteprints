@@ -60,7 +60,9 @@ class LazyCommandLoader(Group):
         Returns:
             True if the object is recognized as a Command, False otherwise.
         """
-        return isinstance(obj, Command)
+        return isinstance(obj, Command) or isinstance(
+            getattr(obj, "__self__", None), Command
+        )
 
     @cached_property
     def command_lookup(self) -> dict[str, dict[str, str]]:
@@ -79,7 +81,10 @@ class LazyCommandLoader(Group):
                 importlib.import_module(module, __package__),
                 LazyCommandLoader._is_command,
             ):
-                command_lookup[command[1].name] = {
+                command_name = command[1]
+                command_lookup[
+                    getattr(command_name, "__self__", command_name).name
+                ] = {
                     "module": module,
                     "function_name": command[0],
                 }
@@ -116,16 +121,17 @@ class LazyCommandLoader(Group):
         Returns:
             A command.
         """
-        if (command := self.command_lookup.get(cmd_name)) is None:
+        if (command_module := self.command_lookup.get(cmd_name)) is None:
             return None
 
-        return getattr(
+        command = getattr(
             importlib.import_module(
-                command["module"],
+                command_module["module"],
                 __package__,
             ),
-            command["function_name"],
+            command_module["function_name"],
         )
+        return getattr(command, "__self__", command)
 
 
 @override
