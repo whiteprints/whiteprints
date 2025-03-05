@@ -7,7 +7,7 @@
 import importlib
 import logging
 import sys
-from typing import Final, Literal, TextIO
+from typing import TYPE_CHECKING, Final, Literal, TextIO
 
 from whiteprints import console
 from whiteprints.loc import _
@@ -22,14 +22,30 @@ else:
     from typing_extensions import TypeAlias
 
 
-LogLevel: TypeAlias = Literal[
-    "CRITICAL",
-    "ERROR",
-    "WARNING",
-    "INFO",
-    "DEBUG",
-    "NOTSET",
-]
+if TYPE_CHECKING:  # <-- if static type-checking, then PEP 613
+    LogLevel: TypeAlias = Literal[
+        "CRITICAL",
+        "ERROR",
+        "WARNING",
+        "INFO",
+        "DEBUG",
+        "NOTSET",
+    ]
+elif sys.version_info >= (3, 12):  # <-- if Python >= 3.12, then PEP 695
+    exec(
+        "type LogLevel = Literal["
+        "   ' CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG', 'NOTSET'"
+        "]"
+    )
+else:  # <-- if Python < 3.12, then PEP 484
+    LogLevel: TypeAlias = Literal[
+        "CRITICAL",
+        "ERROR",
+        "WARNING",
+        "INFO",
+        "DEBUG",
+        "NOTSET",
+    ]
 
 
 def configure_logging(

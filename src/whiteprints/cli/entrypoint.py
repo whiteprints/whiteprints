@@ -232,7 +232,8 @@ class CLIArgsType(TypedDict):
     "-l",
     "--log-level",
     type=click.Choice(
-        get_args(LogLevel),
+        # Remove getattr when python support >= 3.12
+        get_args(getattr(LogLevel, "__value__", LogLevel)),
         case_sensitive=False,
     ),
     help=_("Logging verbosity."),

@@ -58,7 +58,7 @@ dependencies = [
     "rich>=13.9.4",
     "rich-click==1.8.6",
     "typing-extensions==4.12.2; python_full_version<'3.12.0'",
-    "uv>=0.6.3",
+    "uv>=0.6.4",
 ]
 urls.changelog = "https://github.com/whiteprints/whiteprints/releases"
 urls.discussions = "https://github.com/whiteprints/whiteprints/discussions"
@@ -100,8 +100,8 @@ build-documentation = [
     "stdlib-list>=0.11.1",
 ]
 tests = [
-    "hypothesis==6.127.3",
-    "pytest==8.3.4",
+    "hypothesis==6.127.6",
+    "pytest==8.3.5",
     "pytest-cov==6.0.0",
     "pytest-html==4.1.1",
     "pytest-md-report==0.6.3",
