@@ -11,10 +11,8 @@ from functools import cached_property
 from pathlib import Path
 from typing import Final, Optional, TextIO, TypedDict, get_args
 
-import rich_click as click
-from rich_click import Context, File, Option
-from rich_click.rich_command import RichCommand as Command
-from rich_click.rich_command import RichGroup as Group
+import click
+from click import Command, Context, File, Group, Option
 
 from whiteprints import __version__
 from whiteprints.cli import APP_NAME, __app_name__
@@ -232,8 +230,7 @@ class CLIArgsType(TypedDict):
     "-l",
     "--log-level",
     type=click.Choice(
-        # Remove getattr when python support >= 3.12
-        get_args(getattr(LogLevel, "__value__", LogLevel)),
+        get_args(LogLevel),
         case_sensitive=False,
     ),
     help=_("Logging verbosity."),

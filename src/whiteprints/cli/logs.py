@@ -16,13 +16,12 @@ from whiteprints.loc import _
 __all__: Final = ["LogLevel", "configure_logging"]
 
 
-if sys.version_info >= (3, 10):
-    from typing import TypeAlias
-else:
-    from typing_extensions import TypeAlias
-
-
 if TYPE_CHECKING:  # <-- if static type-checking, then PEP 613
+    if sys.version_info >= (3, 10):
+        from typing import TypeAlias
+    else:
+        from typing_extensions import TypeAlias
+
     LogLevel: TypeAlias = Literal[
         "CRITICAL",
         "ERROR",
@@ -37,8 +36,8 @@ elif sys.version_info >= (3, 12):  # <-- if Python >= 3.12, then PEP 695
         "   ' CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG', 'NOTSET'"
         "]"
     )
-else:  # <-- if Python < 3.12, then PEP 484
-    LogLevel: TypeAlias = Literal[
+else:
+    LogLevel = Literal[
         "CRITICAL",
         "ERROR",
         "WARNING",

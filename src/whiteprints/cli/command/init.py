@@ -9,7 +9,7 @@ import sys
 from collections.abc import Iterable
 from pathlib import Path
 
-import rich_click as click
+import click
 
 from whiteprints.cli.init_interface import InitKwargs
 from whiteprints.loc import _
