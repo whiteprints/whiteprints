@@ -17,7 +17,7 @@ repos:
       - id: detect-private-key
       - id: trailing-whitespace
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.5.0
+    rev: v2.5.1
     hooks:
       - id: pyproject-fmt
         args: ["--column-width", "79", "--indent", "4", "--no-print-diff"]
@@ -29,7 +29,7 @@ repos:
         entry: reuse
         description: "[License] Lint the chand file for compliance with the REUSE Specification"
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.6
+    rev: v0.9.10
     hooks:
       - id: ruff-format
         name: "ruff format"
