@@ -23,6 +23,8 @@ def _parse_args(
 ) -> Namespace:
     """Parse the arguments.
 
+    Print an error and exit on parsing error.
+
     Args:
         parser: the entrypoint argument parser
         args: the arguments to parse
