@@ -17,28 +17,6 @@ __all__: Final = ["entrypoint"]
 """Public module attributes."""
 
 
-def _setup_parser() -> ArgumentParser:
-    """Set up the argument parser.
-
-    Returns:
-        The entrypoint argument parser.
-    """
-    try:
-        entrypoint_parser = importlib.import_module(
-            "whiteprints.cli.entrypoint_parser",
-            __package__,
-        ).create_entrypoint_parser()
-        importlib.import_module("argcomplete").autocomplete(entrypoint_parser)
-    except Exception:
-        logger = importlib.import_module("logging").getLogger("entrypoint")
-        logger.exception(
-            "Fatal Error. Something went wrong while setting up the program."
-        )
-        sys.exit(os.EX_SOFTWARE)
-
-    return entrypoint_parser
-
-
 def _parse_args(
     parser: ArgumentParser,
     args: Optional[list[str]],
@@ -55,28 +33,27 @@ def _parse_args(
     try:
         namespace = parser.parse_args(args)
     except ArgumentError as argument_error:
-        logger = importlib.import_module("logging").getLogger("entrypoint")
         importlib.import_module(
             "whiteprints.console", __package__
         ).stderr().print(argument_error)
         sys.exit(os.EX_USAGE)
-    except Exception:
-        logger = importlib.import_module("logging").getLogger("entrypoint")
-        logger.exception(
-            "Fatal Error. Something went wrong while setting up the program."
-        )
-        sys.exit(os.EX_SOFTWARE)
 
     return namespace
 
 
-def _setup_logging(namespace: Namespace) -> None:
-    """Setup the logging.
+def entrypoint(args: Optional[list[str]] = None) -> None:
+    """The Whiteprint CLI.
 
     Args:
-        namespace: the namespace container the logging configuration.
+        args: the arguments forwarded to argparse. For example sys.argv.
     """
     try:
+        entrypoint_parser = importlib.import_module(
+            "whiteprints.cli.entrypoint_parser",
+            __package__,
+        ).create_entrypoint_parser()
+        importlib.import_module("argcomplete").autocomplete(entrypoint_parser)
+        namespace = _parse_args(entrypoint_parser, args)
         importlib.import_module(
             "whiteprints.cli.logs",
             __package__,
@@ -89,14 +66,3 @@ def _setup_logging(namespace: Namespace) -> None:
             "Fatal Error. Something went wrong while setting up the program."
         )
         sys.exit(os.EX_SOFTWARE)
-
-
-def entrypoint(args: Optional[list[str]] = None) -> None:
-    """The Whiteprint CLI.
-
-    Args:
-        args: the arguments forwarded to argparse. For example sys.argv.
-    """
-    entrypoint_parser = _setup_parser()
-    namespace = _parse_args(entrypoint_parser, args)
-    _setup_logging(namespace)
