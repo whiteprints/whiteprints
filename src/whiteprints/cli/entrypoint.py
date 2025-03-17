@@ -62,7 +62,7 @@ def _parse_args(
         importlib.import_module(
             "whiteprints.console", __package__
         ).stderr().print(argument_error)
-        sys.exit(os.EX_SOFTWARE)
+        sys.exit(os.EX_USAGE)
     except Exception:
         logger = importlib.import_module("logging").getLogger("entrypoint")
         logger.exception(
