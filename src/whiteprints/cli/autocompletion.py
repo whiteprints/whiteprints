@@ -9,8 +9,5 @@ from argparse import ArgumentParser
 
 
 def argcomplete(parser: ArgumentParser) -> None:
-    """Add autocompletion to the parser.
-
-    Does nothing if argcomplete is not installed.
-    """
+    """Add autocompletion to the parser."""
     importlib.import_module("argcomplete").autocomplete(parser)
