@@ -21,12 +21,13 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
         args: the arguments forwarded to argparse. For example sys.argv.
     """
     try:
-        namespace = importlib.import_module(
-            ".entrypoint_parser",
+        entrypoint_parser = importlib.import_module(
+            "whiteprints.cli.entrypoint_parser",
             __package__,
-        ).parse_command_line(args)
+        ).create_entrypoint_parser()
+        namespace = entrypoint_parser.parse_args(args)
         importlib.import_module(
-            ".logs",
+            "whiteprints.cli.logs",
             __package__,
         ).setup_logging(
             namespace.log_conf,

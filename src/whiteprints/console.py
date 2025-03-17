@@ -18,6 +18,9 @@ __all__: Final = ["stderr", "stdout"]
 def stdout() -> Console:
     """A high level console interface instance.
 
+    The ouput of this function is cached. No new instances are created on
+    subsequent calls.
+
     See Also:
         https://rich.readthedocs.io/en/stable/reference/console.html
 
