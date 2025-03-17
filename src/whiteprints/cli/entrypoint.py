@@ -64,7 +64,5 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
         )
     except Exception:
         logger = importlib.import_module("logging").getLogger("entrypoint")
-        logger.exception(
-            "Fatal Error. Something went wrong while setting up the program."
-        )
+        logger.exception("Fatal Error")
         sys.exit(os.EX_SOFTWARE)
