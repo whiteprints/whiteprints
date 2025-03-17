@@ -28,10 +28,7 @@ def _setup_parser() -> ArgumentParser:
             "whiteprints.cli.entrypoint_parser",
             __package__,
         ).create_entrypoint_parser()
-        importlib.import_module(
-            "whiteprints.cli.autocompletion",
-            __package__,
-        ).argcomplete(entrypoint_parser)
+        importlib.import_module("argcomplete").autocomplete(entrypoint_parser)
     except Exception:
         logger = importlib.import_module("logging").getLogger("entrypoint")
         logger.exception(
