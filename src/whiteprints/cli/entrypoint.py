@@ -29,7 +29,9 @@ def _setup_parser() -> ArgumentParser:
         ).argcomplete(entrypoint_parser)
     except Exception:
         logger = importlib.import_module("logging").getLogger("entrypoint")
-        logger.exception("Something went wrong while setting up the program.")
+        logger.exception(
+            "Fatal Error. Something went wrong while setting up the program."
+        )
         sys.exit(os.EX_SOFTWARE)
 
     return entrypoint_parser
@@ -45,11 +47,13 @@ def _parse_args(
         logger = importlib.import_module("logging").getLogger("entrypoint")
         importlib.import_module(
             "whiteprints.console", __package__
-        ).stdout().print(argument_error)
+        ).stderr().print(argument_error)
         sys.exit(os.EX_SOFTWARE)
     except Exception:
         logger = importlib.import_module("logging").getLogger("entrypoint")
-        logger.exception("Something went wrong while setting up the program.")
+        logger.exception(
+            "Fatal Error. Something went wrong while setting up the program."
+        )
         sys.exit(os.EX_SOFTWARE)
 
     return namespace
@@ -65,7 +69,9 @@ def _setup_logging(namespace: Namespace) -> None:
         )
     except Exception:
         logger = importlib.import_module("logging").getLogger("entrypoint")
-        logger.exception("Something went wrong while setting up the program.")
+        logger.exception(
+            "Fatal Error. Something went wrong while setting up the program."
+        )
         sys.exit(os.EX_SOFTWARE)
 
 

@@ -57,7 +57,9 @@ def _gracefully_setup_package() -> None:
         _setup_package()
     except BaseException:
         logger = importlib.import_module("logging").getLogger("entrypoint")
-        logger.exception("Something went wrong while seting up the package.")
+        logger.exception(
+            "Fatal Error. Something went wrong while seting up the package."
+        )
         sys.exit(os.EX_SOFTWARE)
 
 
