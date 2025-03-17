@@ -18,6 +18,11 @@ __all__: Final = ["entrypoint"]
 
 
 def _setup_parser() -> ArgumentParser:
+    """Set up the argument parser.
+
+    Returns:
+        The entrypoint argument parser.
+    """
     try:
         entrypoint_parser = importlib.import_module(
             "whiteprints.cli.entrypoint_parser",
@@ -41,6 +46,15 @@ def _parse_args(
     parser: ArgumentParser,
     args: Optional[list[str]],
 ) -> Namespace:
+    """Parse the arguments.
+
+    Args:
+        parser: the entrypoint argument parser
+        args: the arguments to parse
+
+    Returns:
+        an argument namespace.
+    """
     try:
         namespace = parser.parse_args(args)
     except ArgumentError as argument_error:
@@ -60,6 +74,11 @@ def _parse_args(
 
 
 def _setup_logging(namespace: Namespace) -> None:
+    """Setup the logging.
+
+    Args:
+        namespace: the namespace container the logging configuration.
+    """
     try:
         importlib.import_module(
             "whiteprints.cli.logs",
