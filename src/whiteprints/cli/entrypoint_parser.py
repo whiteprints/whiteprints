@@ -210,9 +210,18 @@ def create_entrypoint_parser() -> ArgumentParser:
             "managed by uv."
         ),
         exit_on_error=False,
+        add_help=False,
     )
 
-    parser.add_argument(
+    program_info = parser.add_argument_group("Program Info")
+    program_info.add_argument(
+        "-h",
+        "--help",
+        action="help",
+        help=_("show this help message and exit"),
+    )
+
+    program_info.add_argument(
         "-v",
         "--version",
         action="version",
@@ -220,9 +229,10 @@ def create_entrypoint_parser() -> ArgumentParser:
             "whiteprints.package_metadata",
             __package__,
         ).__version__,
+        help=_("show program's version number and exit"),
     )
 
-    parser.add_argument(
+    program_info.add_argument(
         "-c",
         "--copyright",
         nargs=0,
@@ -230,7 +240,7 @@ def create_entrypoint_parser() -> ArgumentParser:
         help=_("show the copyright information and exit"),
     )
 
-    parser.add_argument(
+    program_info.add_argument(
         "-l",
         "--license",
         nargs=0,
@@ -238,15 +248,16 @@ def create_entrypoint_parser() -> ArgumentParser:
         help=_("show the license information and exit"),
     )
 
-    parser.add_argument(
+    program_info.add_argument(
         "-d",
-        "--debug-info",
+        "--debug",
         nargs=0,
         action=DebugInfo,
         help=_("show debugging information and exit"),
     )
 
-    parser.add_argument(
+    completion = parser.add_argument_group("Completion")
+    completion.add_argument(
         "-C",
         "--completion-script",
         nargs="?",
@@ -255,11 +266,12 @@ def create_entrypoint_parser() -> ArgumentParser:
         help=_("show the completion script code and exit"),
     )
 
+    logs = parser.add_argument_group("Logging")
     app_name_env_prefix = app_name.replace("-", "_").upper()
     log_conf_metavar = f"{app_name_env_prefix}_LOG_CONF"
-    parser.add_argument(
+    logs.add_argument(
         "-L",
-        "--log-conf",
+        "--log-config",
         action="store",
         type=Path,
         help=(

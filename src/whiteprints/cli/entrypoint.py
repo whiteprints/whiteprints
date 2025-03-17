@@ -9,7 +9,12 @@
 import importlib
 import os
 import sys
-from argparse import ArgumentError, ArgumentParser, Namespace
+from argparse import (
+    ArgumentError,
+    ArgumentParser,
+    ArgumentTypeError,
+    Namespace,
+)
 from typing import Final, Optional
 
 
@@ -34,7 +39,7 @@ def _parse_args(
     """
     try:
         namespace = parser.parse_args(args)
-    except ArgumentError as argument_error:
+    except (ArgumentError, ArgumentTypeError) as argument_error:
         importlib.import_module(
             "whiteprints.console", __package__
         ).stderr().print(argument_error)
@@ -60,7 +65,7 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
             "whiteprints.cli.logs",
             __package__,
         ).setup_logging(
-            namespace.log_conf,
+            namespace.log_config,
         )
     except Exception:
         logger = importlib.import_module("logging").getLogger("entrypoint")

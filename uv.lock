@@ -2150,6 +2150,7 @@ wheels = [
 name = "whiteprints"
 source = { editable = "." }
 dependencies = [
+    { name = "argcomplete" },
     { name = "beartype" },
     { name = "distro" },
     { name = "importlib-metadata", marker = "python_full_version < '3.10'" },
@@ -2157,14 +2158,9 @@ dependencies = [
     { name = "python-dotenv" },
     { name = "rich" },
     { name = "rich-argparse" },
+    { name = "shellingham" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
     { name = "uv" },
-]
-
-[package.optional-dependencies]
-autocomplete = [
-    { name = "argcomplete" },
-    { name = "shellingham" },
 ]
 
 [package.dev-dependencies]
@@ -2260,7 +2256,7 @@ tests = [
 
 [package.metadata]
 requires-dist = [
-    { name = "argcomplete", marker = "extra == 'autocomplete'", specifier = ">=3.6.0" },
+    { name = "argcomplete", specifier = "==3.6.0" },
     { name = "beartype", specifier = "==0.20.0" },
     { name = "distro", specifier = "==1.9.0" },
     { name = "importlib-metadata", marker = "python_full_version < '3.10'", specifier = "==8.6.1" },
@@ -2268,11 +2264,10 @@ requires-dist = [
     { name = "python-dotenv", specifier = "==1.0.1" },
     { name = "rich", specifier = "==13.9.4" },
     { name = "rich-argparse", specifier = "==1.7.0" },
-    { name = "shellingham", marker = "extra == 'autocomplete'", specifier = ">=1.5.4" },
+    { name = "shellingham", specifier = "==1.5.4" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'", specifier = "==4.12.2" },
     { name = "uv", specifier = "==0.6.6" },
 ]
-provides-extras = ["autocomplete"]
 
 [package.metadata.requires-dev]
 audit-maintainability = [{ name = "radon", specifier = "==6.0.1" }]

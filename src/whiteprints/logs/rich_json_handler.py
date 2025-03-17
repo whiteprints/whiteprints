@@ -33,7 +33,7 @@ class RichJSONHandler(Handler):
         console_args: Optional[Mapping[str, Any]] = None,
         print_json_args: Optional[Mapping[str, Any]] = None,
     ) -> None:
-        """Initialize the logigng Handler.
+        """Initialize the logging Handler.
 
         Args:
             console_args: arguments forwarded to the `rich.console.Console`
