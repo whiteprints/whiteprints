@@ -7,12 +7,10 @@
 We use Python subprocesses.
 """
 
-import subprocess  # nosec
+import importlib
 from collections.abc import Iterable
 from functools import cached_property
 from pathlib import Path
-
-import uv
 
 
 class UVX:
@@ -25,7 +23,7 @@ class UVX:
         Returns:
             a path to the uv binary.
         """
-        return Path(uv.find_uv_bin())
+        return Path(importlib.import_module("uv").find_uv_bin())
 
     def run(self, command: Iterable[str]) -> None:
         """Run `uv tool run`.
@@ -36,7 +34,7 @@ class UVX:
         Args:
             command: The `uv tool run` command to execute.
         """
-        subprocess.run(  # nosec
+        importlib.import_module("subprocess").run(  # nosec
             [
                 self.bin,
                 "tool",

@@ -4,7 +4,7 @@
 
 """Test the CLI entrypoint."""
 
-from rich_click import testing
+from click import testing
 
 from whiteprints import package_metadata
 from whiteprints.cli import __app_name__, entrypoint

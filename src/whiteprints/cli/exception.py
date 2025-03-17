@@ -4,7 +4,9 @@
 
 """Command-Line Interface user defined exceptions."""
 
-import re
+import importlib
+from functools import cache
+from re import Pattern
 from typing import Final
 
 
@@ -26,6 +28,16 @@ class InvalidAppNameError(ValueError):
         )
 
 
+@cache
+def valid_slug_pattern() -> Pattern[str]:
+    """Create a pattern representing a valid slug.
+
+    Returns:
+        a pattern that represents a valid slug.
+    """
+    return importlib.import_module("re").compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+
+
 def is_valid_slug(slug: str) -> bool:
     """Check if a slug is valid.
 
@@ -42,7 +54,7 @@ def is_valid_slug(slug: str) -> bool:
     Returns:
         True if the slug name is valid, False otherwise.
     """
-    return bool(re.fullmatch(r"^[a-z0-9]+(?:-[a-z0-9]+)*$", slug))
+    return bool(valid_slug_pattern().fullmatch(slug))
 
 
 def check_app_name(app_name: str) -> str:

@@ -6,7 +6,7 @@
 
 """Top-level executable."""
 
-from whiteprints.cli.entrypoint import whiteprints
+from whiteprints.cli.entrypoint import entrypoint
 
 
-whiteprints()
+entrypoint()

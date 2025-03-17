@@ -50,13 +50,14 @@ dynamic = [
 ]
 dependencies = [
     "beartype==0.20.0",
-    "click>=8.1.8",
     "distro==1.9.0",
     "importlib-metadata==8.6.1; python_full_version<'3.10.0'",
-    "pygments>=2.15.1",
+    "platformdirs==4.3.6",
     "python-dotenv==1.0.1",
+    "rich==13.9.4",
+    "rich-argparse==1.7.0",
     "typing-extensions==4.12.2; python_full_version<'3.12.0'",
-    "uv>=0.6.4",
+    "uv==0.6.6",
 ]
 urls.changelog = "https://github.com/whiteprints/whiteprints/releases"
 urls.discussions = "https://github.com/whiteprints/whiteprints/discussions"
@@ -67,7 +68,7 @@ urls.integration = "https://github.com/whiteprints/whiteprints/actions"
 urls.issues = "https://github.com/whiteprints/whiteprints/issues"
 urls.pypi = "https://pypi.org/project/whiteprints"
 urls.repository = "https://github.com/whiteprints/whiteprints"
-scripts.whiteprints = "whiteprints.cli.entrypoint:whiteprints"
+scripts.whiteprints = "whiteprints.cli.entrypoint:entrypoint"
 
 [dependency-groups]
 dev = [
@@ -79,7 +80,6 @@ dev = [
     { include-group = "check-vulnerabilities" },
     { include-group = "coverage" },
     { include-group = "editor" },
-    { include-group = "lint" },
     { include-group = "localization" },
     { include-group = "profile" },
     { include-group = "serve-documentation" },
@@ -90,15 +90,15 @@ build-documentation = [
     "myst-parser[linkify]==3.0.1",
     "pydata-sphinx-theme==0.16.1",
     "sphinx==7.4.7",
+    "sphinx-argparse==0.4.0",
     "sphinx-autoapi==3.6.0",
-    "sphinx-click==6.0.0",
     "sphinx-copybutton==0.5.2",
     "sphinxcontrib-napoleon==0.7.0",
     "sphinxcontrib-spelling==8.0.0",
     "stdlib-list>=0.11.1",
 ]
 tests = [
-    "hypothesis==6.127.6",
+    "hypothesis==6.129.0",
     "pytest==8.3.5",
     "pytest-cov==6.0.0",
     "pytest-html==4.1.1",
@@ -112,10 +112,6 @@ profile = [
 ]
 editor = [
     "pynvim==0.5.2",
-]
-lint = [
-    "pylint==3.3.4",
-    { include-group = "tests" },
 ]
 coverage = [
     "coverage==7.6.12",
@@ -148,3 +144,15 @@ column_width = 79
 indent = 4
 keep_full_version = true
 max_supported_python = "3.13"
+
+[tool.uv]
+required-version = ">=0.6.6"
+cache-keys = [
+    { git = { commit = true, tags = true } },
+    { file = "pyproject.toml" },
+    { file = "uv.toml.py" },
+    { file = "hatch.toml" },
+    { file = "hatch_build.py" },
+    { file = "*.md" },
+    { file = "uv.lock" },
+]

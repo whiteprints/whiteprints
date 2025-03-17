@@ -22,8 +22,7 @@ This is useful for debugging issues related to dependency resolution,
 environment configuration across different systems.
 """
 
-import platform
-import re
+import importlib
 import sys
 from functools import cache
 from importlib import metadata
@@ -32,10 +31,7 @@ from importlib.util import find_spec
 from pathlib import Path
 from typing import Final, TypedDict
 
-from distro import distro
 from distro.distro import InfoDict
-
-from whiteprints import __version__
 
 
 __all__: Final = ["DebugInfo", "PackageInfo", "gather_debug_info"]
@@ -57,7 +53,14 @@ class PackageInfo(TypedDict):
 
     name: str
     version: str
-    origin: NotRequired[Path]
+    origin: NotRequired[str]
+
+
+class LogsInfo(TypedDict):
+    """Holds the logging configuration."""
+
+    USER_LOG_DIR: str
+    default_configuration: str
 
 
 class DebugInfo(TypedDict):
@@ -66,10 +69,11 @@ class DebugInfo(TypedDict):
     operating_system: InfoDict
     platform: str
     python_version: str
-    python_executable: Path
+    python_executable: str
     package_version: str
-    pythonpath: list[Path]
+    pythonpath: list[str]
     dependencies: list[PackageInfo]
+    logs: LogsInfo
 
 
 class _DistributionPackage(TypedDict):
@@ -106,7 +110,7 @@ def _add_spec(package_info: PackageInfo, *, package_name: str) -> None:
     """
     spec = find_spec(package_name)
     if spec is not None and spec.origin is not None:
-        package_info["origin"] = Path(spec.origin)
+        package_info["origin"] = str(Path(spec.origin).parent)
 
 
 def _package_info_from_name(
@@ -149,7 +153,9 @@ def _gather_required_packages() -> list[str]:
     Returns:
         A list of normalized package names extracted from the requirements.
     """
-    package_name_regex = re.compile(r"==|===|~=|!=|>=|>|<=|<")
+    package_name_regex = importlib.import_module("re").compile(
+        r"==|===|~=|!=|>=|>|<=|<"
+    )
     return [
         package_name_regex.split(package, maxsplit=1)[0].replace("-", "_")
         for package in (
@@ -242,16 +248,24 @@ def gather_debug_info() -> DebugInfo:
         required=_gather_required_packages(),
         distributions_packages=_gather_distribution_packages(),
     )
-
+    logs = importlib.import_module(
+        "whiteprints.cli.logs",
+    )
     return DebugInfo(
-        operating_system=distro.info(),
-        platform=platform.platform(),
-        python_executable=Path(sys.executable),
+        operating_system=importlib.import_module("distro.distro").info(),
+        platform=importlib.import_module("platform").platform(),
+        python_executable=str(Path(sys.executable)),
         python_version=sys.version,
-        package_version=__version__,
-        pythonpath=list(map(Path, sys.path)),
+        package_version=importlib.import_module(
+            "whiteprints.package_metadata"
+        ).__version__,
+        pythonpath=list(map(str, map(Path, sys.path))),
         dependencies=[
             _package_info_from_name(distribution_package)
             for distribution_package in required_distribution
         ],
+        logs=LogsInfo(
+            USER_LOG_DIR=str(logs.user_log_dir()),
+            default_configuration=str(logs.user_log_config()),
+        ),
     )

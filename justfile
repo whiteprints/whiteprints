@@ -163,6 +163,7 @@ requirements-dev args="":
 sync resolution="highest":
     @just uv " \
         sync \
+        --refresh \
         --resolution={{ resolution }} \
         --all-extras \
     "
@@ -382,18 +383,6 @@ pre-commit args="":
         {{ args }} \
     "
 
-# Lint the project with pylint
-[group("repository analysis")]
-lint:
-    @just uvr " \
-        --group=lint \
-    pylint \
-        --rcfile '.pylintrc' \
-        'src' \
-        'tests' \
-        'docs' \
-    "
-
 # Run `pyright`
 [private]
 pyright args="":
@@ -447,7 +436,7 @@ alias check-types := check-types-repository
 [group("dependencies")]
 print-dependency-tree python: (venv "print-dependency-tree" python)
     uv tree \
-        --python="$(just venv-path check-types-repository {{ python }})" \
+        --python="$(just venv-path print-dependency-tree {{ python }})" \
         --frozen \
         --no-dev
 

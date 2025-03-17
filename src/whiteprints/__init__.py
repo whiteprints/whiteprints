@@ -5,21 +5,60 @@
 """Top-level module."""
 
 import importlib
+import os
+import sys
 from typing import Final
 
-from whiteprints.environment import ENVIRONMENT_FILE, load_dotenv
-from whiteprints.package_metadata import __version__
 
-
-__all__: Final = ["__version__"]
+__all__: Final = []
 """Public module attributes."""
 
 
-if __debug__:
-    beartype = importlib.import_module("beartype")
-    beartype_claw = importlib.import_module("beartype.claw")
-    beartype_claw.beartype_this_package(
-        conf=beartype.BeartypeConf(is_color=False),
-    )
+def _setup_package() -> None:
+    """Setup the package.
 
-load_dotenv(ENVIRONMENT_FILE)
+    The behaviour of the program is the following:
+        * On debug (__debug__ == True), we activate beartype for runtime type
+        checking and disable all sigint handling.
+        * On release (__debug__ == False), we disable beartype and activate
+        sigint handling.
+
+    Then environement variables are imported from a dotenv file.
+    """
+    if __debug__:
+        importlib.import_module("beartype.claw").beartype_this_package()
+    else:
+        importlib.import_module(
+            "whiteprints.signals",
+            __package__,
+        ).exit_gracefully_on_sigint()
+
+    environment = importlib.import_module(
+        "whiteprints.environment",
+        __package__,
+    )
+    environment.load_dotenv(environment.ENVIRONMENT_FILE)
+
+
+def _gracefully_setup_package() -> None:
+    """Setup the package.
+
+    The behaviour of the program is the following:
+        * On debug (__debug__ == True), we activate beartype for runtime type
+        checking and disable all sigint handling.
+        * On release (__debug__ == False), we disable beartype and activate
+        sigint handling.
+
+    Then environement variables are imported from a dotenv file.
+
+    Fails gracefully on error.
+    """
+    try:
+        _setup_package()
+    except BaseException:
+        logger = importlib.import_module("logging").getLogger("entrypoint")
+        logger.exception("Something went wrong while seting up the package.")
+        sys.exit(os.EX_SOFTWARE)
+
+
+_gracefully_setup_package()

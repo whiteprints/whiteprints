@@ -4,11 +4,9 @@
 
 """Manage environment variables."""
 
-import logging
+import importlib
 from pathlib import Path
 from typing import Final
-
-import dotenv
 
 
 __all__: Final = ["ENVIRONMENT_FILE", "load_dotenv"]
@@ -26,7 +24,7 @@ def load_dotenv(environment_file: Path) -> None:
     Args:
         environment_file: the dotenv file to load.
     """
-    if dotenv.load_dotenv(environment_file):
-        logging.getLogger(__name__).info(
+    if importlib.import_module("dotenv").load_dotenv(environment_file):
+        importlib.import_module("logging").getLogger(__name__).info(
             "Loading environment variables from `%s` file.", environment_file
         )

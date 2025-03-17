@@ -13,10 +13,10 @@ from hatchling.builders.config import BuilderConfigBound
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 
 
-if sys.version_info < (3, 12):
-    from typing_extensions import override
-else:
+if sys.version_info >= (3, 12):
     from typing import override
+else:
+    from typing_extensions import override
 
 
 def _compile(locale_path: Path) -> None:
