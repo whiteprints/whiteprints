@@ -59,6 +59,10 @@ dependencies = [
     "typing-extensions==4.12.2; python_full_version<'3.12.0'",
     "uv==0.6.6",
 ]
+optional-dependencies.autocomplete = [
+    "argcomplete>=3.6.0",
+    "shellingham>=1.5.4",
+]
 urls.changelog = "https://github.com/whiteprints/whiteprints/releases"
 urls.discussions = "https://github.com/whiteprints/whiteprints/discussions"
 urls.documentation = "https://github.com/whiteprints/whiteprints"

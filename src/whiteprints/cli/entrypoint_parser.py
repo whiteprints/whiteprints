@@ -7,10 +7,10 @@
 import importlib
 import os
 import sys
-from argparse import Action, ArgumentParser
+from argparse import Action, ArgumentParser, Namespace
 from functools import cache
 from pathlib import Path
-from typing import Final, NoReturn
+from typing import ClassVar, Final, NoReturn, Optional
 
 from whiteprints.console import stdout
 from whiteprints.loc import _
@@ -25,15 +25,77 @@ else:
 __all__: Final = ["create_entrypoint_parser"]
 
 
+class Completion(Action):
+    """Print the code licenses information."""
+
+    SUPPORTED_SHELLS: ClassVar = (
+        "bash",
+        "zsh",
+        "tcsh",
+        "fish",
+        "powershell",
+    )
+
+    @override
+    def __call__(
+        self,
+        parser: ArgumentParser,
+        namespace: Namespace,
+        *args: Optional[object],
+    ) -> NoReturn:
+        """Generate the autocompletion code.
+
+        Args:
+            parser: the argument parser
+            namespace: the arguments namespace
+            args: the arguments passed to the parser
+        """
+        shell = (
+            importlib.import_module("shellingham").detect_shell()[0]
+            if args[0] is None
+            else args[0]
+        )
+        if shell not in self.SUPPORTED_SHELLS:
+            logger = importlib.import_module("logging").getLogger("entrypoint")
+            logger.error(
+                "Unsupported shell: %s.",
+                shell,
+            )
+            sys.exit(os.EX_SOFTWARE)
+
+        shell_integration = importlib.import_module(
+            "argcomplete.shell_integration"
+        )
+        stdout().print(
+            shell_integration.shellcode(
+                [
+                    importlib.import_module(
+                        "whiteprints.cli.app_metadata",
+                        __package__,
+                    ).app_name()
+                ],
+                shell=shell,
+            ).strip()
+        )
+        sys.exit(os.EX_OK)
+
+
 class Copyright(Action):
     """Print the code licenses information."""
 
     @override
-    def __call__(self, *args: object) -> NoReturn:
+    def __call__(
+        self,
+        parser: ArgumentParser,
+        namespace: Namespace,
+        *args: Optional[object],
+    ) -> NoReturn:
         """Print the code copyright information.
 
         Args:
-            args: all arguments passed are ignored.
+            parser: the argument parser
+            namespace: the arguments namespace
+            args: the arguments passed to the parser
         """
         stdout().print(
             _(
@@ -48,14 +110,22 @@ class License(Action):
     """Print the code licenses information."""
 
     @override
-    def __call__(self, *args: object) -> NoReturn:
+    def __call__(
+        self,
+        parser: ArgumentParser,
+        namespace: Namespace,
+        *args: Optional[object],
+    ) -> NoReturn:
         """The action callback.
 
         Args:
-            args: all arguments passed are ignored.
+            parser: the argument parser
+            namespace: the arguments namespace
+            args: the arguments passed to the parser
         """
         package_metadata = importlib.import_module(
-            "whiteprints.package_metadata"
+            "whiteprints.package_metadata",
+            __package__,
         )
         stdout().print(
             _("Code released under license '{}'.").format(
@@ -89,11 +159,18 @@ class DebugInfo(Action):
     """Print system information for debug."""
 
     @override
-    def __call__(self, *args: object) -> NoReturn:
+    def __call__(
+        self,
+        parser: ArgumentParser,
+        namespace: Namespace,
+        *args: Optional[object],
+    ) -> NoReturn:
         """The action callback.
 
         Args:
-            args: all arguments passed are ignored.
+            parser: the argument parser
+            namespace: the arguments namespace
+            args: the arguments passed to the parser
         """
         stdout().print_json(
             data=importlib.import_module(
@@ -167,6 +244,15 @@ def create_entrypoint_parser() -> ArgumentParser:
         nargs=0,
         action=DebugInfo,
         help=_("show debugging information and exit"),
+    )
+
+    parser.add_argument(
+        "-C",
+        "--completion-script",
+        nargs="?",
+        action=Completion,
+        choices=Completion.SUPPORTED_SHELLS,
+        help=_("show the completion script code and exit"),
     )
 
     app_name_env_prefix = app_name.replace("-", "_").upper()
