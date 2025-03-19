@@ -191,6 +191,16 @@ def init(namespace: Namespace) -> None:
         )
         sys.exit(importlib.import_module("signal").SIGINT)
     except copier_errors.CopierError:
+        importlib.import_module("whiteprints", __package__).stderr().print(
+            _("[red]Project creation failed[/]")
+        )
         logger = importlib.import_module("logging").getLogger(__name__)
         logger.exception("Copier Error", stack_info=True)
+        sys.exit(os.EX_SOFTWARE)
+    except Exception as exception:
+        importlib.import_module("whiteprints", __package__).stderr().print(
+            _("[red]Project creation failed:[/] {}").format(exception),
+        )
+        logger = importlib.import_module("logging").getLogger(__name__)
+        logger.exception("Exception caught", stack_info=True)
         sys.exit(os.EX_SOFTWARE)

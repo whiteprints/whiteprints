@@ -10,9 +10,11 @@ import sys
 from functools import cache
 from pathlib import Path
 from types import FrameType
-from typing import Final, NoReturn
+from typing import TYPE_CHECKING, Final, NoReturn
 
-from rich.console import Console
+
+if TYPE_CHECKING:
+    import rich.console
 
 
 __all__: Final = ["LOCALE_DIRECTORY", "TRANSLATION", "_", "stderr", "stdout"]
@@ -33,7 +35,7 @@ _: Final = TRANSLATION.gettext
 
 
 @cache
-def stdout() -> Console:
+def stdout() -> "rich.console.Console":
     """A high level console interface instance.
 
     The ouput of this function is cached. No new instances are created on
@@ -45,11 +47,11 @@ def stdout() -> Console:
     Returns:
         A rich console printing to the standard output.
     """
-    return Console(soft_wrap=True)
+    return importlib.import_module("rich.console").Console(soft_wrap=True)
 
 
 @cache
-def stderr() -> Console:
+def stderr() -> "rich.console.Console":
     """A high level console interface instance.
 
     The ouput of this function is cached. No new instances are created on
@@ -61,7 +63,9 @@ def stderr() -> Console:
     Returns:
         A rich console printing to the standard error.
     """
-    return Console(stderr=True, soft_wrap=True)
+    return importlib.import_module("rich.console").Console(
+        stderr=True, soft_wrap=True
+    )
 
 
 def _exit_gracefully_action(signalnum: int, frame: FrameType) -> NoReturn:
