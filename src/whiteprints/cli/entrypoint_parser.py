@@ -51,17 +51,21 @@ class Completion(Action):
         """
         shell_arg = args[0]
         try:
+            shell_integration = importlib.import_module(
+                "argcomplete.shell_integration"
+            )
             shell = (
                 importlib.import_module("shellingham").detect_shell()[0]
                 if shell_arg is None
-                else shell_arg
+                else args[0]
             )
         except ModuleNotFoundError:
             stderr().print(
                 _(
-                    "No shell specified. Please specify a shell or install"
+                    "No autocompletion installed. Please install"
                     " `{app_name}` with the `qol` extra"
-                    " (e.g. `pip install {app_name}[qol]`)."
+                    " (e.g. `pip install {app_name}"
+                    r"\[qol]`)."
                 ).format(
                     app_name=importlib.import_module(
                         "whiteprints.cli.app_metadata"
@@ -77,13 +81,6 @@ class Completion(Action):
                 shell,
             )
             sys.exit(os.EX_SOFTWARE)
-
-        with importlib.import_module("contextlib").suppress(
-            ModuleNotFoundError
-        ):
-            shell_integration = importlib.import_module(
-                "argcomplete.shell_integration"
-            )
 
         stdout().print(
             shell_integration.shellcode(
