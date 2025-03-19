@@ -70,11 +70,12 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
         __package__,
     ).init_parser(subparser, entrypoint_parser)
 
-    importlib.import_module("argcomplete").autocomplete(
-        entrypoint_parser,
-        exit_method=sys.exit,
-        always_complete_options="long",
-    )
+    with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
+        importlib.import_module("argcomplete").autocomplete(
+            entrypoint_parser,
+            exit_method=sys.exit,
+            always_complete_options="long",
+        )
 
     namespace = _parse_args(entrypoint_parser, args)
     if namespace.cmd is None:

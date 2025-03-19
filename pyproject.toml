@@ -49,18 +49,21 @@ dynamic = [
     "version",
 ]
 dependencies = [
-    "argcomplete==3.6.0",
-    "beartype==0.20.0",
     "copier==9.6.0",
     "distro==1.9.0",
     "importlib-metadata==8.6.1; python_full_version<'3.10.0'",
     "platformdirs==4.3.6",
-    "python-dotenv==1.0.1",
     "rich==13.9.4",
-    "rich-argparse==1.7.0",
-    "shellingham==1.5.4",
     "typing-extensions==4.12.2; python_full_version<'3.12.0'",
     "whiteprints-template-context==0.6.0",
+]
+optional-dependencies.debug = [
+    "beartype==0.20.0",
+]
+optional-dependencies.qol = [
+    "argcomplete==3.6.0",
+    "rich-argparse==1.7.0",
+    "shellingham==1.5.4",
 ]
 urls.changelog = "https://github.com/whiteprints/whiteprints/releases"
 urls.discussions = "https://github.com/whiteprints/whiteprints/discussions"

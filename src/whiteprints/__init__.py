@@ -102,15 +102,11 @@ def _setup_package() -> None:
         * On debug (__debug__ == True), we activate beartype for runtime type
         checking.
         * On release (__debug__ == False), we disable beartype.
-
-    Then environment variables are imported from a dotenv file.
     """
     exit_gracefully_on_sigint()
 
-    if __debug__:
+    with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
         importlib.import_module("beartype.claw").beartype_this_package()
-
-    importlib.import_module("dotenv").load_dotenv(Path.cwd() / ".env")
 
 
 _setup_package()

@@ -7,12 +7,12 @@
 import importlib
 import os
 import sys
-from argparse import Action, ArgumentParser, Namespace
+from argparse import Action, ArgumentParser, HelpFormatter, Namespace
 from functools import cache
 from pathlib import Path
 from typing import ClassVar, Final, NoReturn, Optional
 
-from whiteprints import _, stdout
+from whiteprints import _, stderr, stdout
 
 
 if sys.version_info >= (3, 12):
@@ -50,11 +50,26 @@ class Completion(Action):
             args: the arguments passed to the parser
         """
         shell_arg = args[0]
-        shell = (
-            importlib.import_module("shellingham").detect_shell()[0]
-            if shell_arg is None
-            else shell_arg
-        )
+        try:
+            shell = (
+                importlib.import_module("shellingham").detect_shell()[0]
+                if shell_arg is None
+                else shell_arg
+            )
+        except ModuleNotFoundError:
+            stderr(
+                _(
+                    "No shell specified. Please specify a shell or install"
+                    " `{app_name}` with the `qol` extra"
+                    " (e.g. `pip install {app_name}[qol]`)."
+                ).format(
+                    app_name=importlib.import_module(
+                        "whiteprints.cli.app_metadata"
+                    ).app_name()
+                ),
+            )
+            sys.exit(os.EX_USAGE)
+
         if shell not in self.SUPPORTED_SHELLS:
             logger = importlib.import_module("logging").getLogger(__name__)
             logger.error(
@@ -63,9 +78,13 @@ class Completion(Action):
             )
             sys.exit(os.EX_SOFTWARE)
 
-        shell_integration = importlib.import_module(
-            "argcomplete.shell_integration"
-        )
+        with importlib.import_module("contextlib").suppress(
+            ModuleNotFoundError
+        ):
+            shell_integration = importlib.import_module(
+                "argcomplete.shell_integration"
+            )
+
         stdout().print(
             shell_integration.shellcode(
                 [
@@ -208,13 +227,16 @@ def create_entrypoint_parser() -> ArgumentParser:
         __package__,
     ).app_name()
 
-    argcomplete = importlib.import_module("argcomplete")
+    try:
+        formatter_class = importlib.import_module(
+            "rich_argparse"
+        ).RichHelpFormatter
+    except ModuleNotFoundError:
+        formatter_class = HelpFormatter
 
     parser = ArgumentParser(
         prog=app_name,
-        formatter_class=importlib.import_module(
-            "rich_argparse"
-        ).RichHelpFormatter,
+        formatter_class=formatter_class,
         description=_(
             "A Copier-based cookiecutter for creating Python projects "
             "managed by uv."
@@ -279,7 +301,7 @@ def create_entrypoint_parser() -> ArgumentParser:
     logs = parser.add_argument_group("Logging")
     app_name_env_prefix = app_name.replace("-", "_").upper()
     log_conf_metavar = f"{app_name_env_prefix}_LOG_CONF"
-    logs.add_argument(
+    logs_arg = logs.add_argument(
         "-L",
         "--log-config",
         action="store",
@@ -288,5 +310,10 @@ def create_entrypoint_parser() -> ArgumentParser:
         ),
         metavar="PATH",
         default=os.environ.get(log_conf_metavar),
-    ).__dict__["completer"] = argcomplete.FilesCompleter(allowednames=".json")
+    )
+    with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
+        logs_arg.__dict__["completer"] = importlib.import_module(
+            "argcomplete"
+        ).FilesCompleter(allowednames=".json")
+
     return parser

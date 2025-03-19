@@ -17,8 +17,6 @@ def init_parser(subparser: Action, parser: ArgumentParser) -> None:
     if add_parser is None:
         return
 
-    argcomplete = importlib.import_module("argcomplete")
-
     parser = add_parser(
         "init",
         formatter_class=parser.formatter_class,
@@ -94,10 +92,14 @@ def init_parser(subparser: Action, parser: ArgumentParser) -> None:
         ),
         action="store_true",
     )
-    parser.add_argument(
+    project_directory_arg = parser.add_argument(
         "project_directory",
         default=str(Path.cwd()),
         nargs="?",
         help=_("Directory in which to initialize the Python project."),
         metavar="PROJECT_DIRECTORY",
-    ).__dict__["completer"] = argcomplete.DirectoriesCompleter()
+    )
+    with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
+        project_directory_arg.__dict__["completer"] = importlib.import_module(
+            "argcomplete"
+        ).DirectoriesCompleter()
