@@ -57,7 +57,7 @@ class Completion(Action):
                 else shell_arg
             )
         except ModuleNotFoundError:
-            stderr(
+            stderr().print(
                 _(
                     "No shell specified. Please specify a shell or install"
                     " `{app_name}` with the `qol` extra"
