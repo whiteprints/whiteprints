@@ -5,13 +5,10 @@
 """Logging handlers."""
 
 import sys
-from logging import Handler
+from logging import Handler, LogRecord
 from logging.handlers import QueueListener
-from multiprocessing.queues import Queue
-from typing import (
-    Any,
-    Final,
-)
+from queue import Queue
+from typing import Final
 
 
 if sys.version_info >= (3, 12):
@@ -29,7 +26,7 @@ class AutoStartQueueListener(QueueListener):
     @override
     def __init__(
         self,
-        queue: Queue[Any],
+        queue: Queue[LogRecord],
         *handlers: Handler,
         respect_handler_level: bool = False,
     ) -> None:
@@ -38,7 +35,7 @@ class AutoStartQueueListener(QueueListener):
         Use the specified queue and handlers.
 
         Args:
-            queue: a `multiprocessing.Queue` instance
+            queue: a log events queue
             handlers: the handlers pushing to the queue
             respect_handler_level: respect the handlers logging levels
         """

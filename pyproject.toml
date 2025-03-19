@@ -51,6 +51,7 @@ dynamic = [
 dependencies = [
     "argcomplete==3.6.0",
     "beartype==0.20.0",
+    "copier==9.6.0",
     "distro==1.9.0",
     "importlib-metadata==8.6.1; python_full_version<'3.10.0'",
     "platformdirs==4.3.6",
@@ -59,7 +60,7 @@ dependencies = [
     "rich-argparse==1.7.0",
     "shellingham==1.5.4",
     "typing-extensions==4.12.2; python_full_version<'3.12.0'",
-    "uv==0.6.6",
+    "whiteprints-template-context==0.6.0",
 ]
 urls.changelog = "https://github.com/whiteprints/whiteprints/releases"
 urls.discussions = "https://github.com/whiteprints/whiteprints/discussions"
@@ -100,7 +101,7 @@ build-documentation = [
     "stdlib-list>=0.11.1",
 ]
 tests = [
-    "hypothesis==6.129.0",
+    "hypothesis==6.129.4",
     "pytest==8.3.5",
     "pytest-cov==6.0.0",
     "pytest-html==4.1.1",
@@ -116,7 +117,7 @@ editor = [
     "pynvim==0.5.2",
 ]
 coverage = [
-    "coverage==7.6.12",
+    "coverage==7.7.0",
 ]
 audit-vulnerabilities = [
     "pip-audit==2.8.0",

@@ -42,6 +42,9 @@ class JSONFormatter(Formatter):
     def _extract_extras(cls, record: LogRecord) -> dict[str, Any]:
         """Extract the extra keys from a record.
 
+        If the extra key is a callable that takes no ars, it will be called.
+        This allow defered evaluation of the extras at logging time.
+
         Args:
             record: a record containing some extra keys.
 
@@ -49,7 +52,7 @@ class JSONFormatter(Formatter):
             The extra keys.
         """
         return {
-            key: value
+            key: value() if callable(value) else value
             for key, value in record.__dict__.items()
             if key not in cls._DUMMY_RECORD_KEYS
         }

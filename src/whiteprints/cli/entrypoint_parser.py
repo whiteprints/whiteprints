@@ -12,8 +12,7 @@ from functools import cache
 from pathlib import Path
 from typing import ClassVar, Final, NoReturn, Optional
 
-from whiteprints.console import stdout
-from whiteprints.loc import _
+from whiteprints import _, stdout
 
 
 if sys.version_info >= (3, 12):
@@ -50,13 +49,14 @@ class Completion(Action):
             namespace: the arguments namespace
             args: the arguments passed to the parser
         """
+        shell_arg = args[0]
         shell = (
             importlib.import_module("shellingham").detect_shell()[0]
-            if args[0] is None
-            else args[0]
+            if shell_arg is None
+            else shell_arg
         )
         if shell not in self.SUPPORTED_SHELLS:
-            logger = importlib.import_module("logging").getLogger("entrypoint")
+            logger = importlib.import_module("logging").getLogger(__name__)
             logger.error(
                 "Unsupported shell: %s.",
                 shell,
@@ -127,28 +127,36 @@ class License(Action):
             "whiteprints.package_metadata",
             __package__,
         )
-        stdout().print(
-            _("Code released under license '{}'.").format(
-                package_metadata.__license__
-            )
-        )
-        stdout().print(
-            _(
-                "\nThis project is REUSE compliant ('https://reuse.software/')."
-                " Please check the SPDX header of each source code file for "
-                "detailed licensing information.\nSources are located at "
-                "'{}'.\n"
-            ).format(Path(__file__).parent.parent)
-        )
-
         panel = importlib.import_module("rich.panel")
         box = importlib.import_module("rich.box")
+
+        stdout().print(
+            panel.Panel(
+                _(
+                    "Code released under license '{}'.\n\n"
+                    "This project is REUSE compliant (see"
+                    " [link=https://reuse.software/]https://reuse.software[/]"
+                    " website for more information)."
+                    " Please check the SPDX header of each source code file"
+                    " for detailed licensing information.\n"
+                    "Sources are located at '{}'."
+                ).format(
+                    package_metadata.__license__,
+                    Path(__file__).parent.parent,
+                ),
+                box=box.HORIZONTALS,
+                title="foreword",
+                highlight=True,
+            )
+        )
+
         for license_path in package_metadata.__license_file__:
             license_panel = panel.Panel(
                 license_path.read_text(),
                 box=box.HORIZONTALS,
                 title=license_path.stem,
                 subtitle=str(license_path.locate()),
+                highlight=True,
             )
             stdout().print(license_panel)
 
@@ -177,7 +185,7 @@ class DebugInfo(Action):
                 "whiteprints.debug_info",
                 __package__,
             ).gather_debug_info(),
-            indent=4,
+            indent=None,
         )
         sys.exit(os.EX_OK)
 
@@ -200,6 +208,8 @@ def create_entrypoint_parser() -> ArgumentParser:
         __package__,
     ).app_name()
 
+    argcomplete = importlib.import_module("argcomplete")
+
     parser = ArgumentParser(
         prog=app_name,
         formatter_class=importlib.import_module(
@@ -218,7 +228,7 @@ def create_entrypoint_parser() -> ArgumentParser:
         "-h",
         "--help",
         action="help",
-        help=_("show this help message and exit"),
+        help=_("Show this help message and exit."),
     )
 
     program_info.add_argument(
@@ -229,7 +239,7 @@ def create_entrypoint_parser() -> ArgumentParser:
             "whiteprints.package_metadata",
             __package__,
         ).__version__,
-        help=_("show program's version number and exit"),
+        help=_("Show program's version number and exit."),
     )
 
     program_info.add_argument(
@@ -237,7 +247,7 @@ def create_entrypoint_parser() -> ArgumentParser:
         "--copyright",
         nargs=0,
         action=Copyright,
-        help=_("show the copyright information and exit"),
+        help=_("Show the copyright information and exit."),
     )
 
     program_info.add_argument(
@@ -245,7 +255,7 @@ def create_entrypoint_parser() -> ArgumentParser:
         "--license",
         nargs=0,
         action=License,
-        help=_("show the license information and exit"),
+        help=_("Show the license information and exit."),
     )
 
     program_info.add_argument(
@@ -253,7 +263,7 @@ def create_entrypoint_parser() -> ArgumentParser:
         "--debug",
         nargs=0,
         action=DebugInfo,
-        help=_("show debugging information and exit"),
+        help=_("Show debugging information and exit."),
     )
 
     completion = parser.add_argument_group("Completion")
@@ -263,7 +273,7 @@ def create_entrypoint_parser() -> ArgumentParser:
         nargs="?",
         action=Completion,
         choices=Completion.SUPPORTED_SHELLS,
-        help=_("show the completion script code and exit"),
+        help=_("Show the completion script code and exit."),
     )
 
     logs = parser.add_argument_group("Logging")
@@ -273,11 +283,10 @@ def create_entrypoint_parser() -> ArgumentParser:
         "-L",
         "--log-config",
         action="store",
-        type=Path,
-        help=(
-            _("logging configuration file [[grey62]%s[/]]") % log_conf_metavar
+        help=_("JSON logging configuration (env: {}).").format(
+            log_conf_metavar
         ),
         metavar="PATH",
         default=os.environ.get(log_conf_metavar),
-    )
+    ).__dict__["completer"] = argcomplete.FilesCompleter(allowednames=".json")
     return parser

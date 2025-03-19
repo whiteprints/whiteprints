@@ -65,20 +65,37 @@ def _generate_configuration(log_config_path: Path) -> None:
                     "struct_json": {
                         "class": "whiteprints.logs.formatters.JSONFormatter",
                         "datefmt": "%Y-%m-%dT%H:%M:%S",
-                    }
+                    },
                 },
                 "handlers": {
                     "stderr": {
                         "class": (
                             "whiteprints.logs.rich_json_handler.RichJSONHandler"
                         ),
+                        "level": "CRITICAL",
                         "formatter": "struct_json",
-                    }
+                    },
+                    "file": {
+                        "class": "logging.handlers.RotatingFileHandler",
+                        "level": "DEBUG",
+                        "filename": "$USER_LOG_DIR/debug.log",
+                        "formatter": "struct_json",
+                        "maxBytes": 4_000_000,
+                        "backupCount": 4,
+                    },
+                    "queue_handler": {
+                        "class": "logging.handlers.QueueHandler",
+                        "listener": (
+                            "whiteprints.logs.queue_handler.AutoStartQueueListener"
+                        ),
+                        "handlers": ["stderr", "file"],
+                        "respect_handler_level": True,
+                    },
                 },
                 "loggers": {
                     "root": {
-                        "level": "WARNING",
-                        "handlers": ["stderr"],
+                        "level": "NOTSET",
+                        "handlers": ["queue_handler"],
                     },
                 },
             },

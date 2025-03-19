@@ -15,7 +15,10 @@ from argparse import (
     ArgumentTypeError,
     Namespace,
 )
+from pathlib import Path
 from typing import Final, Optional
+
+from whiteprints import _
 
 
 __all__: Final = ["entrypoint"]
@@ -40,9 +43,9 @@ def _parse_args(
     try:
         namespace = parser.parse_args(args)
     except (ArgumentError, ArgumentTypeError) as argument_error:
-        importlib.import_module(
-            "whiteprints.console", __package__
-        ).stderr().print(argument_error)
+        importlib.import_module("whiteprints", __package__).stderr().print(
+            argument_error
+        )
         sys.exit(os.EX_USAGE)
 
     return namespace
@@ -54,20 +57,53 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
     Args:
         args: the arguments forwarded to argparse. For example sys.argv.
     """
-    try:
-        entrypoint_parser = importlib.import_module(
-            "whiteprints.cli.entrypoint_parser",
-            __package__,
-        ).create_entrypoint_parser()
-        importlib.import_module("argcomplete").autocomplete(entrypoint_parser)
-        namespace = _parse_args(entrypoint_parser, args)
-        importlib.import_module(
-            "whiteprints.cli.logs",
-            __package__,
-        ).setup_logging(
-            namespace.log_config,
-        )
-    except Exception:
-        logger = importlib.import_module("logging").getLogger("entrypoint")
-        logger.exception("Fatal Error")
-        sys.exit(os.EX_SOFTWARE)
+    entrypoint_parser = importlib.import_module(
+        "whiteprints.cli.entrypoint_parser",
+        __package__,
+    ).create_entrypoint_parser()
+    subparser = entrypoint_parser.add_subparsers(
+        title=_("Subcommands"),
+        dest="cmd",
+    )
+    importlib.import_module(
+        "whiteprints.cli.command.init_parser",
+        __package__,
+    ).init_parser(subparser, entrypoint_parser)
+
+    importlib.import_module("argcomplete").autocomplete(
+        entrypoint_parser,
+        exit_method=sys.exit,
+        always_complete_options="long",
+    )
+
+    namespace = _parse_args(entrypoint_parser, args)
+    if namespace.cmd is None:
+        entrypoint_parser.print_help()
+        sys.exit(os.EX_OK)
+
+    importlib.import_module(
+        "whiteprints.cli.logs",
+        __package__,
+    ).setup_logging(
+        Path(namespace.log_config) if namespace.log_config else None,
+    )
+    logger = importlib.import_module("logging").getLogger(__name__)
+    logger.debug(
+        "program started",
+        extra={
+            "debug_info": (
+                lambda: (
+                    importlib.import_module(
+                        "whiteprints.debug_info",
+                        __package__,
+                    ).gather_debug_info()
+                )
+            ),
+            "namespace": namespace.__dict__,
+        },
+    )
+    command = importlib.import_module(
+        f"whiteprints.cli.command.{namespace.cmd}",
+        __package__,
+    )
+    getattr(command, namespace.cmd)(namespace)
