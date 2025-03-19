@@ -62,10 +62,10 @@ class Completion(Action):
         except ModuleNotFoundError:
             stderr().print(
                 _(
-                    "No autocompletion installed. Please install"
+                    "No autocompletion installed. Please reinstall"
                     " `{app_name}` with the `qol` extra"
                     " (e.g. `pip install {app_name}"
-                    r"\[qol]`)."
+                    r"\[qol]`) to use autocompletion."
                 ).format(
                     app_name=importlib.import_module(
                         "whiteprints.cli.app_metadata"
@@ -73,14 +73,6 @@ class Completion(Action):
                 ),
             )
             sys.exit(os.EX_USAGE)
-
-        if shell not in self.SUPPORTED_SHELLS:
-            logger = importlib.import_module("logging").getLogger(__name__)
-            logger.error(
-                "Unsupported shell: %s.",
-                shell,
-            )
-            sys.exit(os.EX_SOFTWARE)
 
         stdout().print(
             shell_integration.shellcode(
@@ -161,7 +153,7 @@ class License(Action):
                     Path(__file__).parent.parent,
                 ),
                 box=box.HORIZONTALS,
-                title="foreword",
+                title="Foreword",
                 highlight=True,
             )
         )

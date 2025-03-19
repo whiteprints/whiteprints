@@ -190,9 +190,9 @@ def init(namespace: Namespace) -> None:
             extra={"copier_answer_interrupt": str(copier_answer_interrupt)},
         )
         sys.exit(importlib.import_module("signal").SIGINT)
-    except copier_errors.CopierError:
+    except copier_errors.CopierError as exception:
         importlib.import_module("whiteprints", __package__).stderr().print(
-            _("[red]Project creation failed[/]")
+            _("[red]Project creation failed:[/] {}").format(exception)
         )
         logger = importlib.import_module("logging").getLogger(__name__)
         logger.exception("Copier Error", stack_info=True)
