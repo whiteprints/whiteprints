@@ -1,0 +1,110 @@
+#: src/whiteprints/__init__.py:77 src/whiteprints/cli/command/init.py:186
+msgid "[red]Execution stopped by user[/]"
+msgstr ""
+
+#: src/whiteprints/cli/command/init.py:195
+#: src/whiteprints/cli/command/init.py:202
+#, python-brace-format
+msgid "[red]Project creation failed:[/] {}"
+msgstr ""
+
+#: src/whiteprints/cli/command/init_parser.py:23
+#: src/whiteprints/cli/command/init_parser.py:24
+msgid "Initialize a Python project."
+msgstr ""
+
+#: src/whiteprints/cli/command/init_parser.py:37
+msgid "Add a command-line to the project."
+msgstr ""
+
+#: src/whiteprints/cli/command/init_parser.py:44
+msgid "Configure the project for GitHub and push it."
+msgstr ""
+
+#: src/whiteprints/cli/command/init_parser.py:52
+msgid "Configure GitHub to publish package to PyPI. This imply `-gh`."
+msgstr ""
+
+#: src/whiteprints/cli/command/init_parser.py:61
+msgid "Configure GitHub to publish coverage report to CodeCov. This imply `-gh`."
+msgstr ""
+
+#: src/whiteprints/cli/command/init_parser.py:71
+msgid ""
+"Configure GitHub to publish documentation to ReadTheDocs. This imply "
+"`-gh`."
+msgstr ""
+
+#: src/whiteprints/cli/command/init_parser.py:80
+msgid "Configure GitHub to protect branches and tags. This imply `-gh`."
+msgstr ""
+
+#: src/whiteprints/cli/command/init_parser.py:90
+msgid "Full GitHub configuration. This imply `-pp`, `-cc`, `rd`, and `-pr`."
+msgstr ""
+
+#: src/whiteprints/cli/command/init_parser.py:99
+msgid "Directory in which to initialize the Python project."
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint.py:65
+msgid "Subcommands"
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:65
+#, python-brace-format
+msgid ""
+"No autocompletion installed. Please reinstall `{app_name}` with the `qol`"
+" extra (e.g. `pip install {app_name}\\[qol]`) to use autocompletion."
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:110
+msgid "Copyright © 2024 The \"Whiteprints\" contributors <whiteprints@pm.me>."
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:144
+#, python-brace-format
+msgid ""
+"Code released under license '{}'.\n"
+"\n"
+"This project is REUSE compliant (see "
+"[link=https://reuse.software/]https://reuse.software[/] website for more "
+"information). Please check the SPDX header of each source code file for "
+"detailed licensing information.\n"
+"Sources are located at '{}'."
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:237
+msgid "A Copier-based cookiecutter for creating Python projects managed by uv."
+msgstr ""
+
+#: src/whiteprints/cli/command/init_parser.py:32
+#: src/whiteprints/cli/entrypoint_parser.py:249
+msgid "Show this help message and exit."
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:260
+msgid "Show program's version number and exit."
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:268
+msgid "Show the copyright information and exit."
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:276
+msgid "Show the license information and exit."
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:284
+msgid "Show debugging information and exit."
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:294
+msgid "Show the completion script code and exit."
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:304
+#, python-brace-format
+msgid "JSON logging configuration (env: {})."
+msgstr ""
+

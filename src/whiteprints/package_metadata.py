@@ -4,9 +4,15 @@
 
 """Discover the package's version number."""
 
+import sys
 from importlib import metadata
 from typing import Final
 
+
+if sys.version_info >= (3, 10):
+    from importlib.metadata import PackagePath
+else:
+    from importlib_metadata import PackagePath
 
 __all__: Final = [
     "__license__",
@@ -19,14 +25,23 @@ __all__: Final = [
 
 def _find_license_files(
     *,
-    license_paths: list[metadata.PackagePath],
+    license_paths: list[PackagePath],
     license_files: list[str],
-) -> list[metadata.PackagePath]:
+) -> list[PackagePath]:
     """Find the licenses in the wheel defined in the package metadata.
 
     Args:
         license_paths: list of license paths found in the package wheel.
         license_files: list of licenses found in the wheel metadata.
+
+    Example:
+        >>> from importlib import metadata
+        >>> licenses = _find_license_files(
+        >>>     license_paths=metadata.files(__package__ or "") or [],
+        >>>     license_files=__metadata__.get_all("License-File") or [],
+        >>> )
+        >>> len(licenses) > 0
+        True
 
     Returns:
         the list of code licenses used by the present package.

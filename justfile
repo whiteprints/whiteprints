@@ -5,6 +5,8 @@
 
 # Uncomment this to use project local uv cache.
 # export UV_CACHE_DIR := ".just/.cache/uv"
+export UV_OFFLINE := "true"
+export UV_REFRESH := "true"
 export UV_NO_PROGRESS := "true"
 export PYTHONOPTIMIZE := "0"
 export PYTHONDONTWRITEBYTECODE := "1"
@@ -100,7 +102,6 @@ uv args="":
 uvr args="":
     @just uv " \
         run \
-        --refresh \
         --isolated \
         --no-dev \
         --no-config \
@@ -125,7 +126,6 @@ compile args="":
     @just uv " \
         pip compile \
         --quiet \
-        --refresh \
         --generate-hashes \
         --all-extras \
         {{ args }} \
@@ -163,7 +163,6 @@ requirements-dev args="":
 sync resolution="highest":
     @just uv " \
         sync \
-        --refresh \
         --resolution={{ resolution }} \
         --all-extras \
     "
@@ -757,11 +756,19 @@ pybabel args="":
 # Extract the translation from the Python source files
 [group("localization")]
 translation-extract:
+    @just sync
     @just pybabel " \
         extract \
             --omit-header \
             --sort-by-file \
-            --output 'src/whiteprints/locale/base.pot' \
+            --output 'src/whiteprints/locale/argparse.pot' \
+            $(find $(uv python dir) -name "argparse.py" | xargs echo) \
+    "
+    @just pybabel " \
+        extract \
+            --omit-header \
+            --sort-by-file \
+            --output 'src/whiteprints/locale/whiteprints.pot' \
             src \
     "
 
@@ -770,7 +777,15 @@ translation-extract:
 translation-init locale:
     @just pybabel " \
         init \
-            --input-file 'src/whiteprints/locale/base.pot' \
+            --domain 'argparse' \
+            --input-file 'src/whiteprints/locale/argparse.pot' \
+            --output-dir 'src/whiteprints/locale' \
+            --locale='{{ locale }}' \
+    "
+    @just pybabel " \
+        init \
+            --domain 'whiteprints' \
+            --input-file 'src/whiteprints/locale/whiteprints.pot' \
             --output-dir 'src/whiteprints/locale' \
             --locale='{{ locale }}' \
     "
@@ -780,8 +795,17 @@ translation-init locale:
 translation-update locale="":
     @just pybabel " \
         update \
+            --domain 'argparse' \
             --omit-header \
-            --input-file 'src/whiteprints/locale/base.pot' \
+            --input-file 'src/whiteprints/locale/argparse.pot' \
+            --output-dir 'src/whiteprints/locale' \
+            --locale='{{ locale }}' \
+    "
+    @just pybabel " \
+        update \
+            --domain 'whiteprints' \
+            --omit-header \
+            --input-file 'src/whiteprints/locale/whiteprints.pot' \
             --output-dir 'src/whiteprints/locale' \
             --locale='{{ locale }}' \
     "

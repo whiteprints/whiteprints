@@ -58,10 +58,10 @@ class TestGatherDebugInfo:
 
     @staticmethod
     def test_pythonpath_elements_are_paths() -> None:
-        """Test that all elements in 'pythonpath' are Path instances."""
+        """Test that all elements in 'pythonpath' are valid Paths."""
         debug_info = gather_debug_info()
-        assert all(isinstance(p, Path) for p in debug_info["pythonpath"]), (
-            "All elements in 'pythonpath' should be Path instances."
+        assert all(isinstance(p, str) for p in debug_info["pythonpath"]), (
+            "All elements in 'pythonpath' should be strings."
         )
 
     @staticmethod
@@ -102,11 +102,11 @@ class TestGatherDebugInfo:
 
     @staticmethod
     def test_dependency_origin_is_path_if_present() -> None:
-        """Test that 'origin' is a Path if present in each dependency."""
+        """Test that 'origin' is a valid Path."""
         debug_info = gather_debug_info()
         for dependency in debug_info["dependencies"]:
             origin = dependency.get("origin")
-            assert origin is None or isinstance(origin, Path), (
-                "'origin' should be a Path or NoneType in dependency, "
+            assert origin is None or Path(origin).is_dir(), (
+                "'origin' should be a valid Path or NoneType in dependency, "
                 f"but got {type(dependency.get('origin')).__name__}."
             )

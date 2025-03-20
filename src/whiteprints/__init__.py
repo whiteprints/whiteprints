@@ -17,21 +17,18 @@ if TYPE_CHECKING:
     import rich.console
 
 
-__all__: Final = ["LOCALE_DIRECTORY", "TRANSLATION", "_", "stderr", "stdout"]
+__all__: Final = ["LOCALE_DIRECTORY", "_", "stderr", "stdout"]
 """Public module attributes."""
 
 LOCALE_DIRECTORY: Final = Path(__file__).parent / "locale"
 """Path to the directory containing the locales."""
 
-TRANSLATION: Final = gettext.translation(
-    "messages",
+_: Final = gettext.translation(
+    __name__,
     LOCALE_DIRECTORY,
     fallback=True,
-)
+).gettext
 """A Gettext translation."""
-
-_: Final = TRANSLATION.gettext
-"""Convenient access to Gettext's translation."""
 
 
 @cache
@@ -43,6 +40,10 @@ def stdout() -> "rich.console.Console":
 
     See Also:
         https://rich.readthedocs.io/en/stable/reference/console.html
+
+    Example:
+        >>> stdout().print("Hello, World!")
+        "Hello, World!"
 
     Returns:
         A rich console printing to the standard output.
@@ -59,6 +60,10 @@ def stderr() -> "rich.console.Console":
 
     See Also:
         https://rich.readthedocs.io/en/stable/reference/console.html
+
+    Example:
+        >>> stderr().print("Fatal Error!")
+        None
 
     Returns:
         A rich console printing to the standard error.
@@ -92,6 +97,17 @@ def _exit_gracefully_action(signalnum: int, frame: FrameType) -> NoReturn:
 def exit_gracefully_on_sigint() -> None:
     """Register a sigint signal handler.
 
+    Example:
+        >>> import signal
+        >>> import os
+        >>> exit_gracefully_on_sigint()
+        None
+        >>> try:
+        >>>     os.kill(os.getpid(), signal.SIGINT)
+        >>> except SystemExit:
+        >>>     print("Bye!")
+        "Bye!"
+
     When sigint is caught, the event is logged and the program exits with the
     SIGINT error code.
     """
@@ -101,6 +117,10 @@ def exit_gracefully_on_sigint() -> None:
 
 def _setup_package() -> None:
     """Setup the package.
+
+    Example:
+        >>> _setup_package()
+        None
 
     The behaviour of the program is the following:
         * On debug (__debug__ == True), we activate beartype for runtime type

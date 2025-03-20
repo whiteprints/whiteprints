@@ -43,7 +43,7 @@ class RichJSONHandler(Handler):
         """
         super().__init__()
         self.console = importlib.import_module("rich.console").Console(
-            **(console_args or {"stderr": True})
+            **(console_args or {"stderr": True, "soft_wrap": True})
         )
         self.print_json_args = print_json_args or {"indent": None}
         self.error = importlib.import_module("rich.errors")
@@ -55,15 +55,41 @@ class RichJSONHandler(Handler):
 
         If a formatter is specified, it is used to format the record.
 
+        The message must be a valid JSON.
+
+        Example:
+            >>> RichJSONHandler().emit(
+            >>>     LogRecord(
+            >>>         "dummy",
+            >>>         0,
+            >>>         "dummy",
+            >>>         0,
+            >>>         '{"message": "dummy"}',
+            >>>         (),
+            >>>         (),
+            >>>     )
+            >>> )
+            None
+            >>> RichJSONHandler(
+            >>>     console_args={"style": "does not exists"}
+            >>> ).emit(
+            >>>     LogRecord(
+            >>>         "dummy",
+            >>>         0,
+            >>>         "dummy",
+            >>>         0,
+            >>>         '{"message": "dummy"}',
+            >>>         (),
+            >>>         (),
+            >>>     )
+            >>> )
+            None
+
         Args:
             record: the record use to emit the log.
         """
         message = self.format(record)
-
-        if isinstance(self.console.file, self.NullFile):
+        try:
+            self.console.print_json(message, **self.print_json_args)
+        except (self.error.ConsoleError, self.error.StyleError):
             self.handleError(record)
-        else:
-            try:
-                self.console.print_json(message, **self.print_json_args)
-            except (self.error.ConsoleError, self.error.StyleError):
-                self.handleError(record)

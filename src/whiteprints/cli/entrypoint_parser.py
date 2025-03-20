@@ -8,11 +8,11 @@ import importlib
 import os
 import sys
 from argparse import Action, ArgumentParser, HelpFormatter, Namespace
-from functools import cache
+from functools import cache, partial
 from pathlib import Path
 from typing import ClassVar, Final, NoReturn, Optional
 
-from whiteprints import _, stderr, stdout
+from whiteprints import LOCALE_DIRECTORY, _, stderr, stdout
 
 
 if sys.version_info >= (3, 12):
@@ -62,7 +62,7 @@ class Completion(Action):
         except ModuleNotFoundError:
             stderr().print(
                 _(
-                    "No autocompletion installed. Please reinstall"
+                    "No autocompletion installed. Reinstall"
                     " `{app_name}` with the `qol` extra"
                     " (e.g. `pip install {app_name}"
                     r"\[qol]`) to use autocompletion."
@@ -135,38 +135,26 @@ class License(Action):
             "whiteprints.package_metadata",
             __package__,
         )
-        panel = importlib.import_module("rich.panel")
-        box = importlib.import_module("rich.box")
-
-        stdout().print(
-            panel.Panel(
-                _(
-                    "Code released under license '{}'.\n\n"
-                    "This project is REUSE compliant (see"
-                    " [link=https://reuse.software/]https://reuse.software[/]"
-                    " website for more information)."
-                    " Please check the SPDX header of each source code file"
-                    " for detailed licensing information.\n"
-                    "Sources are located at '{}'."
-                ).format(
-                    package_metadata.__license__,
-                    Path(__file__).parent.parent,
-                ),
-                box=box.HORIZONTALS,
-                title="Foreword",
-                highlight=True,
+        if args[0] is None:
+            stdout().print_json(
+                data={
+                    "SPDX-License-Identifier": package_metadata.__license__,
+                    "DISCLAIMER": _(
+                        "This project is REUSE compliant."
+                        " Check the SPDX header of each"
+                        " individual source code file"
+                        " for detailed licensing information."
+                    ).format(),
+                    "source_code_location": str(Path(__file__).parent.parent),
+                    "REUSE": "https://reuse.software/",
+                },
+                indent=None,
             )
-        )
+            sys.exit(os.EX_OK)
 
         for license_path in package_metadata.__license_file__:
-            license_panel = panel.Panel(
-                license_path.read_text(),
-                box=box.HORIZONTALS,
-                title=license_path.stem,
-                subtitle=str(license_path.locate()),
-                highlight=True,
-            )
-            stdout().print(license_panel)
+            if args[0] in license_path.stem:
+                stdout().print(license_path.read_text())
 
         sys.exit(os.EX_OK)
 
@@ -205,21 +193,34 @@ def create_entrypoint_parser() -> ArgumentParser:
     The ouput of this function is cached. No new instances are created on
     subsequent calls.
 
+    Example:
+        >>> create_entrypoint_parser()
+        ArgumentParser(...)
+
     Args:
         args: the arguments forwarded to argparse. For example sys.argv.
 
     Returns:
         the arguments namespace.
     """
+    gettext = importlib.import_module("gettext")
+    gettext.bindtextdomain(
+        "argparse",
+        LOCALE_DIRECTORY,
+    )
+    gettext.textdomain("argparse")
+
     app_name = importlib.import_module(
         "whiteprints.cli.app_metadata",
         __package__,
     ).app_name()
 
     try:
-        formatter_class = importlib.import_module(
-            "rich_argparse"
-        ).RichHelpFormatter
+        formatter_class = partial(
+            importlib.import_module("rich_argparse").RichHelpFormatter,
+            console=stdout(),
+            indent_increment=4,
+        )
     except ModuleNotFoundError:
         formatter_class = HelpFormatter
 
@@ -264,8 +265,15 @@ def create_entrypoint_parser() -> ArgumentParser:
     program_info.add_argument(
         "-l",
         "--license",
-        nargs=0,
+        nargs="?",
         action=License,
+        choices=[
+            license_path.stem
+            for license_path in importlib.import_module(
+                "whiteprints.package_metadata",
+                __package__,
+            ).__license_file__
+        ],
         help=_("Show the license information and exit."),
     )
 
@@ -300,9 +308,10 @@ def create_entrypoint_parser() -> ArgumentParser:
         metavar="PATH",
         default=os.environ.get(log_conf_metavar),
     )
-    with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
-        logs_arg.__dict__["completer"] = importlib.import_module(
-            "argcomplete"
-        ).FilesCompleter(allowednames=".json")
+    completer = getattr(logs_arg, "completer", None)
+    if completer is not None:
+        completer = importlib.import_module("argcomplete").FilesCompleter(
+            allowednames=".json"
+        )
 
     return parser

@@ -19,6 +19,10 @@ def user_log_dir() -> Path:
 
     The default path is given by `platformdirs.user_log_path`.
 
+    Example:
+        >>> user_log_dir()
+        PosixPath(...)
+
     Returns:
         The path to the log directory.
     """
@@ -35,6 +39,10 @@ def user_log_config() -> Path:
     """The default user logging configuration file Path.
 
     The default path is given by `platformdirs.user_config_path`.
+
+    Example:
+        >>> user_log_config()
+        PosixPath(...)
 
     Returns:
         The path to the logging configuration file.

@@ -8,6 +8,7 @@ import importlib
 import os
 import sys
 from argparse import Namespace
+from functools import cache
 from typing import Final, TypedDict
 
 from whiteprints import _
@@ -37,13 +38,21 @@ class _FeatureRepository(TypedDict):
     protect_repository: str
 
 
-FEATURE_REPOSITORY = _FeatureRepository(
-    pypi="gh:whiteprints/template-github-publish-pypi.git",
-    codecov="gh:whiteprints/template-github-codecov.git",
-    readthedocs="gh:whiteprints/template-github-readthedocs.git",
-    protect_repository="gh:whiteprints/template-github-protect-repository.git",
-)
-"""A mapping from a feature name to its template repository."""
+@cache
+def _feature_repository() -> _FeatureRepository:
+    """Additional GitHub repository functionalities.
+
+    Returns:
+        A mapping from a feature name to its template repository.
+    """
+    return {
+        "pypi": "gh:whiteprints/template-github-publish-pypi.git",
+        "codecov": "gh:whiteprints/template-github-codecov.git",
+        "readthedocs": "gh:whiteprints/template-github-readthedocs.git",
+        "protect_repository": (
+            "gh:whiteprints/template-github-protect-repository.git"
+        ),
+    }
 
 
 def _should_add(feature: str, cli_kwargs: InitKwargs) -> bool:
@@ -71,7 +80,7 @@ def add_github_functionalities(
         project_directory: directory where the new project will be created.
         init_kwargs: the command line flags.
     """
-    for feature, repository in FEATURE_REPOSITORY.items():
+    for feature, repository in _feature_repository().items():
         if _should_add(feature, cli_kwargs=init_kwargs):  # pragma: no cover
             importlib.import_module("copier.main").Worker(
                 src_path=repository,
@@ -97,7 +106,7 @@ def _require_github(init_kwargs: InitKwargs) -> bool:
     )
 
 
-def add_github(
+def _add_github(
     project_directory: str,
     init_kwargs: InitKwargs,
 ) -> None:
@@ -126,7 +135,7 @@ def add_github(
     )
 
 
-def create_project(
+def _create_project(
     *,
     project_directory: str,
     init_kwargs: InitKwargs,
@@ -151,7 +160,7 @@ def create_project(
             unsafe=True,
         ).run_copy()
 
-    add_github(
+    _add_github(
         project_directory=project_directory,
         init_kwargs=init_kwargs,
     )
@@ -168,7 +177,7 @@ def init(namespace: Namespace) -> None:
     copier_errors = importlib.import_module("copier.errors")
     try:
         project_directory_str = namespace.project_directory
-        create_project(
+        _create_project(
             project_directory=project_directory_str,
             init_kwargs={
                 "command_line": namespace.command_line,

@@ -54,6 +54,13 @@ def _parse_args(
 def entrypoint(args: Optional[list[str]] = None) -> None:
     """The Whiteprint CLI.
 
+    Example:
+        >>> try:
+        >>>     entrypoint()
+        >>> except SystemExit:
+        >>>     pass
+        ...
+
     Args:
         args: the arguments forwarded to argparse. For example sys.argv.
     """

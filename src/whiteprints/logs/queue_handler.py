@@ -4,6 +4,7 @@
 
 """Logging handlers."""
 
+import importlib
 import sys
 from logging import Handler, LogRecord
 from logging.handlers import QueueListener
@@ -32,7 +33,14 @@ class AutoStartQueueListener(QueueListener):
     ) -> None:
         """Initialise the instance.
 
-        Use the specified queue and handlers.
+        It inherits from logging.QueueListener and start/stop the queue
+        automatically on instanciation and destruction.
+
+        Example:
+            >>> from queue import Queue
+            >>>
+            >>> AutoStartQueueListener(Queue())
+            < ... AutoStartQueueListener ... >
 
         Args:
             queue: a log events queue
@@ -45,5 +53,19 @@ class AutoStartQueueListener(QueueListener):
         self.start()
 
     def __del__(self) -> None:
-        """Stop the queue."""
-        self.stop()
+        """Stop the queue.
+
+        Example:
+            >>> from queue import Queue
+            >>>
+            >>> handler = AutoStartQueueListener(
+            >>>     Queue()
+            >>> )
+            >>> handler.__del__()
+            None
+        """
+        # required when not sys.version_info >= (3, 13)
+        # thread stopping may be called more than once.
+        # see CPython issue gh-114706
+        with importlib.import_module("contextlib").suppress(AttributeError):
+            self.stop()

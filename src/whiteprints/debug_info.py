@@ -34,9 +34,6 @@ from typing import Final, TypedDict
 from distro.distro import InfoDict
 
 
-__all__: Final = ["DebugInfo", "PackageInfo", "gather_debug_info"]
-
-
 if sys.version_info >= (3, 11):
     from typing import NotRequired
 else:
@@ -46,6 +43,8 @@ if sys.version_info >= (3, 10):
     from importlib.metadata import packages_distributions
 else:
     from importlib_metadata import packages_distributions
+
+__all__: Final = ["DebugInfo", "PackageInfo", "gather_debug_info"]
 
 
 class PackageInfo(TypedDict):
@@ -101,7 +100,7 @@ def _add_spec(package_info: PackageInfo, *, package_name: str) -> None:
         >>> _add_spec(package_info, package_name="os")
         >>> "origin" in package_info
         True
-        >>> isinstance(package_info["origin"], Path)
+        >>> isinstance(package_info["origin"], str)
         True
         >>> package_info = {"name": "nonexistent-package", "version": "1.0"}
         >>> _add_spec(package_info, package_name="some_nonexistent_package")
@@ -228,6 +227,10 @@ def gather_debug_info() -> DebugInfo:
     version of the executing package. Additionally, it includes the Python path
     and information about runtime dependencies, including their names,
     versions, and locations (if available).
+
+    Example:
+        >>> gather_debug_info()
+        { ... }
 
     Returns:
         DebugInfo: A dictionary containing:

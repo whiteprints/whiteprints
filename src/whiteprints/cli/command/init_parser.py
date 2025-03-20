@@ -12,10 +12,20 @@ from whiteprints import _
 
 
 def init_parser(subparser: Action, parser: ArgumentParser) -> None:
-    """Add a subparser to initialize a Python project."""
+    """Add a subparser to initialize a Python project.
+
+    Example:
+        >>> main_parser = ArgumentParser()
+        >>> subparser = main_parser.add_subparsers()
+        >>> init_parser(subparser, main_parser)
+        None
+
+    Args:
+        subparser: the subparser to attach to
+        parser: the main parser use to forward the `formatter_class`.
+    """
     add_parser = getattr(subparser, "add_parser", None)
-    if add_parser is None:
-        return
+    assert add_parser is not None
 
     parser = add_parser(
         "init",
@@ -59,7 +69,7 @@ def init_parser(subparser: Action, parser: ArgumentParser) -> None:
         "--CodeCov",
         help=_(
             "Configure GitHub to publish coverage report to CodeCov."
-            " This imply `--github`."
+            " This imply `-gh`."
         ),
         action="store_true",
     )
@@ -77,8 +87,7 @@ def init_parser(subparser: Action, parser: ArgumentParser) -> None:
         "-pr",
         "--protect-repository",
         help=_(
-            "Configure GitHub to protect branches and tags. "
-            "This imply `--github`."
+            "Configure GitHub to protect branches and tags. This imply `-gh`."
         ),
         action="store_true",
     )
@@ -99,7 +108,8 @@ def init_parser(subparser: Action, parser: ArgumentParser) -> None:
         help=_("Directory in which to initialize the Python project."),
         metavar="PROJECT_DIRECTORY",
     )
-    with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
-        project_directory_arg.__dict__["completer"] = importlib.import_module(
+    completer = getattr(project_directory_arg, "completer", None)
+    if completer is not None:
+        completer = importlib.import_module(
             "argcomplete"
         ).DirectoriesCompleter()

@@ -32,8 +32,8 @@ class JSONFormatter(Formatter):
         0,
         "dummy",
         0,
-        None,
-        None,
+        "dummy",
+        (),
         None,
     ).__dict__.keys()
     """A dummy record use to extract the extra keys from a record"""
@@ -60,6 +60,20 @@ class JSONFormatter(Formatter):
     @override
     def format(self, record: LogRecord) -> str:
         """Format a record.
+
+        Example:
+            >>> JSONFormatter().format(
+            >>>     LogRecord(
+            >>>         "dummy",
+            >>>         0,
+            >>>         "dummy",
+            >>>         0,
+            >>>         "dummy",
+            >>>         (),
+            >>>         (),
+            >>>     )
+            >>> )
+            { ... }
 
         Args:
             record: the record to format.
