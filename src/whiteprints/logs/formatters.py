@@ -54,7 +54,7 @@ class JSONFormatter(Formatter):
         return {
             key: value() if callable(value) else value
             for key, value in record.__dict__.items()
-            if key not in cls._DUMMY_RECORD_KEYS
+            if key not in cls._DUMMY_RECORD_KEYS and key != "message"
         }
 
     @override
