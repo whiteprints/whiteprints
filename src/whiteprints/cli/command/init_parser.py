@@ -34,6 +34,10 @@ def init_parser(subparser: Action, parser: ArgumentParser) -> None:
         help=_("Initialize a Python project."),
         exit_on_error=False,
         add_help=False,
+        epilog=_(
+            "Note: see https://copier.readthedocs.io/en/stable/configuring/"
+            " for help on how to use Copier and COPIER_ARGS (optional)."
+        ),
     )
     parser.add_argument(
         "-h",

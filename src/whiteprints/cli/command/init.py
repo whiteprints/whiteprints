@@ -4,13 +4,15 @@
 
 """Initialize a project."""
 
+import importlib
+import os
 import sys
 from argparse import Namespace
 from collections.abc import Iterable
 from subprocess import CalledProcessError  # nosec
 from typing import Final, TypedDict
 
-from whiteprints.exception import WhiteprintsError
+from whiteprints import _
 from whiteprints.libuv.copier import Copier
 
 
@@ -20,7 +22,7 @@ else:
     from typing_extensions import Required
 
 
-__all__: Final = ["CopierCopyError", "init"]
+__all__: Final = ["init"]
 
 
 WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.6.0"
@@ -55,14 +57,6 @@ FEATURE_REPOSITORY = _FeatureRepository(
     protect_repository="gh:whiteprints/template-github-protect-repository.git",
 )
 """A mapping from a feature name to its template repository."""
-
-
-class CopierCopyError(RuntimeError, WhiteprintsError):
-    """An error occured while creating the project."""
-
-    def __init__(self) -> None:
-        """Create an exception instance."""
-        super().__init__("Project creation failed.")
 
 
 def _should_add(feature: str, cli_kwargs: InitKwargs) -> bool:
@@ -224,9 +218,6 @@ def init(namespace: Namespace) -> None:
 
     Args:
         namespace: the arguments namespace.
-
-    Raises:
-        CopierCopyError: An error happened while creating the project.
     """
     copier = Copier()
     project_directory_str = str(namespace.project_directory)
@@ -246,5 +237,10 @@ def init(namespace: Namespace) -> None:
                 "github_all": namespace.github_all,
             },
         )
-    except CalledProcessError as process_error:
-        raise CopierCopyError from process_error
+    except CalledProcessError as exception:
+        importlib.import_module("whiteprints", __package__).stderr().print(
+            _("[red]Project creation failed:[/] {}").format(exception),
+        )
+        logger = importlib.import_module("logging").getLogger(__name__)
+        logger.exception("Exception caught", stack_info=True)
+        sys.exit(os.EX_SOFTWARE)
