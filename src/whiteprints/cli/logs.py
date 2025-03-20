@@ -65,48 +65,42 @@ def _generate_configuration(log_config_path: Path) -> None:
         log_config_path: path to the logging configuration file.
     """
     with log_config_path.open("w", encoding="utf-8") as user_log_config_fh:
-        importlib.import_module("json").dump(
-            {
-                "version": 1,
-                "disable_existing_loggers": True,
-                "formatters": {
-                    "struct_json": {
-                        "class": "whiteprints.logs.formatters.JSONFormatter",
-                        "datefmt": "%Y-%m-%dT%H:%M:%S",
-                    },
-                },
-                "handlers": {
-                    "stderr": {
-                        "class": (
-                            "whiteprints.logs.rich_json_handler.RichJSONHandler"
-                        ),
-                        "level": "CRITICAL",
-                        "formatter": "struct_json",
-                    },
-                    "file": {
-                        "class": "logging.handlers.RotatingFileHandler",
-                        "level": "DEBUG",
-                        "filename": "$USER_LOG_DIR/debug.log",
-                        "formatter": "struct_json",
-                        "maxBytes": 4_000_000,
-                        "backupCount": 4,
-                    },
-                    "queue_handler": {
-                        "class": "logging.handlers.QueueHandler",
-                        "listener": (
-                            "whiteprints.logs.queue_handler.AutoStartQueueListener"
-                        ),
-                        "handlers": ["stderr", "file"],
-                        "respect_handler_level": True,
-                    },
-                },
-                "loggers": {
-                    "root": {
-                        "level": "NOTSET",
-                        "handlers": ["queue_handler"],
-                    },
+        default_logs_config = {
+            "version": 1,
+            "disable_existing_loggers": True,
+            "formatters": {
+                "struct_json": {
+                    "class": "whiteprints.logs.formatters.JSONFormatter",
+                    "datefmt": "%Y-%m-%dT%H:%M:%S",
                 },
             },
+            "handlers": {
+                "stderr": {
+                    "class": (
+                        "whiteprints.logs.rich_json_handler.RichJSONHandler"
+                    ),
+                    "level": "CRITICAL",
+                    "formatter": "struct_json",
+                },
+                "file": {
+                    "class": "logging.handlers.RotatingFileHandler",
+                    "level": "DEBUG",
+                    "filename": "$USER_LOG_DIR/debug.log",
+                    "formatter": "struct_json",
+                    "maxBytes": 4_000_000,
+                    "backupCount": 4,
+                },
+            },
+            "loggers": {
+                "root": {
+                    "level": "NOTSET",
+                    "handlers": ["stderr, file"],
+                },
+            },
+        }
+
+        importlib.import_module("json").dump(
+            default_logs_config,
             user_log_config_fh,
             indent=4,
         )

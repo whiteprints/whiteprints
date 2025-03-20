@@ -5,7 +5,6 @@
 """Logging handlers."""
 
 import atexit
-import importlib
 import sys
 from logging import Handler, LogRecord
 from logging.handlers import QueueListener
@@ -37,6 +36,9 @@ class AutoStartQueueListener(QueueListener):
         It inherits from logging.QueueListener and start/stop the queue
         automatically on instanciation and destruction.
 
+        This is usefule for python >= 3.12 as it can be passed directly in the
+        dictconfig.
+
         Example:
             >>> from queue import Queue
             >>>
@@ -53,21 +55,3 @@ class AutoStartQueueListener(QueueListener):
         )
         self.start()
         atexit.register(self.stop)
-
-    def stop(self) -> None:
-        """Stop the queue.
-
-        Example:
-            >>> from queue import Queue
-            >>>
-            >>> handler = AutoStartQueueListener(
-            >>>     Queue()
-            >>> )
-            >>> handler.stop()
-            None
-        """
-        # required when not sys.version_info >= (3, 13)
-        # thread stopping may be called more than once.
-        # see CPython issue gh-114706
-        with importlib.import_module("contextlib").suppress(AttributeError):
-            self.stop()
