@@ -4,6 +4,7 @@
 
 """Logging handlers."""
 
+import atexit
 import importlib
 import sys
 from logging import Handler, LogRecord
@@ -51,8 +52,9 @@ class AutoStartQueueListener(QueueListener):
             queue, *handlers, respect_handler_level=respect_handler_level
         )
         self.start()
+        atexit.register(self.stop)
 
-    def __del__(self) -> None:
+    def stop(self) -> None:
         """Stop the queue.
 
         Example:
@@ -61,7 +63,7 @@ class AutoStartQueueListener(QueueListener):
             >>> handler = AutoStartQueueListener(
             >>>     Queue()
             >>> )
-            >>> handler.__del__()
+            >>> handler.stop()
             None
         """
         # required when not sys.version_info >= (3, 13)

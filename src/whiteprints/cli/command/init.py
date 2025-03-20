@@ -237,9 +237,9 @@ def init(namespace: Namespace) -> None:
                 "github_all": namespace.github_all,
             },
         )
-    except CalledProcessError as exception:
+    except CalledProcessError:
         importlib.import_module("whiteprints", __package__).stderr().print(
-            _("[red]Project creation failed:[/] {}").format(exception),
+            _("[red]Project creation failed[/]")
         )
         logger = importlib.import_module("logging").getLogger(__name__)
         logger.exception("Exception caught", stack_info=True)
