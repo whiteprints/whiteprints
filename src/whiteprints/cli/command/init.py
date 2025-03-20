@@ -242,5 +242,5 @@ def init(namespace: Namespace) -> None:
             _("[red]Project creation failed[/]")
         )
         logger = importlib.import_module("logging").getLogger(__name__)
-        logger.exception("Exception caught", stack_info=True)
+        logger.exception("Exception caught while running Copier")
         sys.exit(os.EX_SOFTWARE)
