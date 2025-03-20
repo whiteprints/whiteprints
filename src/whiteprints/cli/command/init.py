@@ -4,17 +4,27 @@
 
 """Initialize a project."""
 
-import importlib
-import os
 import sys
 from argparse import Namespace
-from functools import cache
+from collections.abc import Iterable
+from subprocess import CalledProcessError  # nosec
 from typing import Final, TypedDict
 
-from whiteprints import _
+from whiteprints.exception import WhiteprintsError
+from whiteprints.libuv.copier import Copier
 
 
-__all__: Final = ["init"]
+if sys.version_info >= (3, 11):
+    from typing import Required
+else:
+    from typing_extensions import Required
+
+
+__all__: Final = ["CopierCopyError", "init"]
+
+
+WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.6.0"
+"""The whiteprints-template-context version pin."""
 
 
 class InitKwargs(TypedDict):
@@ -32,27 +42,27 @@ class InitKwargs(TypedDict):
 class _FeatureRepository(TypedDict):
     """Feature dictionnary interface."""
 
-    pypi: str
-    codecov: str
-    readthedocs: str
-    protect_repository: str
+    pypi: Required[str]
+    codecov: Required[str]
+    readthedocs: Required[str]
+    protect_repository: Required[str]
 
 
-@cache
-def _feature_repository() -> _FeatureRepository:
-    """Additional GitHub repository functionalities.
+FEATURE_REPOSITORY = _FeatureRepository(
+    pypi="gh:whiteprints/template-github-publish-pypi.git",
+    codecov="gh:whiteprints/template-github-codecov.git",
+    readthedocs="gh:whiteprints/template-github-readthedocs.git",
+    protect_repository="gh:whiteprints/template-github-protect-repository.git",
+)
+"""A mapping from a feature name to its template repository."""
 
-    Returns:
-        A mapping from a feature name to its template repository.
-    """
-    return {
-        "pypi": "gh:whiteprints/template-github-publish-pypi.git",
-        "codecov": "gh:whiteprints/template-github-codecov.git",
-        "readthedocs": "gh:whiteprints/template-github-readthedocs.git",
-        "protect_repository": (
-            "gh:whiteprints/template-github-protect-repository.git"
-        ),
-    }
+
+class CopierCopyError(RuntimeError, WhiteprintsError):
+    """An error occured while creating the project."""
+
+    def __init__(self) -> None:
+        """Create an exception instance."""
+        super().__init__("Project creation failed.")
 
 
 def _should_add(feature: str, cli_kwargs: InitKwargs) -> bool:
@@ -69,6 +79,9 @@ def _should_add(feature: str, cli_kwargs: InitKwargs) -> bool:
 
 
 def add_github_functionalities(
+    copier: Copier,
+    *,
+    copier_args: Iterable[str],
     project_directory: str,
     init_kwargs: InitKwargs,
 ) -> None:
@@ -80,13 +93,23 @@ def add_github_functionalities(
         project_directory: directory where the new project will be created.
         init_kwargs: the command line flags.
     """
-    for feature, repository in _feature_repository().items():
+    for feature, repository in FEATURE_REPOSITORY.items():
         if _should_add(feature, cli_kwargs=init_kwargs):  # pragma: no cover
-            importlib.import_module("copier.main").Worker(
-                src_path=repository,
-                dst_path=project_directory,
-                unsafe=True,
-            ).run_copy()
+            copier.copy(
+                [
+                    # There seems to be a bug in pyright as of 2024/10/19
+                    # repository is guaranteed to be a string, as shown
+                    # in the TypedDict _FeatureRepository...
+                    repository,  # type: ignore[reportPropertyTypeMismatch]
+                    project_directory,
+                    *copier_args,
+                ],
+                context=[
+                    "whiteprints-template-context=="
+                    + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
+                ],
+                trust=True,
+            )
 
 
 def _require_github(init_kwargs: InitKwargs) -> bool:
@@ -106,7 +129,10 @@ def _require_github(init_kwargs: InitKwargs) -> bool:
     )
 
 
-def _add_github(
+def add_github(
+    copier: Copier,
+    *,
+    copier_args: Iterable[str],
     project_directory: str,
     init_kwargs: InitKwargs,
 ) -> None:
@@ -123,20 +149,31 @@ def _add_github(
         or init_kwargs["github_all"]
         or _require_github(init_kwargs)
     ):
-        importlib.import_module("copier.main").Worker(
-            src_path="gh:whiteprints/template-github.git",
-            dst_path=project_directory,
-            unsafe=True,
-        ).run_copy()
+        copier.copy(
+            [
+                "gh:whiteprints/template-github.git",
+                project_directory,
+                *copier_args,
+            ],
+            context=[
+                "whiteprints-template-context=="
+                + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
+            ],
+            trust=True,
+        )
 
     add_github_functionalities(
+        copier,
+        copier_args=copier_args,
         project_directory=project_directory,
         init_kwargs=init_kwargs,
     )
 
 
-def _create_project(
+def create_project(
+    copier: Copier,
     *,
+    copier_args: Iterable[str],
     project_directory: str,
     init_kwargs: InitKwargs,
 ) -> None:
@@ -148,19 +185,35 @@ def _create_project(
         project_directory: directory where the new project will be created.
         init_kwargs: the command line flags.
     """
-    importlib.import_module("copier.main").Worker(
-        src_path="gh:whiteprints/template-python.git",
-        dst_path=project_directory,
-        unsafe=True,
-    ).run_copy()
+    copier.copy(
+        [
+            "gh:whiteprints/template-python.git",
+            project_directory,
+            *copier_args,
+        ],
+        context=[
+            "whiteprints-template-context=="
+            + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
+        ],
+        trust=True,
+    )
     if init_kwargs["command_line"]:  # pragma: no cover
-        importlib.import_module("copier.main").Worker(
-            src_path="gh:whiteprints/template-rich-click.git",
-            dst_path=project_directory,
-            unsafe=True,
-        ).run_copy()
+        copier.copy(
+            [
+                "gh:whiteprints/template-rich-click.git",
+                project_directory,
+                *copier_args,
+            ],
+            context=[
+                "whiteprints-template-context=="
+                + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
+            ],
+            trust=True,
+        )
 
-    _add_github(
+    add_github(
+        copier,
+        copier_args=copier_args,
         project_directory=project_directory,
         init_kwargs=init_kwargs,
     )
@@ -170,14 +223,18 @@ def init(namespace: Namespace) -> None:
     """Initialize a python project.
 
     Args:
-        namespace: the argument parser namespace.
+        namespace: the arguments namespace.
+
+    Raises:
+        CopierCopyError: An error happened while creating the project.
     """
-    logger = importlib.import_module("logging").getLogger(__name__)
-    logger.debug("Project creation started")
-    copier_errors = importlib.import_module("copier.errors")
+    copier = Copier()
+    project_directory_str = str(namespace.project_directory)
+
     try:
-        project_directory_str = namespace.project_directory
-        _create_project(
+        create_project(
+            copier,
+            copier_args=namespace.copier_args,
             project_directory=project_directory_str,
             init_kwargs={
                 "command_line": namespace.command_line,
@@ -189,27 +246,5 @@ def init(namespace: Namespace) -> None:
                 "github_all": namespace.github_all,
             },
         )
-        logger.debug("Project creation succeed")
-    except copier_errors.CopierAnswersInterrupt as copier_answer_interrupt:
-        importlib.import_module("whiteprints", __package__).stderr().print(
-            _("[red]Execution stopped by user[/]")
-        )
-        logger.debug(
-            "Copier stopped by user.",
-            extra={"copier_answer_interrupt": str(copier_answer_interrupt)},
-        )
-        sys.exit(importlib.import_module("signal").SIGINT)
-    except copier_errors.CopierError as exception:
-        importlib.import_module("whiteprints", __package__).stderr().print(
-            _("[red]Project creation failed:[/] {}").format(exception)
-        )
-        logger = importlib.import_module("logging").getLogger(__name__)
-        logger.exception("Copier Error", stack_info=True)
-        sys.exit(os.EX_SOFTWARE)
-    except Exception as exception:
-        importlib.import_module("whiteprints", __package__).stderr().print(
-            _("[red]Project creation failed:[/] {}").format(exception),
-        )
-        logger = importlib.import_module("logging").getLogger(__name__)
-        logger.exception("Exception caught", stack_info=True)
-        sys.exit(os.EX_SOFTWARE)
+    except CalledProcessError as process_error:
+        raise CopierCopyError from process_error

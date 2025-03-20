@@ -9,6 +9,8 @@ from functools import cache
 from re import Pattern
 from typing import Final
 
+from whiteprints.exception import WhiteprintsError
+
 
 __all__: Final = [
     "InvalidAppNameError",
@@ -17,7 +19,7 @@ __all__: Final = [
 ]
 
 
-class InvalidAppNameError(ValueError):
+class InvalidAppNameError(ValueError, WhiteprintsError):
     """The application name is invalid."""
 
     def __init__(self, app_name: str) -> None:

@@ -113,3 +113,11 @@ def init_parser(subparser: Action, parser: ArgumentParser) -> None:
         completer = importlib.import_module(
             "argcomplete"
         ).DirectoriesCompleter()
+
+    project_directory_arg = parser.add_argument(
+        "copier_args",
+        default=[],
+        nargs="*",
+        help=_("Additional arguments forwarded to each Copier invocations."),
+        metavar="COPIER_ARGS",
+    )
