@@ -8,7 +8,7 @@ import importlib
 import os
 import sys
 from argparse import Action, ArgumentParser, HelpFormatter, Namespace
-from functools import cache, partial
+from functools import partial
 from pathlib import Path
 from typing import ClassVar, Final, NoReturn, Optional
 
@@ -186,7 +186,6 @@ class DebugInfo(Action):
         sys.exit(os.EX_OK)
 
 
-@cache
 def create_entrypoint_parser() -> ArgumentParser:
     """Parse command line arguments.
 
@@ -231,7 +230,6 @@ def create_entrypoint_parser() -> ArgumentParser:
             "A Copier-based cookiecutter for creating Python projects "
             "managed by uv."
         ),
-        exit_on_error=False,
         add_help=False,
     )
 

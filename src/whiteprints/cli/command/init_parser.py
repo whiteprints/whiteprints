@@ -32,7 +32,6 @@ def init_parser(subparser: Action, parser: ArgumentParser) -> None:
         formatter_class=parser.formatter_class,
         description=_("Initialize a Python project."),
         help=_("Initialize a Python project."),
-        exit_on_error=False,
         add_help=False,
         epilog=_(
             "Note: see https://copier.readthedocs.io/en/stable/configuring/"
