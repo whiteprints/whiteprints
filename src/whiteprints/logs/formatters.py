@@ -6,12 +6,15 @@
 
 import json
 import sys
+import traceback
 from logging import Formatter, LogRecord
 from pathlib import Path
 from typing import (
     Any,
     ClassVar,
     Final,
+    Optional,
+    TypedDict,
 )
 
 
@@ -22,6 +25,37 @@ else:
 
 
 __all__: Final = ["JSONFormatter"]
+
+
+class _TraceBackJSON(TypedDict):
+    """JSONserializable representation of an exception trace."""
+
+    exception_type: Optional[str]
+    exception_message: str
+    traceback: list[list[str]]
+
+
+def _logrecord_exception_to_dict(
+    record: LogRecord,
+) -> Optional[_TraceBackJSON]:
+    """Convert a LogRecord exception into a _TraceBackJSON.
+
+    Returns:
+        A _TraceBackJSON representing the exception in the record.
+    """
+    if record.exc_info is None:
+        return None
+
+    return {
+        "exception_type": (
+            None if record.exc_info[0] is None else record.exc_info[0].__name__
+        ),
+        "exception_message": str(record.exc_info[1]),
+        "traceback": [
+            frame.splitlines()
+            for frame in traceback.format_tb(record.exc_info[2], limit=None)
+        ],
+    }
 
 
 class JSONFormatter(Formatter):
@@ -113,13 +147,9 @@ class JSONFormatter(Formatter):
                     },
                 },
                 "exception": {
-                    "traceback": (
-                        self.formatException(record.exc_info)
-                        if record.exc_info
-                        else None
-                    ),
+                    "traceback": _logrecord_exception_to_dict(record),
                     "stack": (
-                        self.formatStack(record.stack_info)
+                        self.formatStack(record.stack_info).splitlines()
                         if record.stack_info
                         else None
                     ),
@@ -127,6 +157,6 @@ class JSONFormatter(Formatter):
                 },
             },
             "extra": self._extract_extras(record),
-            "message": record.getMessage(),
+            "message": record.getMessage().splitlines(),
         }
         return json.dumps(struct_log)
