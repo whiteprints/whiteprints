@@ -68,3 +68,5 @@ __license_file__: Final = _find_license_files(
     license_files=__metadata__.get_all("License-File") or [],
 )
 """A list containing the path to the license(s) of the package code."""
+
+assert len(__license_file__) > 0, "No license found in the project."
