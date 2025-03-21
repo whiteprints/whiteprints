@@ -5,7 +5,7 @@
 
 # Uncomment this to use project local uv cache.
 # export UV_CACHE_DIR := ".just/.cache/uv"
-export UV_OFFLINE := "true"
+export UV_OFFLINE := "false"
 export UV_REFRESH := "true"
 export UV_NO_PROGRESS := "true"
 export PYTHONOPTIMIZE := "0"

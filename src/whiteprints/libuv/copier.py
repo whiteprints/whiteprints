@@ -18,7 +18,7 @@ class Copier:
     """Manage the copier command."""
 
     @cached_property
-    def uvx(self) -> UVX:
+    def _uvx(self) -> UVX:
         """A uvx manager.
 
         Returns:
@@ -35,6 +35,10 @@ class Copier:
     ) -> None:
         """Run a copier command.
 
+        Example:
+            >>> Copier().copy(["--help"])
+            ...
+
         Args:
             command: arguments for the copier copy command.
             context: additional depenencies to inject.
@@ -48,4 +52,4 @@ class Copier:
             "copy",
             *command,
         ] + (["--trust"] if trust else [])
-        self.uvx.run(command)
+        self._uvx.run(command)

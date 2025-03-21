@@ -51,14 +51,14 @@ dynamic = [
 dependencies = [
     "distro==1.9.0",
     "importlib-metadata==8.6.1; python_full_version<'3.10.0'",
-    "platformdirs==4.3.6",
+    "platformdirs==4.3.7",
     "rich==13.9.4",
     "typing-extensions==4.12.2; python_full_version<'3.12.0'",
-    "uv==0.6.8",
+    "uv==0.6.9",
     "whiteprints-template-context==0.6.0",
 ]
 optional-dependencies.debug = [
-    "beartype==0.20.0",
+    "beartype==0.20.1",
 ]
 optional-dependencies.qol = [
     "argcomplete==3.6.0",
@@ -104,8 +104,8 @@ build-documentation = [
     "stdlib-list>=0.11.1",
 ]
 tests = [
-    "beartype==0.20.0",
-    "hypothesis==6.129.4",
+    "beartype==0.20.1",
+    "hypothesis==6.130.0",
     "pytest==8.3.5",
     "pytest-cov==6.0.0",
     "pytest-html==4.1.1",
@@ -153,7 +153,7 @@ keep_full_version = true
 max_supported_python = "3.13"
 
 [tool.uv]
-required-version = ">=0.6.6"
+required-version = ">=0.6.9"
 cache-keys = [
     { git = { commit = true, tags = true } },
     { file = "pyproject.toml" },

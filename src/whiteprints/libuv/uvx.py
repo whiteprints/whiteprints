@@ -22,6 +22,10 @@ class UVX:
     def bin(self) -> Path:
         """The uv binary path.
 
+        Example:
+            >>> UVX().bin
+            PosixPath(...)
+
         Returns:
             a path to the uv binary.
         """
@@ -32,6 +36,10 @@ class UVX:
 
         Note:
             `uv tool run` is equivalent to `uvx`
+
+        Example:
+            >>> UVX().run(["uv", "--help"])
+            ...
 
         Args:
             command: The `uv tool run` command to execute.

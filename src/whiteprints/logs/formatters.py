@@ -104,7 +104,7 @@ class JSONFormatter(Formatter):
             >>>         0,
             >>>         "dummy",
             >>>         (),
-            >>>         (),
+            >>>         None,
             >>>     )
             >>> )
             { ... }

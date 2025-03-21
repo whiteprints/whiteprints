@@ -94,7 +94,7 @@ def _generate_configuration(log_config_path: Path) -> None:
             "loggers": {
                 "root": {
                     "level": "NOTSET",
-                    "handlers": ["stderr, file"],
+                    "handlers": ["stderr", "file"],
                 },
             },
         }
