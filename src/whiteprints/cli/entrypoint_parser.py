@@ -62,7 +62,7 @@ class Completion(Action):
         except ModuleNotFoundError:
             stderr().print(
                 _(
-                    "No autocompletion installed. Reinstall"
+                    "Error, no autocompletion plugin installed. Reinstall"
                     " `{app_name}` with the `qol` extra"
                     " (e.g. `pip install {app_name}"
                     r"\[qol]`) to use autocompletion."

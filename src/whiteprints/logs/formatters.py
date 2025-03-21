@@ -103,8 +103,20 @@ class JSONFormatter(Formatter):
             >>>         "dummy",
             >>>         0,
             >>>         "dummy",
-            >>>         (),
             >>>         None,
+            >>>         None,
+            >>>     )
+            >>> )
+            { ... }
+            >>> JSONFormatter().format(
+            >>>     LogRecord(
+            >>>         "dummy",
+            >>>         0,
+            >>>         "dummy",
+            >>>         0,
+            >>>         "dummy",
+            >>>         None,
+            >>>         sys.exc_info(),
             >>>     )
             >>> )
             { ... }
