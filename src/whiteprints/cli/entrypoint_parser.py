@@ -83,7 +83,7 @@ class Completion(Action):
                     ).app_name()
                 ],
                 shell=shell,
-            ).strip()
+            ).strip(),
         )
         sys.exit(os.EX_OK)
 
