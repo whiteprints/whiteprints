@@ -10,12 +10,16 @@ import sys
 from argparse import Action, ArgumentParser, HelpFormatter, Namespace
 from collections.abc import Iterable
 from functools import partial
-from importlib.metadata import PackagePath
 from pathlib import Path
 from typing import ClassVar, Final, NoReturn, Optional
 
 from whiteprints import _, robust_print, robust_print_json
 
+
+if sys.version_info >= (3, 10):
+    from importlib.metadata import PackagePath
+else:
+    from importlib_metadata import PackagePath
 
 if sys.version_info >= (3, 12):
     from typing import override
