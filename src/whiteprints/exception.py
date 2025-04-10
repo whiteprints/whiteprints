@@ -12,3 +12,7 @@ class WhiteprintsError(Exception):
         >>> class NewError(ValueError, WhiteprintsError):
         >>>     ...
     """
+
+
+class NoLicenseFoundError(AssertionError, WhiteprintsError):
+    """No license found in the project."""

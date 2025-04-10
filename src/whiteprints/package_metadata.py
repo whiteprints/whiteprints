@@ -6,7 +6,9 @@
 
 import sys
 from importlib import metadata
-from typing import Final
+from typing import Any, Final
+
+from whiteprints.exception import NoLicenseFoundError
 
 
 if sys.version_info >= (3, 10):
@@ -54,6 +56,11 @@ def _find_license_files(
     ]
 
 
+def _check_license_found(licenses_found: list[Any]) -> None:
+    if not len(licenses_found):
+        raise NoLicenseFoundError
+
+
 __version__: Final = metadata.version(__package__ or "")
 """The package version number as found by importlib metadata."""
 
@@ -68,3 +75,5 @@ __license_file__: Final = _find_license_files(
     license_files=__metadata__.get_all("License-File") or [],
 )
 """A list containing the path to the license(s) of the package code."""
+
+_check_license_found(__license_file__)
