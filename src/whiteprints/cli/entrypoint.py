@@ -26,7 +26,7 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
         >>> import os
         >>>
         >>> try:
-        >>>     entrypoint()
+        >>>     entrypoint([])
         >>> except SystemExit as ext:
         >>>     assert ext.code == os.EX_OK
         ...

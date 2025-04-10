@@ -5,11 +5,15 @@
 
 # Uncomment this to use project local uv cache.
 # export UV_CACHE_DIR := ".just/.cache/uv"
+#
 export UV_OFFLINE := "false"
 export UV_REFRESH := "true"
 export UV_NO_PROGRESS := "true"
 export PYTHONOPTIMIZE := "0"
 export PYTHONDONTWRITEBYTECODE := "1"
+
+# Comment to parallelize tests with xdist
+export PYTEST_XDIST_AUTO_NUM_WORKERS := "0"
 
 
 # list all receipts
@@ -93,12 +97,14 @@ all:
 
 # Run `uv`
 [private]
+[no-exit-message]
 uv args="":
     uv \
     {{ args }}
 
 # Run `uv run`
 [private]
+[no-exit-message]
 uvr args="":
     @just uv " \
         run \
@@ -113,6 +119,7 @@ uvr args="":
 
 # Run `uv tool run`
 [private]
+[no-exit-message]
 uvx args="":
     @just uv " \
         tool run \
@@ -284,7 +291,8 @@ pytest-from-venv python-path tmp-path coverage-path tests-results-path:
     env TMPDIR="{{ tmp-path }}" \
     COVERAGE_FILE="{{ coverage-path }}/.coverage.{{ arch() }}-{{ os() }}" \
     "{{ python-path }}" -m pytest \
-        -n='auto' \
+        -m='not no_extras' \
+        --numprocesses='auto' \
         --html="{{ tests-results-path }}/test_report.{{ arch() }}.{{ os() }}.html" \
         --junitxml="{{ tests-results-path }}/junit-{{ arch() }}-{{ os() }}.xml" \
         --md-report-output="{{ tests-results-path }}/test_report_{{ arch() }}_{{ os() }}.md" \
@@ -317,42 +325,51 @@ test-distribution-low-high python dist link_mode="":
 alias test-dist-lh := test-distribution-low-high
 alias tdlh := test-distribution-low-high
 
+[private]
+[no-exit-message]
+@collect-tests *args:
+    just uvr "--group=tests pytest --quiet --no-cov --collect-only -m 'no_extras' {{ args }}"
+
 # Run the tests with pytest for a given Python
 [group("tests")]
-test-repository python: (venv "test-repository" python)
+test-repository python *args: (venv "test-repository" python)
     @TMPDIR="$(just tmp-path test-repository {{ python }})" \
     COVERAGE_FILE="$(just coverage-path test-repository {{ python }})/.coverage.{{ arch() }}-{{ os() }}" \
-    just uvr " \
-        --group=tests \
-        --python=\"$(just venv-path test-repository {{ python }})\" \
-    pytest \
-        -n='auto' \
-        -m='not test_extras' \
-        --html=\"$(just tests-results-path test-repository {{ python }})/test_report.{{ arch() }}.{{ os() }}.html\" \
-        --junitxml=\"$(just tests-results-path test-repository {{ python }})/junit-{{ arch() }}-{{ os() }}.xml\" \
-        --md-report-output=\"$(just tests-results-path test-repository {{ python }})/test_report_{{ arch() }}_{{ os() }}.md\" \
-        --basetemp=\"$(just tmp-path test-repository {{ python }})\" \
-        --cov-config=".coveragerc" \
-        'src' \
-        'tests' \
-    "
-    @TMPDIR="$(just tmp-path test-repository {{ python }})" \
-    COVERAGE_FILE="$(just coverage-path test-repository {{ python }})/.coverage.extras.{{ arch() }}-{{ os() }}" \
     just uvr " \
         --all-extras \
         --group=tests \
         --python=\"$(just venv-path test-repository {{ python }})\" \
     pytest \
-        -n='auto' \
-        -m='test_extras' \
-        --html=\"$(just tests-results-path test-repository {{ python }})/test_report.extras.{{ arch() }}.{{ os() }}.html\" \
-        --junitxml=\"$(just tests-results-path test-repository {{ python }})/junit-extras-{{ arch() }}-{{ os() }}.xml\" \
-        --md-report-output=\"$(just tests-results-path test-repository {{ python }})/test_report_extras_{{ arch() }}_{{ os() }}.md\" \
+        -m='not no_extras' \
+        --numprocesses='auto' \
+        --html=\"$(just tests-results-path test-repository {{ python }})/test_report.{{ arch() }}.{{ os() }}.html\" \
+        --junitxml=\"$(just tests-results-path test-repository {{ python }})/junit-{{ arch() }}-{{ os() }}.xml\" \
+        --md-report-output=\"$(just tests-results-path test-repository {{ python }})/test_report_{{ arch() }}_{{ os() }}.md\" \
         --basetemp=\"$(just tmp-path test-repository {{ python }})\" \
         --cov-config=".coveragerc" \
+        {{ args }} \
         'src' \
         'tests' \
     "
+    @if just collect-tests {{ args }}; then \
+        TMPDIR="$(just tmp-path test-repository {{ python }})" \
+        COVERAGE_FILE="$(just coverage-path test-repository {{ python }})/.coverage.extras.{{ arch() }}-{{ os() }}" \
+        just uvr " \
+            --group=tests \
+            --python=\"$(just venv-path test-repository {{ python }})\" \
+        pytest \
+            -m='no_extras' \
+            --numprocesses='auto' \
+            --html=\"$(just tests-results-path test-repository {{ python }})/test_report.extras.{{ arch() }}.{{ os() }}.html\" \
+            --junitxml=\"$(just tests-results-path test-repository {{ python }})/junit-extras-{{ arch() }}-{{ os() }}.xml\" \
+            --md-report-output=\"$(just tests-results-path test-repository {{ python }})/test_report_extras_{{ arch() }}_{{ os() }}.md\" \
+            --basetemp=\"$(just tmp-path test-repository {{ python }})\" \
+            --cov-config=".coveragerc" \
+            {{ args }} \
+            'src' \
+            'tests' \
+        "; \
+    fi
     @just uvx "pyclean ."
 
 alias test-repo := test-repository

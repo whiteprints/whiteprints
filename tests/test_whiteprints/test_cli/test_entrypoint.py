@@ -113,6 +113,7 @@ def test_license_valid(capsys: pytest.CaptureFixture[str]) -> None:
     assert captured.out, "There should be a license text displayed"
 
 
+@pytest.mark.no_extras
 def test_shell_completion_fail_when_no_extras(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
@@ -129,7 +130,6 @@ def test_shell_completion_fail_when_no_extras(
     )
 
 
-@pytest.mark.test_extras
 def test_shell_completion(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
@@ -143,7 +143,6 @@ def test_shell_completion(
     assert captured.out, "There should be a shell completion displayed"
 
 
-@pytest.mark.test_extras
 def test_shell_completion_auto(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
