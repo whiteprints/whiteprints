@@ -10,14 +10,38 @@ import importlib
 import importlib.metadata
 import os
 import sys
+from functools import cache
 from pathlib import Path
 from typing import Final, Optional
 
 from whiteprints import LOCALE_DIRECTORY, _
 
 
-__all__: Final = ["entrypoint"]
+__all__: Final = ["entrypoint", "prog_name"]
 """Public module attributes."""
+
+
+@cache
+def prog_name() -> str:
+    """Determine the program name from the entrypoint metadata.
+
+    Returns:
+        The program name
+    """
+    entrypoints = importlib.metadata.entry_points()
+    entrypoint_value = f"{__name__}:entrypoint"
+
+    if sys.version_info >= (3, 10):
+        return entrypoints.select(
+            group="console_scripts",
+            value=entrypoint_value,
+        ).names.pop()
+
+    return next(
+        entrypoint.name
+        for entrypoint in entrypoints["console_scripts"]
+        if entrypoint.value == entrypoint_value
+    )
 
 
 def entrypoint(args: Optional[list[str]] = None) -> None:
@@ -45,11 +69,7 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
     entrypoint_parser = importlib.import_module(
         "whiteprints.cli.entrypoint_parser",
         __package__,
-    ).create_entrypoint_parser(
-        importlib.metadata.entry_points(
-            module=__name__, attr="entrypoint"
-        ).names.pop()
-    )
+    ).create_entrypoint_parser(prog_name())
 
     subparsers = entrypoint_parser.add_subparsers(
         title=_("Subcommands"),
