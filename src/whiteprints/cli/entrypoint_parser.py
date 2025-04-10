@@ -44,11 +44,14 @@ class ArgumentParserExUsage(ArgumentParser):
         self.exit(os.EX_USAGE, _("{}: error: {}\n").format(self.prog, message))
 
 
-def try_detect_shell() -> str:
+def try_detect_shell(prog: str) -> str:
     """Try to detect the shell name.
 
     If the module `shellingham` is not installed exit with return code
     `os.EX_SOFTWARE`.
+
+    Args:
+        prog: the program name.
 
     Returns:
         The name of the shell.
@@ -59,24 +62,16 @@ def try_detect_shell() -> str:
         robust_print(
             _(
                 "error: no shell detection plugin installed. reinstall"
-                " `{app_name}` with the `qol` extra"
-                " (e.g. `pip install {app_name}"
+                " `{prog}` with the `qol` extra"
+                " (e.g. `pip install {prog}"
                 r"\[qol]`) to use autocompletion."
-            ).format(
-                app_name=importlib.import_module(
-                    "whiteprints.cli.app_metadata"
-                ).app_name()
-            ),
+            ).format(prog=prog),
             fallback_message=_(
                 "error: no shell detection plugin installed. Reinstall"
-                " `{app_name}` with the `qol` extra"
-                " (e.g. `pip install {app_name}"
+                " `{prog}` with the `qol` extra"
+                " (e.g. `pip install {prog}"
                 r"[qol]`) to use autocompletion."
-            ).format(
-                app_name=importlib.import_module(
-                    "whiteprints.cli.app_metadata"
-                ).app_name()
-            ),
+            ).format(prog=prog),
             file=sys.stderr,
         )
         sys.exit(os.EX_SOFTWARE)
@@ -108,43 +103,31 @@ class Completion(Action):
             args: the arguments passed to the parser
         """
         maybe_shell = args[0]
-        shell = try_detect_shell() if maybe_shell is None else str(maybe_shell)
+        shell = (
+            try_detect_shell(parser.prog)
+            if maybe_shell is None
+            else str(maybe_shell)
+        )
         try:
             robust_print(
                 importlib.import_module("argcomplete.shell_integration")
-                .shellcode(
-                    [
-                        importlib.import_module(
-                            "whiteprints.cli.app_metadata",
-                            __package__,
-                        ).app_name()
-                    ],
-                    shell,
-                )
+                .shellcode([parser.prog], shell)
                 .strip()
             )
         except ModuleNotFoundError:
             robust_print(
                 _(
                     "error: no autocompletion plugin installed. reinstall"
-                    " `{app_name}` with the `qol` extra"
-                    " (e.g. `pip install {app_name}"
+                    " `{prog}` with the `qol` extra"
+                    " (e.g. `pip install {prog}"
                     r"\[qol]`) to use autocompletion."
-                ).format(
-                    app_name=importlib.import_module(
-                        "whiteprints.cli.app_metadata"
-                    ).app_name()
-                ),
+                ).format(prog=parser.prog),
                 fallback_message=_(
                     "error: no autocompletion plugin installed. Reinstall"
-                    " `{app_name}` with the `qol` extra"
-                    " (e.g. `pip install {app_name}"
+                    " `{prog}` with the `qol` extra"
+                    " (e.g. `pip install {prog}"
                     r"[qol]`) to use autocompletion."
-                ).format(
-                    app_name=importlib.import_module(
-                        "whiteprints.cli.app_metadata"
-                    ).app_name()
-                ),
+                ).format(parser.prog),
                 file=sys.stderr,
             )
             sys.exit(os.EX_SOFTWARE)
@@ -275,7 +258,7 @@ class DebugInfo(Action):
         sys.exit(os.EX_OK)
 
 
-def create_entrypoint_parser() -> ArgumentParserExUsage:
+def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
     """Parse command line arguments.
 
     The ouput of this function is cached. No new instances are created on
@@ -286,16 +269,11 @@ def create_entrypoint_parser() -> ArgumentParserExUsage:
         True
 
     Args:
-        args: the arguments forwarded to argparse. For example sys.argv.
+        prog: the program name
 
     Returns:
         the arguments namespace.
     """
-    app_name = importlib.import_module(
-        "whiteprints.cli.app_metadata",
-        __package__,
-    ).app_name()
-
     try:
         formatter_class = partial(
             importlib.import_module("rich_argparse").RichHelpFormatter,
@@ -305,7 +283,7 @@ def create_entrypoint_parser() -> ArgumentParserExUsage:
         formatter_class = HelpFormatter
 
     parser = ArgumentParserExUsage(
-        prog=app_name,
+        prog=prog,
         formatter_class=formatter_class,
         description=_(
             "A Copier-based cookiecutter for creating Python projects "
@@ -375,7 +353,7 @@ def create_entrypoint_parser() -> ArgumentParserExUsage:
     )
 
     logs = parser.add_argument_group("Logging")
-    app_name_env_prefix = app_name.replace("-", "_").upper()
+    app_name_env_prefix = prog.upper()
     log_conf_metavar = f"{app_name_env_prefix}_LOG_CONF"
     logs_arg = logs.add_argument(
         "-L",

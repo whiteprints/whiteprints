@@ -7,6 +7,7 @@
 """Command Line Interface app entrypoint."""
 
 import importlib
+import importlib.metadata
 import os
 import sys
 from pathlib import Path
@@ -44,7 +45,11 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
     entrypoint_parser = importlib.import_module(
         "whiteprints.cli.entrypoint_parser",
         __package__,
-    ).create_entrypoint_parser()
+    ).create_entrypoint_parser(
+        importlib.metadata.entry_points(
+            module=__name__, attr="entrypoint"
+        ).names.pop()
+    )
 
     subparsers = entrypoint_parser.add_subparsers(
         title=_("Subcommands"),
