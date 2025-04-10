@@ -4,9 +4,15 @@
 
 """Discover the package's version number."""
 
+import sys
 from importlib import metadata
-from importlib.metadata import PackagePath
 from typing import Final
+
+
+if sys.version_info >= (3, 10):
+    from importlib.metadata import PackagePath
+else:
+    from importlib_metadata import PackagePath
 
 
 __all__: Final = [

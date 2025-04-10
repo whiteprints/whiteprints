@@ -2193,6 +2193,7 @@ wheels = [
 name = "whiteprints"
 source = { editable = "." }
 dependencies = [
+    { name = "importlib-metadata", marker = "python_full_version < '3.10'" },
     { name = "pdbpp" },
     { name = "typing-extensions", version = "4.13.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "uv" },
@@ -2309,6 +2310,7 @@ tests = [
 requires-dist = [
     { name = "argcomplete", marker = "extra == 'qol'", specifier = "==3.6.2" },
     { name = "beartype", marker = "extra == 'debug'", specifier = "==0.20.2" },
+    { name = "importlib-metadata", marker = "python_full_version < '3.10'", specifier = "==8.6.1" },
     { name = "pdbpp", specifier = ">=0.10.3" },
     { name = "platformdirs", marker = "extra == 'qol'", specifier = "==4.3.7" },
     { name = "rich", marker = "extra == 'color'", specifier = "==14.0.0" },
