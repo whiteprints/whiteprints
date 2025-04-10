@@ -6,7 +6,7 @@
 
 import sys
 from importlib import metadata
-from typing import Final
+from typing import Final, cast
 
 
 if sys.version_info >= (3, 10):
@@ -65,8 +65,17 @@ __metadata__: Final = metadata.metadata(__package__ or "")
 __license__: Final = __metadata__["License-Expression"]
 """The package code license as found by importlib metadata."""
 
-__license_file__: Final = _find_license_files(
-    license_paths=metadata.files(__package__ or "") or [],
-    license_files=__metadata__.get_all("License-File") or [],
-)
-"""A list containing the path to the license(s) of the package code."""
+if sys.version_info >= (3, 10):
+    __license_file__: Final = _find_license_files(
+        license_paths=metadata.files(__package__ or "") or [],
+        license_files=__metadata__.get_all("License-File") or [],
+    )
+    """A list containing the path to the license(s) of the package code."""
+else:
+    __license_file__: Final = _find_license_files(
+        license_paths=cast(
+            "list[PackagePath]", metadata.files(__package__ or "") or []
+        ),
+        license_files=__metadata__.get_all("License-File") or [],
+    )
+    """A list containing the path to the license(s) of the package code."""
