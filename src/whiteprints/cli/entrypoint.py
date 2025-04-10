@@ -9,61 +9,38 @@
 import importlib
 import os
 import sys
-from argparse import (
-    ArgumentError,
-    ArgumentParser,
-    ArgumentTypeError,
-    Namespace,
-)
 from pathlib import Path
 from typing import Final, Optional
 
-from whiteprints import _
+from whiteprints import LOCALE_DIRECTORY, _
 
 
 __all__: Final = ["entrypoint"]
 """Public module attributes."""
 
 
-def _parse_args(
-    parser: ArgumentParser,
-    args: Optional[list[str]],
-) -> Namespace:
-    """Parse the arguments.
-
-    Print an error and exit on parsing error.
-
-    Args:
-        parser: the entrypoint argument parser
-        args: the arguments to parse
-
-    Returns:
-        an argument namespace.
-    """
-    try:
-        namespace = parser.parse_args(args)
-    except (ArgumentError, ArgumentTypeError) as argument_error:
-        importlib.import_module("whiteprints", __package__).stderr().print(
-            argument_error
-        )
-        sys.exit(os.EX_USAGE)
-
-    return namespace
-
-
 def entrypoint(args: Optional[list[str]] = None) -> None:
     """The Whiteprint CLI.
 
     Example:
+        >>> import os
+        >>>
         >>> try:
         >>>     entrypoint()
-        >>> except SystemExit:
-        >>>     pass
+        >>> except SystemExit as ext:
+        >>>     assert ext.code == os.EX_OK
         ...
 
     Args:
         args: the arguments forwarded to argparse. For example sys.argv.
     """
+    gettext = importlib.import_module("gettext")
+    gettext.bindtextdomain(
+        "argparse",
+        LOCALE_DIRECTORY,
+    )
+    gettext.textdomain("argparse")
+
     entrypoint_parser = importlib.import_module(
         "whiteprints.cli.entrypoint_parser",
         __package__,
@@ -78,13 +55,9 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
     ).init_parser(subparser, entrypoint_parser)
 
     with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
-        importlib.import_module("argcomplete").autocomplete(
-            entrypoint_parser,
-            exit_method=sys.exit,
-            always_complete_options="long",
-        )
+        importlib.import_module("argcomplete").autocomplete(entrypoint_parser)
 
-    namespace = _parse_args(entrypoint_parser, args)
+    namespace = entrypoint_parser.parse_args(args)
     if namespace.cmd is None:
         entrypoint_parser.print_help()
         sys.exit(os.EX_OK)
@@ -115,3 +88,4 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
         __package__,
     )
     getattr(command, namespace.cmd)(namespace)
+    logger.debug("program finished without errors")

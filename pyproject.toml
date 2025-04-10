@@ -49,20 +49,21 @@ dynamic = [
     "version",
 ]
 dependencies = [
-    "distro==1.9.0",
     "importlib-metadata==8.6.1; python_full_version<'3.10.0'",
-    "platformdirs==4.3.7",
-    "rich==13.9.4",
-    "typing-extensions==4.12.2; python_full_version<'3.12.0'",
-    "uv==0.6.9",
-    "whiteprints-template-context==0.6.0",
+    "nuitka>=2.6.9",
+    "typing-extensions==4.13.1; python_full_version<'3.12.0'",
+    "uv==0.6.13",
+]
+optional-dependencies.color = [
+    "rich==14.0.0",
+    "rich-argparse==1.7.0",
 ]
 optional-dependencies.debug = [
-    "beartype==0.20.1",
+    "beartype==0.20.2",
 ]
 optional-dependencies.qol = [
-    "argcomplete==3.6.0",
-    "rich-argparse==1.7.0",
+    "argcomplete==3.6.2",
+    "platformdirs==4.3.7",
     "shellingham==1.5.4",
 ]
 urls.changelog = "https://github.com/whiteprints/whiteprints/releases"
@@ -104,10 +105,10 @@ build-documentation = [
     "stdlib-list>=0.11.1",
 ]
 tests = [
-    "beartype==0.20.1",
-    "hypothesis==6.130.0",
+    "beartype==0.20.2",
+    "hypothesis==6.130.12",
     "pytest==8.3.5",
-    "pytest-cov==6.0.0",
+    "pytest-cov==6.1.1",
     "pytest-html==4.1.1",
     "pytest-md-report==0.6.3",
     "pytest-randomly==3.16.0",
@@ -121,10 +122,10 @@ editor = [
     "pynvim==0.5.2",
 ]
 coverage = [
-    "coverage==7.7.0",
+    "coverage==7.8.0",
 ]
 audit-vulnerabilities = [
-    "pip-audit==2.8.0",
+    "pip-audit==2.9.0",
 ]
 audit-maintainability = [
     "radon==6.0.1",
@@ -153,7 +154,7 @@ keep_full_version = true
 max_supported_python = "3.13"
 
 [tool.uv]
-required-version = ">=0.6.9"
+required-version = ">=0.6.12"
 cache-keys = [
     { git = { commit = true, tags = true } },
     { file = "pyproject.toml" },

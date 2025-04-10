@@ -12,7 +12,7 @@ from collections.abc import Iterable
 from subprocess import CalledProcessError  # nosec
 from typing import Final, TypedDict
 
-from whiteprints import _
+from whiteprints import _, robust_print
 from whiteprints.libuv.copier import Copier
 
 
@@ -238,8 +238,11 @@ def init(namespace: Namespace) -> None:
             },
         )
     except CalledProcessError:
-        importlib.import_module("whiteprints", __package__).stderr().print(
-            _("[red]Project creation failed[/]")
+        error_message = _("Project creation failed")
+        robust_print(
+            f"[red]{error_message}[/]",
+            fallback_message=error_message,
+            file=sys.stderr,
         )
         logger = importlib.import_module("logging").getLogger(__name__)
         logger.exception(

@@ -40,16 +40,19 @@ fail_under = 100
 exclude_also =
   ; Don't complain about missing debug-only code:
   if __debug__
-  if self\.debug
-  if DEBUG
+  if self.debug
+  if settings.DEBUG
 
   ; Don't complain if tests don't hit defensive assertion code:
+  raise AssertionError
   raise NotImplementedError
 
   ; Don't complain if non-runnable code isn't run:
   if 0:
   if False:
   if __name__ == .__main__.:
+  if TYPE_CHECKING:
 
-  ; Don't complain about abstract methods, they aren't run:
+  ; Don't complain about abstract methods and protocols, they aren't run:
+  class .*\bProtocol\):
   @(abc\.)?abstractmethod

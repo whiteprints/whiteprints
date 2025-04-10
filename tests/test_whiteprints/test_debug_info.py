@@ -30,7 +30,6 @@ class TestGatherDebugInfo:
             "platform",
             "python_version",
             "package_version",
-            "operating_system",
         ],
     )
     def test_gather_debug_info_keys(key: str) -> None:
@@ -62,14 +61,6 @@ class TestGatherDebugInfo:
         debug_info = gather_debug_info()
         assert all(isinstance(p, str) for p in debug_info["pythonpath"]), (
             "All elements in 'pythonpath' should be strings."
-        )
-
-    @staticmethod
-    def test_operating_system_info_present() -> None:
-        """Test that 'operating_system' information is present."""
-        debug_info = gather_debug_info()
-        assert "operating_system" in debug_info, (
-            "'operating_system' key missing in debug_info."
         )
 
     @staticmethod

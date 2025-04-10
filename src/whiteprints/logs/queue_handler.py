@@ -36,7 +36,7 @@ class AutoStartQueueListener(QueueListener):
         It inherits from logging.QueueListener and start/stop the queue
         automatically on instanciation and destruction.
 
-        This is usefule for python >= 3.12 as it can be passed directly in the
+        This is useful for python >= 3.12 as it can be passed directly in the
         dictconfig.
 
         Example:

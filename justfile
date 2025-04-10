@@ -284,7 +284,7 @@ pytest-from-venv python-path tmp-path coverage-path tests-results-path:
     env TMPDIR="{{ tmp-path }}" \
     COVERAGE_FILE="{{ coverage-path }}/.coverage.{{ arch() }}-{{ os() }}" \
     "{{ python-path }}" -m pytest \
-        -n="auto" \
+        -n='auto' \
         --html="{{ tests-results-path }}/test_report.{{ arch() }}.{{ os() }}.html" \
         --junitxml="{{ tests-results-path }}/junit-{{ arch() }}-{{ os() }}.xml" \
         --md-report-output="{{ tests-results-path }}/test_report_{{ arch() }}_{{ os() }}.md" \
@@ -326,10 +326,28 @@ test-repository python: (venv "test-repository" python)
         --group=tests \
         --python=\"$(just venv-path test-repository {{ python }})\" \
     pytest \
-        -n="auto" \
+        -n='auto' \
+        -m='not test_extras' \
         --html=\"$(just tests-results-path test-repository {{ python }})/test_report.{{ arch() }}.{{ os() }}.html\" \
         --junitxml=\"$(just tests-results-path test-repository {{ python }})/junit-{{ arch() }}-{{ os() }}.xml\" \
         --md-report-output=\"$(just tests-results-path test-repository {{ python }})/test_report_{{ arch() }}_{{ os() }}.md\" \
+        --basetemp=\"$(just tmp-path test-repository {{ python }})\" \
+        --cov-config=".coveragerc" \
+        'src' \
+        'tests' \
+    "
+    @TMPDIR="$(just tmp-path test-repository {{ python }})" \
+    COVERAGE_FILE="$(just coverage-path test-repository {{ python }})/.coverage.extras.{{ arch() }}-{{ os() }}" \
+    just uvr " \
+        --all-extras \
+        --group=tests \
+        --python=\"$(just venv-path test-repository {{ python }})\" \
+    pytest \
+        -n='auto' \
+        -m='test_extras' \
+        --html=\"$(just tests-results-path test-repository {{ python }})/test_report.extras.{{ arch() }}.{{ os() }}.html\" \
+        --junitxml=\"$(just tests-results-path test-repository {{ python }})/junit-extras-{{ arch() }}-{{ os() }}.xml\" \
+        --md-report-output=\"$(just tests-results-path test-repository {{ python }})/test_report_extras_{{ arch() }}_{{ os() }}.md\" \
         --basetemp=\"$(just tmp-path test-repository {{ python }})\" \
         --cov-config=".coveragerc" \
         'src' \

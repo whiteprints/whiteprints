@@ -31,8 +31,6 @@ from importlib.util import find_spec
 from pathlib import Path
 from typing import Final, TypedDict
 
-from distro.distro import InfoDict
-
 
 if sys.version_info >= (3, 11):
     from typing import NotRequired
@@ -65,7 +63,6 @@ class LogsInfo(TypedDict):
 class DebugInfo(TypedDict):
     """Holds runtime debug information."""
 
-    operating_system: InfoDict
     platform: str
     python_version: str
     python_executable: str
@@ -254,8 +251,8 @@ def gather_debug_info() -> DebugInfo:
     logs = importlib.import_module(
         "whiteprints.cli.logs",
     )
+
     return DebugInfo(
-        operating_system=importlib.import_module("distro.distro").info(),
         platform=importlib.import_module("platform").platform(),
         python_executable=str(Path(sys.executable)),
         python_version=sys.version,

@@ -18,6 +18,7 @@ def user_log_dir() -> Path:
     """The default user log directory Path.
 
     The default path is given by `platformdirs.user_log_path`.
+    If `platformdirs` is not installed, returns the current directory.
 
     Example:
         >>> user_log_dir()
@@ -26,40 +27,46 @@ def user_log_dir() -> Path:
     Returns:
         The path to the log directory.
     """
-    return importlib.import_module("platformdirs").user_log_path(
-        importlib.import_module(
-            "whiteprints.cli.app_metadata",
-            __package__,
-        ).app_name()
-    )
-
-
-@cache
-def user_log_config() -> Path:
-    """The default user logging configuration file Path.
-
-    The default path is given by `platformdirs.user_config_path`.
-
-    Example:
-        >>> user_log_config()
-        PosixPath(...)
-
-    Returns:
-        The path to the logging configuration file.
-    """
-    return (
-        importlib.import_module("platformdirs").user_config_path(
+    with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
+        return importlib.import_module("platformdirs").user_log_path(
             importlib.import_module(
                 "whiteprints.cli.app_metadata",
                 __package__,
             ).app_name()
         )
-        / "logs.json"
-    )
+
+    return Path.cwd()
+
+
+@cache
+def user_log_config() -> Optional[Path]:
+    """The default user logging configuration file Path.
+
+    If platformdirs is not installed, returns None.
+    Otherwise the configuration path is given by
+    `platformdirs.user_config_path`.
+
+    Returns:
+        The path to the logging configuration file if `platformdirs` is
+        installed, None otherwise.
+    """
+    with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
+        return (
+            importlib.import_module("platformdirs").user_config_path(
+                importlib.import_module(
+                    "whiteprints.cli.app_metadata",
+                    __package__,
+                ).app_name()
+            )
+            / "logs.json"
+        )
 
 
 def _generate_configuration(log_config_path: Path) -> None:
     """Generate a default logging configuration file.
+
+    The special keyword $USER_LOG_DIR will be replaced by the path returned by
+    the function `user_log_dir`.
 
     Args:
         log_config_path: path to the logging configuration file.
@@ -76,15 +83,13 @@ def _generate_configuration(log_config_path: Path) -> None:
             },
             "handlers": {
                 "stderr": {
-                    "class": (
-                        "whiteprints.logs.rich_json_handler.RichJSONHandler"
-                    ),
+                    "class": "logging.StreamHandler",
                     "level": "CRITICAL",
-                    "formatter": "struct_json",
+                    "stream": "ext://sys.stderr",
                 },
                 "file": {
                     "class": "logging.handlers.RotatingFileHandler",
-                    "level": "DEBUG",
+                    "level": "WARNING",
                     "filename": "$USER_LOG_DIR/debug.log",
                     "formatter": "struct_json",
                     "maxBytes": 4_000_000,
@@ -116,18 +121,19 @@ def setup_logging(log_config_path: Optional[Path] = None) -> None:
         log_config_path: path to the logging configuration file.
     """
     log_config_path = log_config_path or user_log_config()
+    if log_config_path is not None:
+        if not log_config_path.is_file():
+            log_config_path.parent.mkdir(parents=True, exist_ok=True)
+            _generate_configuration(log_config_path)
 
-    if not log_config_path.is_file():
-        log_config_path.parent.mkdir(parents=True, exist_ok=True)
-        _generate_configuration(log_config_path)
-
-    user_log_dir().mkdir(parents=True, exist_ok=True)
-    raw_config = log_config_path.read_text(encoding="utf-8")
-    importlib.import_module("logging.config").dictConfig(
-        config=importlib.import_module("json").loads(
-            importlib.import_module("string")
-            .Template(raw_config)
-            .substitute({"USER_LOG_DIR": user_log_dir()})
+        user_log_dir().mkdir(parents=True, exist_ok=True)
+        raw_config = log_config_path.read_text(encoding="utf-8")
+        importlib.import_module("logging.config").dictConfig(
+            config=importlib.import_module("json").loads(
+                importlib.import_module("string")
+                .Template(raw_config)
+                .substitute({"USER_LOG_DIR": user_log_dir()})
+            )
         )
-    )
+
     importlib.import_module("logging").captureWarnings(capture=True)

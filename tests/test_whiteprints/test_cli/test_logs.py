@@ -26,3 +26,8 @@ def test_setup_logging(tmp_path: Path) -> None:
     assert log_config_path.read_text() == generated_config, (
         "logging configuration should not be modified when reloaded"
     )
+
+
+def test_setup_logging_no_config() -> None:
+    """Test wether logging setup works when no logs config is given."""
+    setup_logging()
