@@ -225,7 +225,7 @@ clean-all:
 
 # Run a receipt for all Python versions (found in the .python-versions file). Works for all receipt whose first argument is a Python version
 [group("tests")]
-for-all-python receipt args="":
+for-all-python receipt *args:
     for python in $(grep -v '^#' .python-versions); do \
         just {{ receipt }} $python {{ args }}; \
     done
@@ -328,7 +328,7 @@ alias tdlh := test-distribution-low-high
 [private]
 [no-exit-message]
 @collect-tests *args:
-    just uvr "--group=tests pytest --quiet --no-cov --collect-only -m 'no_extras' {{ args }}"
+    just uvr "--group=tests pytest --quiet --no-cov --collect-only -m 'no_extras or extras_and_no_extras' {{ args }}"
 
 # Run the tests with pytest for a given Python
 [group("tests")]
@@ -358,7 +358,7 @@ test-repository python *args: (venv "test-repository" python)
             --group=tests \
             --python=\"$(just venv-path test-repository {{ python }})\" \
         pytest \
-            -m='no_extras' \
+            -m='no_extras or extras_and_no_extras' \
             --numprocesses='auto' \
             --html=\"$(just tests-results-path test-repository {{ python }})/test_report.extras.{{ arch() }}.{{ os() }}.html\" \
             --junitxml=\"$(just tests-results-path test-repository {{ python }})/junit-extras-{{ arch() }}-{{ os() }}.xml\" \

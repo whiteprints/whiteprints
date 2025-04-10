@@ -7,6 +7,8 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from whiteprints.cli.logs import setup_logging
 
 
@@ -28,6 +30,7 @@ def test_setup_logging(tmp_path: Path) -> None:
     )
 
 
+@pytest.mark.extras_and_no_extras
 def test_setup_logging_no_config() -> None:
     """Test wether logging setup works when no logs config is given."""
     setup_logging()
