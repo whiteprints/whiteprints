@@ -5,14 +5,14 @@
 """Discover the package's version number."""
 
 import sys
-from collections.abc import Sequence
-from importlib import metadata
 from typing import Final
 
 
 if sys.version_info >= (3, 10):
+    from importlib import metadata
     from importlib.metadata import PackagePath
 else:
+    import importlib_metadata as metadata
     from importlib_metadata import PackagePath
 
 __all__: Final = [
@@ -26,7 +26,7 @@ __all__: Final = [
 
 def _find_license_files(
     *,
-    license_paths: Sequence[PackagePath],
+    license_paths: list[PackagePath],
     license_files: list[str],
 ) -> list[PackagePath]:
     """Find the licenses in the wheel defined in the package metadata.
