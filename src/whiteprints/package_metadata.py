@@ -31,6 +31,7 @@ def _find_license_files(
 
     Example:
         >>> from importlib import metadata
+        >>>
         >>> licenses = _find_license_files(
         >>>     license_paths=metadata.files(__package__ or "") or [],
         >>>     license_files=__metadata__.get_all("License-File") or [],

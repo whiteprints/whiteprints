@@ -40,7 +40,8 @@ else:
 if sys.version_info >= (3, 10):
     from importlib.metadata import packages_distributions
 else:
-    from importlib_metadata import packages_distributions
+    from whiteprints._packages_distributions import packages_distributions
+
 
 __all__: Final = ["DebugInfo", "PackageInfo", "gather_debug_info"]
 
