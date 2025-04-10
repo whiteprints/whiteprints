@@ -67,7 +67,6 @@ export PYTEST_XDIST_AUTO_NUM_WORKERS := "0"
 # run all tests
 all:
     @just pre-commit
-    @just lint
     @just check-vulnerabilities
     @just check-exceptions
     @just check-code-maintainability

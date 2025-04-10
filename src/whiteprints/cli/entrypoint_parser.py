@@ -119,7 +119,7 @@ class Completion(Action):
                             __package__,
                         ).app_name()
                     ],
-                    shell=shell,
+                    shell,
                 )
                 .strip()
             )

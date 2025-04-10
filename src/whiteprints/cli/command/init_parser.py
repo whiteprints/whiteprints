@@ -5,13 +5,13 @@
 """The 'init' subcommand."""
 
 import importlib
-from argparse import Action, ArgumentParser
+from argparse import ArgumentParser
 from pathlib import Path
 
 from whiteprints import _
 
 
-def init_parser(subparser: Action, parser: ArgumentParser) -> None:
+def setup_init_parser(parser: ArgumentParser) -> None:
     """Add a subparser to initialize a Python project.
 
     Example:
@@ -24,20 +24,6 @@ def init_parser(subparser: Action, parser: ArgumentParser) -> None:
         subparser: the subparser to attach to
         parser: the main parser use to forward the `formatter_class`.
     """
-    add_parser = getattr(subparser, "add_parser", None)
-    assert add_parser is not None
-
-    parser = add_parser(
-        "init",
-        formatter_class=parser.formatter_class,
-        description=_("Initialize a Python project."),
-        help=_("Initialize a Python project."),
-        add_help=False,
-        epilog=_(
-            "Note: see https://copier.readthedocs.io/en/stable/configuring/"
-            " for help on how to use Copier and COPIER_ARGS (optional)."
-        ),
-    )
     parser.add_argument(
         "-h",
         "--help",

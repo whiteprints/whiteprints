@@ -45,14 +45,28 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
         "whiteprints.cli.entrypoint_parser",
         __package__,
     ).create_entrypoint_parser()
-    subparser = entrypoint_parser.add_subparsers(
+
+    subparsers = entrypoint_parser.add_subparsers(
         title=_("Subcommands"),
         dest="cmd",
     )
     importlib.import_module(
         "whiteprints.cli.command.init_parser",
         __package__,
-    ).init_parser(subparser, entrypoint_parser)
+    ).setup_init_parser(
+        subparsers.add_parser(
+            "init",
+            formatter_class=entrypoint_parser.formatter_class,
+            description=_("Initialize a Python project."),
+            help=_("Initialize a Python project."),
+            exit_on_error=False,
+            add_help=False,
+            epilog=_(
+                "Note: see https://copier.readthedocs.io/en/stable/configuring/"
+                " for help on how to use Copier and COPIER_ARGS (optional)."
+            ),
+        )
+    )
 
     with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
         importlib.import_module("argcomplete").autocomplete(entrypoint_parser)
