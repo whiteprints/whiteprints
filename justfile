@@ -544,7 +544,7 @@ coverage-report receipt="":
 
 # Print coverage
 [group("coverage")]
-coverage receipt="" args="":
+coverage receipt="" *args:
     @[ ! -z "$(find $(just coverage-path {{ receipt }}) -type f -name 'coverage-combined')" ] || \
         just coverage-combine
     @just uvr " \
@@ -558,7 +558,7 @@ coverage receipt="" args="":
 
 # Run `reuse`
 [private]
-reuse args="":
+reuse *args:
     @just uvx " \
         reuse \
         {{ args }} \
@@ -576,7 +576,7 @@ SBOM-licenses:
 
 # Run `pip-audit`
 [private]
-pip-audit args="":
+pip-audit *args:
     @just uvx " \
         pip-audit \
         --disable-pip \
@@ -639,7 +639,7 @@ autofix:
 
 # Run `bandit`
 [private]
-bandit args="":
+bandit *args:
     @just uvx " \
         bandit \
         {{ args }} \
@@ -658,7 +658,7 @@ check-vulnerabilities:
 
 # Run `tryceratops`
 [private]
-tryceratops args="":
+tryceratops *args:
     @just uvr " \
         --group=check-exceptions \
         tryceratops \
@@ -676,7 +676,7 @@ check-exceptions:
 
 # Run `radon`
 [private]
-radon args="":
+radon *args:
     @just uvx " \
         radon \
         {{ args }} \
@@ -694,7 +694,7 @@ audit-code-maintainability:
 
 # Run `xenon`
 [private]
-xenon args="":
+xenon *args:
     @just uvx " \
         xenon \
         {{ args }} \
@@ -738,7 +738,7 @@ check-supply-chain python resolution="lowest": (venv ("check-supply-chain-" + re
 
 # Run `sphinx-build`
 [private]
-sphinx-build args="":
+sphinx-build *args:
     @just uvr " \
         --group=build-documentation \
         sphinx-build \
@@ -761,7 +761,7 @@ check-documentation-links dest="docs_build":
 
 # Run `sphinx-autobuild`
 [private]
-sphinx-autobuild args="":
+sphinx-autobuild *args:
     @just uvr " \
             --group=serve-documentation \
         sphinx-autobuild \
@@ -780,7 +780,7 @@ serve-documentation port="0":
 
 # Run `pybabel`
 [private]
-pybabel args="":
+pybabel *args:
     @just uvr " \
         --only-group=localization \
     pybabel \
