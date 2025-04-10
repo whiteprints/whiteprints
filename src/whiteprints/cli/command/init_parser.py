@@ -21,7 +21,7 @@ def setup_init_parser(parser: ArgumentParser) -> None:
     Example:
         >>> main_parser = ArgumentParser()
         >>> subparsers = main_parser.add_subparsers()
-        >>> setup_init_parser(subparsers.add_parser("init"))
+        >>> setup_init_parser(subparsers.add_parser("init", add_help=False))
         None
 
     Args:

@@ -10,6 +10,7 @@ import sys
 from argparse import Action, ArgumentParser, HelpFormatter, Namespace
 from collections.abc import Iterable
 from functools import partial
+from importlib.metadata import PackagePath
 from pathlib import Path
 from typing import ClassVar, Final, NoReturn, Optional
 
@@ -20,11 +21,6 @@ if sys.version_info >= (3, 12):
     from typing import override
 else:
     from typing_extensions import override
-
-if sys.version_info >= (3, 10):
-    from importlib.metadata import PackagePath
-else:
-    from importlib_metadata import PackagePath
 
 
 __all__: Final = ["ArgumentParserExUsage", "create_entrypoint_parser"]
