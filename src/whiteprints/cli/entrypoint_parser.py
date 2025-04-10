@@ -258,16 +258,14 @@ class DebugInfo(Action):
         sys.exit(os.EX_OK)
 
 
-def create_entrypoint_parser(
-    prog: Optional[str] = None,
-) -> ArgumentParserExUsage:
+def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
     """Parse command line arguments.
 
     The ouput of this function is cached. No new instances are created on
     subsequent calls.
 
     Example:
-        >>> isinstance(create_entrypoint_parser(), ArgumentParser)
+        >>> isinstance(create_entrypoint_parser("prog"), ArgumentParser)
         True
 
     Args:

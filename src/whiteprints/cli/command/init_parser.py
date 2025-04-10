@@ -7,8 +7,12 @@
 import importlib
 from argparse import ArgumentParser
 from pathlib import Path
+from typing import Final
 
 from whiteprints import _
+
+
+__all__: Final = ["setup_init_parser"]
 
 
 def setup_init_parser(parser: ArgumentParser) -> None:
