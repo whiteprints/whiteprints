@@ -13,15 +13,14 @@ from whiteprints.exception import NotAPackageError
 
 
 if sys.version_info >= (3, 10):
-    from importlib.metadata import PackageMetadata, PackagePath
+    from importlib.metadata import PackagePath
 else:
-    from importlib_metadata import PackageMetadata, PackagePath
+    from importlib_metadata import PackagePath
 
 
 __all__: Final = [
     "find_license_expression",
     "find_license_files",
-    "find_metadata",
     "find_version",
 ]
 """Public module attributes."""
@@ -89,25 +88,15 @@ def find_version() -> str:
 
 
 @cache
-def find_metadata() -> PackageMetadata:
-    """Find the package metadata.
-
-    Returns:
-        the package metadata
-    """
-    return importlib.import_module("importlib.metadata").metadata(
-        _find_present_package()
-    )
-
-
-@cache
 def find_license_expression() -> str:
     """Find the license expression for the current package.
 
     Returns:
         the license expression.
     """
-    return find_metadata()["License-Expression"]
+    return importlib.import_module("importlib.metadata").metadata(
+        _find_present_package()
+    )["License-Expression"]
 
 
 @cache
@@ -124,5 +113,8 @@ def find_license_files() -> list[PackagePath]:
 
     return _find_license_files(
         license_paths=files(_find_present_package) or [],
-        license_files=find_metadata().get_all("License-File") or [],
+        license_files=importlib.import_module("importlib.metadata")
+        .metadata(_find_present_package())
+        .get_all("License-File")
+        or [],
     )

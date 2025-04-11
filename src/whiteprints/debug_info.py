@@ -259,7 +259,7 @@ def gather_debug_info() -> DebugInfo:
         python_version=sys.version,
         package_version=importlib.import_module(
             "whiteprints.package_metadata"
-        ).version(),
+        ).find_version(),
         pythonpath=list(map(str, map(Path, sys.path))),
         dependencies=[
             _package_info_from_name(distribution_package)
