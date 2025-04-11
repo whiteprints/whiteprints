@@ -61,17 +61,22 @@ class LogsInfo(TypedDict):
     default_configuration: Optional[str]
 
 
+class PlatformInfo(TypedDict):
+    """Holds the platform configuration."""
+
+    name: str
+    python_version: str
+    python_executable: str
+    pythonpath: list[str]
+
+
 class DebugInfo(TypedDict):
     """Holds runtime debug information."""
 
-    platform: str
-    python_version: str
-    python_executable: str
-    package_version: str
-    package_root_dir: str
-    pythonpath: list[str]
-    dependencies: list[PackageInfo]
-    logs: LogsInfo
+    platform: PlatformInfo
+    package: PackageInfo
+    direct_dependencies: list[PackageInfo]
+    logs: Optional[LogsInfo]
 
 
 class _DistributionPackage(TypedDict):
@@ -256,15 +261,24 @@ def gather_debug_info() -> DebugInfo:
     log_config = logs.user_log_config()
 
     return DebugInfo(
-        platform=importlib.import_module("platform").platform(),
-        python_executable=str(Path(sys.executable)),
-        python_version=sys.version,
-        package_version=importlib.import_module(
-            "whiteprints.package_metadata"
-        ).find_version(),
-        pythonpath=list(map(str, map(Path, sys.path))),
-        package_root_dir=str(Path(__file__).parent),
-        dependencies=[
+        platform=PlatformInfo(
+            name=importlib.import_module("platform").platform(),
+            python_executable=str(Path(sys.executable)),
+            python_version=sys.version,
+            pythonpath=list(map(str, map(Path, sys.path))),
+        ),
+        package=PackageInfo(
+            name=importlib.import_module(
+                "whiteprints.package_metadata",
+                __package__,
+            ).find_present_package_name(),
+            version=importlib.import_module(
+                "whiteprints.package_metadata",
+                __package__,
+            ).find_version(),
+            origin=str(Path(__file__).parent),
+        ),
+        direct_dependencies=[
             _package_info_from_name(distribution_package)
             for distribution_package in required_distribution
         ],

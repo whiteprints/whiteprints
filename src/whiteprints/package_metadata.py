@@ -22,6 +22,7 @@ else:
 __all__: Final = [
     "find_license_expression",
     "find_license_files",
+    "find_present_package_name",
     "find_version",
 ]
 """Public module attributes."""
