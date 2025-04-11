@@ -6,6 +6,7 @@
 
 import importlib
 import sys
+from collections.abc import Iterable
 from functools import cache
 from typing import Final
 
@@ -28,8 +29,8 @@ __all__: Final = [
 
 def _find_license_files(
     *,
-    license_paths: list[PackagePath],
-    license_files: list[str],
+    license_paths: Iterable[PackagePath],
+    license_files: Iterable[str],
 ) -> list[PackagePath]:
     """Find the licenses in the wheel defined in the package metadata.
 
