@@ -45,7 +45,7 @@ def _find_license_files(
         >>>     license_paths=metadata.files(__package__) or [],
         >>>     license_files=(
         >>>         metadata.metadata(__package__).get_all("License-File")
-        >>>         or [],
+        >>>         or []
         >>>     )
         >>> )
         >>> len(licenses) > 0
