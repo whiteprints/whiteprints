@@ -69,7 +69,7 @@ class TestVersion:
 
         Version numbers must respect PEP440
         """
-        version_number = package_metadata.__version__
+        version_number = package_metadata.find_version()
         assert TestVersion.is_canonical(
             version_number=version_number,
         ), f"The version number {version_number} does not respect PEP440."
@@ -81,9 +81,11 @@ class TestLicense:
     @staticmethod
     def test___license__() -> None:
         """Test if a license metadata exists."""
-        assert package_metadata.__license__, "No license metadata found."
+        assert package_metadata.find_license_expression(), (
+            "No license metadata found."
+        )
 
     @staticmethod
     def test___license_file__() -> None:
         """Test if the license files are found."""
-        assert package_metadata.__license_file__, "No license file found."
+        assert package_metadata.find_license_files(), "No license file found."
