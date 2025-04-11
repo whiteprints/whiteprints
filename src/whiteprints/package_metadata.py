@@ -117,10 +117,12 @@ def find_license_files() -> list[PackagePath]:
     Returns:
         A list containing the path to the license(s) of the package code.
     """
+    if sys.version_info >= (3, 10):
+        files = importlib.import_module("importlib.metadata").files
+    else:
+        files = importlib.import_module("importlib_metadata").files
+
     return _find_license_files(
-        license_paths=importlib.import_module("importlib.metadata").files(
-            _find_present_package
-        )
-        or [],
+        license_paths=files(_find_present_package) or [],
         license_files=find_metadata().get_all("License-File") or [],
     )
