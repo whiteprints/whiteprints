@@ -8,7 +8,7 @@ import importlib
 import sys
 from collections.abc import Iterable
 from functools import cache
-from typing import Final
+from typing import Final, Optional
 
 from whiteprints.exception import NotAPackageError
 
@@ -63,7 +63,9 @@ def _find_license_files(
 
 
 @cache
-def _find_present_package() -> str:
+def find_present_package_name(
+    package_name: Optional[str] = __package__,
+) -> str:
     """Find the present package name.
 
     Raises:
@@ -72,7 +74,6 @@ def _find_present_package() -> str:
     Returns:
         the present package name.
     """
-    package_name = __package__
     if package_name is None:
         raise NotAPackageError
 
@@ -87,7 +88,7 @@ def find_version() -> str:
         The package version.
     """
     return importlib.import_module("importlib.metadata").version(
-        _find_present_package()
+        find_present_package_name()
     )
 
 
@@ -99,7 +100,7 @@ def find_license_expression() -> str:
         the license expression.
     """
     return importlib.import_module("importlib.metadata").metadata(
-        _find_present_package()
+        find_present_package_name()
     )["License-Expression"]
 
 
@@ -116,10 +117,10 @@ def find_license_files() -> list[PackagePath]:
         files = importlib.import_module("importlib_metadata").files
 
     return _find_license_files(
-        license_paths=files(_find_present_package()) or [],
+        license_paths=files(find_present_package_name()) or [],
         license_files=(
             importlib.import_module("importlib.metadata")
-            .metadata(_find_present_package())
+            .metadata(find_present_package_name())
             .get_all("License-File")
             or []
         ),
