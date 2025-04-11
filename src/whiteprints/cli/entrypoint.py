@@ -6,6 +6,7 @@
 
 """Command Line Interface app entrypoint."""
 
+import contextlib
 import importlib
 import importlib.metadata
 import os
@@ -93,7 +94,7 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
         )
     )
 
-    with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
+    with contextlib.suppress(ModuleNotFoundError):
         importlib.import_module("argcomplete").autocomplete(entrypoint_parser)
 
     namespace = entrypoint_parser.parse_args(args)

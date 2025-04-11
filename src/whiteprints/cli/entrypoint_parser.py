@@ -27,7 +27,7 @@ else:
     from typing_extensions import override
 
 
-__all__: Final = ["ArgumentParserExUsage", "create_entrypoint_parser"]
+__all__: Final = ["create_entrypoint_parser"]
 
 
 class ArgumentParserExUsage(ArgumentParser):

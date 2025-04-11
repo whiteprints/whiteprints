@@ -11,8 +11,12 @@ import subprocess  # nosec
 from collections.abc import Iterable
 from functools import cached_property
 from pathlib import Path
+from typing import Final
 
 import uv
+
+
+__all__: Final = ["UVX"]
 
 
 class UVX:

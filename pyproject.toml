@@ -50,7 +50,6 @@ dynamic = [
 ]
 dependencies = [
     "importlib-metadata==8.6.1; python_full_version<'3.10.0'",
-    "pdbpp>=0.10.3",
     "typing-extensions==4.13.1; python_full_version<'3.12.0'",
     "uv==0.6.14",
 ]
@@ -64,6 +63,7 @@ optional-dependencies.debug = [
 optional-dependencies.qol = [
     "argcomplete==3.6.2",
     "platformdirs==4.3.7",
+    "python-dotenv==1.1.0",
     "shellingham==1.5.4",
 ]
 urls.changelog = "https://github.com/whiteprints/whiteprints/releases"

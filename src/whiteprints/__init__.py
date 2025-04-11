@@ -4,6 +4,7 @@
 
 """Top-level module."""
 
+import contextlib
 import gettext
 import importlib
 import sys
@@ -186,19 +187,19 @@ def _exit_gracefully_on_sigint() -> None:
 def _setup_package() -> None:
     """Setup the package.
 
+    Load the modules dotenv and beartype if found.
+
     Example:
         >>> _setup_package()
         None
-
-    The behaviour of the program is the following:
-        * On debug (__debug__ == True), we activate beartype for runtime type
-        checking.
-        * On release (__debug__ == False), we disable beartype.
     """
-    _exit_gracefully_on_sigint()
-
-    with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
+    with contextlib.suppress(ModuleNotFoundError):
         importlib.import_module("beartype.claw").beartype_this_package()
+
+    with contextlib.suppress(ModuleNotFoundError):
+        importlib.import_module("dotenv").load_dotenv()
+
+    _exit_gracefully_on_sigint()
 
 
 _setup_package()

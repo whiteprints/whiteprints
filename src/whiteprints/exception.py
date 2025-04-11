@@ -4,6 +4,11 @@
 
 """Project specific exception."""
 
+from typing import Final
+
+
+__all__: Final = ["NotAPackageError", "WhiteprintsError"]
+
 
 class WhiteprintsError(Exception):
     """A base exception for the project.

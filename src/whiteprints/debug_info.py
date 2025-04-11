@@ -29,7 +29,7 @@ from importlib import metadata
 from importlib.metadata import Distribution
 from importlib.util import find_spec
 from pathlib import Path
-from typing import Final, TypedDict
+from typing import Final, Optional, TypedDict
 
 
 if sys.version_info >= (3, 11):
@@ -58,7 +58,7 @@ class LogsInfo(TypedDict):
     """Holds the logging configuration."""
 
     USER_LOG_DIR: str
-    default_configuration: str
+    default_configuration: Optional[str]
 
 
 class DebugInfo(TypedDict):
@@ -68,6 +68,7 @@ class DebugInfo(TypedDict):
     python_version: str
     python_executable: str
     package_version: str
+    package_root_dir: str
     pythonpath: list[str]
     dependencies: list[PackageInfo]
     logs: LogsInfo
@@ -252,6 +253,7 @@ def gather_debug_info() -> DebugInfo:
     logs = importlib.import_module(
         "whiteprints.cli.logs",
     )
+    log_config = logs.user_log_config()
 
     return DebugInfo(
         platform=importlib.import_module("platform").platform(),
@@ -261,12 +263,15 @@ def gather_debug_info() -> DebugInfo:
             "whiteprints.package_metadata"
         ).find_version(),
         pythonpath=list(map(str, map(Path, sys.path))),
+        package_root_dir=str(Path(__file__).parent),
         dependencies=[
             _package_info_from_name(distribution_package)
             for distribution_package in required_distribution
         ],
         logs=LogsInfo(
             USER_LOG_DIR=str(logs.user_log_dir()),
-            default_configuration=str(logs.user_log_config()),
+            default_configuration=(
+                None if log_config is None else str(log_config)
+            ),
         ),
     )

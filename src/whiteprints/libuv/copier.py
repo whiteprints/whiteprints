@@ -10,8 +10,12 @@ We use uvx.
 import itertools
 from collections.abc import Iterable
 from functools import cached_property
+from typing import Final
 
 from whiteprints.libuv.uvx import UVX
+
+
+__all__: Final = ["Copier"]
 
 
 class Copier:

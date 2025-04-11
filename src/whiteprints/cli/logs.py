@@ -4,6 +4,7 @@
 
 """Logging configuration for the CLI."""
 
+import contextlib
 import importlib
 from functools import cache
 from pathlib import Path
@@ -27,12 +28,12 @@ def user_log_dir() -> Path:
     Returns:
         The path to the log directory.
     """
-    with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
+    with contextlib.suppress(ModuleNotFoundError):
         return importlib.import_module("platformdirs").user_log_path(
             importlib.import_module(
-                "whiteprints.cli.app_metadata",
+                "whiteprints.cli.entrypoint",
                 __package__,
-            ).app_name()
+            ).prog_name()
         )
 
     return Path.cwd()
@@ -50,13 +51,13 @@ def user_log_config() -> Optional[Path]:
         The path to the logging configuration file if `platformdirs` is
         installed, None otherwise.
     """
-    with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
+    with contextlib.suppress(ModuleNotFoundError):
         return (
             importlib.import_module("platformdirs").user_config_path(
                 importlib.import_module(
-                    "whiteprints.cli.app_metadata",
+                    "whiteprints.cli.entrypoint",
                     __package__,
-                ).app_name()
+                ).prog_name()
             )
             / "logs.json"
         )
