@@ -41,8 +41,11 @@ def _find_license_files(
         >>> from importlib import metadata
         >>>
         >>> licenses = _find_license_files(
-        >>>     license_paths=metadata.files(__package__ or "") or [],
-        >>>     license_files=__metadata__.get_all("License-File") or [],
+        >>>     license_paths=metadata.files(__package__) or [],
+        >>>     license_files=(
+        >>>         metadata.metadata(__package__).get_all("License-File")
+        >>>         or [],
+        >>>     )
         >>> )
         >>> len(licenses) > 0
         True
@@ -112,9 +115,11 @@ def find_license_files() -> list[PackagePath]:
         files = importlib.import_module("importlib_metadata").files
 
     return _find_license_files(
-        license_paths=files(_find_present_package) or [],
-        license_files=importlib.import_module("importlib.metadata")
-        .metadata(_find_present_package())
-        .get_all("License-File")
-        or [],
+        license_paths=files(_find_present_package()) or [],
+        license_files=(
+            importlib.import_module("importlib.metadata")
+            .metadata(_find_present_package())
+            .get_all("License-File")
+            or []
+        ),
     )
