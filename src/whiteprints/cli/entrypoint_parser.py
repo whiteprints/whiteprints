@@ -210,7 +210,9 @@ class License(Action):
         if requested_license is None:
             robust_print_json(
                 data={
-                    "SPDX-License-Identifier": package_metadata.__license__,
+                    "SPDX-License-Identifier": (
+                        package_metadata.find_license_expression()
+                    ),
                     "DISCLAIMER": _(
                         "This project is REUSE compliant."
                         " Check the SPDX header of each"
@@ -226,7 +228,7 @@ class License(Action):
 
         print_lincense_files(
             str(requested_license),
-            package_metadata.__license_file__,
+            package_metadata.find_license_files(),
         )
 
 
@@ -307,7 +309,7 @@ def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
         version=importlib.import_module(
             "whiteprints.package_metadata",
             __package__,
-        ).__version__,
+        ).find_version(),
         help=_("Show program's version number and exit."),
     )
 
@@ -329,7 +331,7 @@ def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
             for license_path in importlib.import_module(
                 "whiteprints.package_metadata",
                 __package__,
-            ).__license_file__
+            ).find_license_files()
         ],
         help=_("Show the license information and exit."),
     )

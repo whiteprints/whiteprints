@@ -12,3 +12,7 @@ class WhiteprintsError(Exception):
         >>> class NewError(ValueError, WhiteprintsError):
         >>>     ...
     """
+
+
+class NotAPackageError(WhiteprintsError, ValueError):
+    """The current project is not a package."""

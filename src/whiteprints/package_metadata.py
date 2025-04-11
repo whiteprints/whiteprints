@@ -4,22 +4,25 @@
 
 """Discover the package's version number."""
 
+import importlib
 import sys
-from importlib import metadata
-from typing import Final, cast
+from functools import cache
+from typing import Final
+
+from whiteprints.exception import NotAPackageError
 
 
 if sys.version_info >= (3, 10):
-    from importlib.metadata import PackagePath
+    from importlib.metadata import PackageMetadata, PackagePath
 else:
-    from importlib_metadata import PackagePath
+    from importlib_metadata import PackageMetadata, PackagePath
 
 
 __all__: Final = [
-    "__license__",
-    "__license_file__",
-    "__metadata__",
-    "__version__",
+    "find_license_expression",
+    "find_license_files",
+    "find_metadata",
+    "find_version",
 ]
 """Public module attributes."""
 
@@ -56,26 +59,68 @@ def _find_license_files(
     ]
 
 
-__version__: Final = metadata.version(__package__ or "")
-"""The package version number as found by importlib metadata."""
+@cache
+def _find_present_package() -> str:
+    """Find the present package name.
 
-__metadata__: Final = metadata.metadata(__package__ or "")
-"""The package metadata."""
+    Raises:
+        NotAPackageError: the current project is not a package.
 
-__license__: Final = __metadata__["License-Expression"]
-"""The package code license as found by importlib metadata."""
+    Returns:
+        the present package name.
+    """
+    package_name = __package__
+    if package_name is None:
+        raise NotAPackageError
 
-if sys.version_info >= (3, 10):
-    __license_file__: Final = _find_license_files(
-        license_paths=metadata.files(__package__ or "") or [],
-        license_files=__metadata__.get_all("License-File") or [],
+    return package_name
+
+
+@cache
+def find_version() -> str:
+    """Find the package version number.
+
+    Returns:
+        The package version.
+    """
+    return importlib.import_module("importlib.metadata").version(
+        _find_present_package()
     )
-    """A list containing the path to the license(s) of the package code."""
-else:
-    __license_file__: Final = _find_license_files(
-        license_paths=cast(
-            "list[PackagePath]", metadata.files(__package__ or "") or []
-        ),
-        license_files=__metadata__.get_all("License-File") or [],
+
+
+@cache
+def find_metadata() -> PackageMetadata:
+    """Find the package metadata.
+
+    Returns:
+        the package metadata
+    """
+    return importlib.import_module("importlib.metadata").metadata(
+        _find_present_package()
     )
-    """A list containing the path to the license(s) of the package code."""
+
+
+@cache
+def find_license_expression() -> str:
+    """Find the license expression for the current package.
+
+    Returns:
+        the license expression.
+    """
+    return find_metadata()["License-Expression"]
+
+
+@cache
+def find_license_files() -> list[PackagePath]:
+    """Find the license files for the current package.
+
+    Returns:
+        A list containing the path to the license(s) of the package code.
+    """
+    return _find_license_files(
+        license_paths=importlib.import_module("importlib.metadata").files(
+            _find_present_package
+        )
+        or [],
+        license_files=find_metadata().get_all("License-File") or [],
+    )

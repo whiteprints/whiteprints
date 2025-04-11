@@ -11,7 +11,7 @@ import pytest
 
 from whiteprints.cli.entrypoint import entrypoint
 from whiteprints.cli.entrypoint_parser import Completion
-from whiteprints.package_metadata import __license_file__, __version__
+from whiteprints.package_metadata import find_license_files, find_version
 
 
 def test_help(capsys: pytest.CaptureFixture[str]) -> None:
@@ -44,7 +44,7 @@ def test_version(capsys: pytest.CaptureFixture[str]) -> None:
     assert ext.value.code == os.EX_OK, "Unexpected exit code."
 
     captured = capsys.readouterr()
-    assert captured.out.rstrip() == __version__, (
+    assert captured.out.rstrip() == find_version(), (
         "Printed version does not match library version"
     )
 
@@ -102,7 +102,7 @@ def test_license_invalid(capsys: pytest.CaptureFixture[str]) -> None:
 def test_license_valid(capsys: pytest.CaptureFixture[str]) -> None:
     """Test wether a license flag exists and works."""
     impossible_license_name = "-".join([
-        path.stem for path in __license_file__
+        path.stem for path in find_license_files()
     ])
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--license", impossible_license_name])
