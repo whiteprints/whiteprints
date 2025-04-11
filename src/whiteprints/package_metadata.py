@@ -68,6 +68,10 @@ def find_present_package_name(
 ) -> str:
     """Find the present package name.
 
+    Example:
+        >>> find_present_package_name()
+        __package__
+
     Raises:
         NotAPackageError: the current project is not a package.
 
