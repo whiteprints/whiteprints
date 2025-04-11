@@ -69,7 +69,8 @@ def find_present_package_name(
     """Find the present package name.
 
     Example:
-        >>> assert find_present_package_name() == __package__
+        >>> find_present_package_name() == __package__
+        True
 
     Raises:
         NotAPackageError: the current project is not a package.
