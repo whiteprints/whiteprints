@@ -109,9 +109,12 @@ class Completion(Action):
             else str(maybe_shell)
         )
         try:
+            # Bandit has a false positive. Here shell is a string not a
+            # boolean. More importantly it is not related to a subprocess
+            # execution simply the shell choice for completion.
             robust_print(
                 importlib.import_module("argcomplete.shell_integration")
-                .shellcode([parser.prog], shell)
+                .shellcode([parser.prog], shell=shell)  # nosec
                 .strip()
             )
         except ModuleNotFoundError:
@@ -232,34 +235,6 @@ class License(Action):
         )
 
 
-class DebugInfo(Action):
-    """Print system information for debug."""
-
-    @override
-    def __call__(
-        self,
-        parser: ArgumentParser,
-        namespace: Namespace,
-        *args: Optional[object],
-    ) -> NoReturn:
-        """The action callback.
-
-        Args:
-            parser: the argument parser
-            namespace: the arguments namespace
-            args: the arguments passed to the parser
-        """
-        data = importlib.import_module(
-            "whiteprints.debug_info",
-            __package__,
-        ).gather_debug_info()
-        robust_print_json(
-            data=data,
-            indent=None,
-        )
-        sys.exit(os.EX_OK)
-
-
 def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
     """Parse command line arguments.
 
@@ -287,10 +262,9 @@ def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
     parser = ArgumentParserExUsage(
         prog=prog,
         formatter_class=formatter_class,
-        description=_(
-            "A Copier-based cookiecutter for creating Python projects "
-            "managed by uv."
-        ),
+        description=importlib.import_module(
+            "importlib.metadata"
+        ).find_metadata()["Summary"],
         add_help=False,
     )
 
@@ -339,9 +313,8 @@ def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
     program_info.add_argument(
         "-d",
         "--debug",
-        nargs=0,
-        action=DebugInfo,
-        help=_("Show debugging information and exit."),
+        action="count",
+        help=_("Show debugging information and exit. "),
     )
 
     completion = parser.add_argument_group("Completion")
@@ -374,3 +347,22 @@ def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
         )
 
     return parser
+
+
+def resolve_flags(
+    argument_parser: ArgumentParser,
+    namespace: Namespace,
+) -> None:
+    if namespace.debug is not None and namespace.debug > 0:
+        robust_print_json(
+            data=importlib.import_module(
+                "whiteprints.debug_info",
+                __package__,
+            ).gather_debug_info(dependencies=(namespace.debug > 1)),
+            indent=None,
+        )
+        sys.exit(os.EX_OK)
+
+    if namespace.cmd is None:
+        argument_parser.print_help()
+        sys.exit(os.EX_OK)

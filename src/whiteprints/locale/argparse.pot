@@ -1,67 +1,19 @@
-#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:228
-#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:228
-#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:228
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:226
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:228
-#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:228
-#, python-format
-msgid "%(heading)s:"
-msgstr ""
-
-#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:296
-#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:300
-#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:300
-#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:299
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:297
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:299
-#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:296
-#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:300
-msgid "usage: "
-msgstr ""
-
-#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:725
-#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:726
-#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:722
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:673
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:678
-#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:725
-#, python-format
-msgid " (default: %(default)s)"
-msgstr ""
-
-#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:779
-#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:780
-#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:784
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:735
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:740
-#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:779
-#, python-format
-msgid "argument %(argument_name)s: %(message)s"
-msgstr ""
-
 #: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:868
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:885
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:886
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:890
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:844
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:844
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:845
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:861
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:868
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:885
 msgid ".__call__() not defined"
-msgstr ""
-
-#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1135
-#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1157
-#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1161
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1135
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:1115
-#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1135
-msgid "show program's version number and exit"
 msgstr ""
 
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1197
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1219
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1223
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1198
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1198
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1197
 #, python-format
 msgid "conflicting subparser: %s"
@@ -70,54 +22,20 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1201
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1223
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1227
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1202
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1202
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1201
 #, python-format
 msgid "conflicting subparser alias: %s"
-msgstr ""
-
-#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:1211
-#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1236
-#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1258
-#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1262
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1241
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:1224
-#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1204
-#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1236
-#, python-format
-msgid "unknown parser %(parser_name)r (choices: %(choices)s)"
-msgstr ""
-
-#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:1271
-#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1296
-#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1318
-#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1323
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1306
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:1295
-#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1264
-#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1296
-#, python-format
-msgid "argument \"-\" with mode %r"
-msgstr ""
-
-#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:1280
-#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1305
-#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1327
-#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1332
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1315
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:1304
-#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1273
-#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1305
-#, python-format
-msgid "can't open '%(filename)s': %(error)s"
 msgstr ""
 
 #: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:1489
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1514
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1536
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1541
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1526
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1526
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1414
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1482
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1489
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1514
 #, python-format
 msgid "cannot merge actions - two groups are named %r"
@@ -127,8 +45,10 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1552
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1574
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1583
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1568
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1568
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1452
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1520
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1527
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1552
 msgid "'required' is an invalid argument for positionals"
 msgstr ""
@@ -137,8 +57,10 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1574
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1596
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1604
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1589
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1589
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1474
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1542
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1549
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1574
 #, python-format
 msgid ""
@@ -150,8 +72,10 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1592
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1614
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1622
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1607
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1607
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1494
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1560
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1567
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1592
 #, python-format
 msgid "dest= is required for options like %r"
@@ -161,20 +85,160 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1609
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1631
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1639
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1624
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1624
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1511
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1577
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1584
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1609
 #, python-format
 msgid "invalid conflict_resolution value: %r"
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:1668
+#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1701
+#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1723
+#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1731
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1717
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1595
+#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1661
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1668
+#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1701
+msgid "mutually exclusive arguments must be optional"
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:1783
+#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1824
+#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1846
+#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1854
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1839
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1705
+#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1775
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1783
+#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1824
+msgid "cannot have multiple subparser arguments"
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:2490
+#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:2534
+#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2560
+#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2541
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2536
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:2404
+#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2478
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:2502
+#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2546
+#, python-format
+msgid "%r is not callable"
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:228
+#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:228
+#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:228
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:226
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:228
+#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:228
+#, python-format
+msgid "%(heading)s:"
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:296
+#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:300
+#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:300
+#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:299
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:297
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:299
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:297
+#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:296
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:296
+#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:300
+msgid "usage: "
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:725
+#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:726
+#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:722
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:673
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:678
+#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:725
+#, python-format
+msgid " (default: %(default)s)"
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:779
+#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:780
+#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:784
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:735
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:740
+#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:779
+#, python-format
+msgid "argument %(argument_name)s: %(message)s"
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1135
+#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1157
+#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1161
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1135
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:1115
+#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1135
+msgid "show program's version number and exit"
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:1211
+#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1236
+#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1258
+#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1262
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1241
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:1224
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1148
+#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1204
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1211
+#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1236
+#, python-format
+msgid "unknown parser %(parser_name)r (choices: %(choices)s)"
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1245
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:1228
+#, python-format
+msgid "command '%(parser_name)s' is deprecated"
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:1271
+#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1296
+#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1318
+#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1323
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1306
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:1295
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1202
+#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1264
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1271
+#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1296
+#, python-format
+msgid "argument \"-\" with mode %r"
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:1280
+#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1305
+#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1327
+#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1332
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1315
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:1304
+#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1273
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1280
+#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1305
+#, python-format
+msgid "can't open '%(filename)s': %(error)s"
 msgstr ""
 
 #: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:1602
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1627
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1649
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1657
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1642
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:1639
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1642
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:1639
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1529
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1595
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1602
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1627
 #, python-format
 msgid "conflicting option string: %s"
@@ -182,23 +246,15 @@ msgid_plural "conflicting option strings: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:1668
-#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1701
-#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1723
-#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1731
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1717
-#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1661
-#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1701
-msgid "mutually exclusive arguments must be optional"
-msgstr ""
-
 #: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:1736
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1777
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1799
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1807
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1794
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:1815
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1794
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:1815
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1658
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1728
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1736
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1777
 msgid "positional arguments"
 msgstr ""
@@ -207,8 +263,9 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1778
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1800
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1808
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1795
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:1816
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1795
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:1816
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1737
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1778
 msgid "options"
 msgstr ""
@@ -217,21 +274,19 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1793
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1815
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1823
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1810
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:1831
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1810
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:1831
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1674
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1744
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1752
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1793
 msgid "show this help message and exit"
 msgstr ""
 
-#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:1783
-#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1824
-#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1846
-#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1854
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1839
-#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1775
-#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1824
-msgid "cannot have multiple subparser arguments"
+#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1860
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1845
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:1866
+msgid "subcommands"
 msgstr ""
 
 #: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:1835
@@ -242,12 +297,16 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2418
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1906
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2459
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1891
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2454
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:1913
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2476
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1891
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2454
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:1913
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2476
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1757
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:2264
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1827
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2338
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1835
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:2362
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1876
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2406
 #, python-format
@@ -258,12 +317,28 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:1976
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:1998
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2011
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1997
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2019
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:1997
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2019
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1854
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1928
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1948
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:1988
 #, python-format
 msgid "not allowed with argument %s"
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:2229
+#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:2276
+#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2300
+#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2030
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2016
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2038
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:2144
+#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2217
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:2241
+#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2288
+#, python-format
+msgid "ambiguous option: %(option)s could match %(matches)s"
 msgstr ""
 
 #: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:1986
@@ -274,25 +349,43 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2071
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2062
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2094
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2048
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2080
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2070
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2102
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2048
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2080
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2070
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2102
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1900
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1914
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1974
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1988
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:1998
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:2012
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2030
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2061
 #, python-format
 msgid "ignored explicit argument %r"
 msgstr ""
 
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2100
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2122
+#, python-format
+msgid "option '%(option)s' is deprecated"
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2132
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2154
+#, python-format
+msgid "argument '%(argument_name)s' is deprecated"
+msgstr ""
+
 #: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:2107
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:2156
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2178
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2230
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2225
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2247
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2225
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2247
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:2021
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2095
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:2119
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2168
 #, python-format
 msgid "the following arguments are required: %s"
@@ -302,9 +395,11 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:2171
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2193
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2245
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2240
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2262
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2240
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2262
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:2036
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2110
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:2134
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2183
 #, python-format
 msgid "one of the arguments %s is required"
@@ -314,9 +409,11 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:2213
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2237
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2289
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2284
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2306
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2284
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2306
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:2079
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2153
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:2177
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2225
 msgid "expected one argument"
 msgstr ""
@@ -325,9 +422,11 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:2214
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2238
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2290
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2285
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2307
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2285
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2307
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:2080
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2154
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:2178
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2226
 msgid "expected at most one argument"
 msgstr ""
@@ -336,9 +435,11 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:2215
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2239
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2291
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2286
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2308
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2286
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2308
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:2081
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2155
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:2179
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2227
 msgid "expected at least one argument"
 msgstr ""
@@ -347,9 +448,11 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:2219
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2243
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2295
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2290
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2312
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2290
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2312
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:2085
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2159
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:2183
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2231
 #, python-format
 msgid "expected %s argument"
@@ -357,48 +460,29 @@ msgid_plural "expected %s arguments"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:2229
-#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:2276
-#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2300
-#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2030
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2016
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2038
-#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2217
-#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2288
-#, python-format
-msgid "ambiguous option: %(option)s could match %(matches)s"
-msgstr ""
-
 #: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:2293
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:2337
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2361
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2405
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2400
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2422
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2400
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2422
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:2207
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2281
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:2305
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2349
 #, python-format
 msgid "unexpected option string: %s"
-msgstr ""
-
-#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:2490
-#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:2534
-#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2560
-#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2541
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2536
-#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2478
-#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2546
-#, python-format
-msgid "%r is not callable"
 msgstr ""
 
 #: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:2507
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:2551
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2576
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2557
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2552
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2569
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2552
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2569
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:2421
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2495
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:2519
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2563
 #, python-format
 msgid "invalid %(type)s value: %(value)r"
@@ -408,63 +492,49 @@ msgstr ""
 #: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:2562
 #: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2587
 #: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2572
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2567
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2587
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2567
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2587
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:2432
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2506
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:2530
 #: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2574
 #, python-format
 msgid "invalid choice: %(value)r (choose from %(choices)s)"
 msgstr ""
 
-#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:2594
-#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:2640
-#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2665
-#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2650
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2645
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2675
-#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2582
-#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2652
-#, python-format
-msgid "%(prog)s: error: %(message)s\n"
-msgstr ""
-
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1245
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:1228
-#, python-format
-msgid "command '%(parser_name)s' is deprecated"
-msgstr ""
-
-#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:1860
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:1845
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:1866
-msgid "subcommands"
-msgstr ""
-
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2100
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2122
-#, python-format
-msgid "option '%(option)s' is deprecated"
-msgstr ""
-
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2132
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2154
-#, python-format
-msgid "argument '%(argument_name)s' is deprecated"
-msgstr ""
-
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2595
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2595
 #, python-format
 msgid ""
 "invalid choice: %(value)r, maybe you meant %(closest)r? (choose from "
 "%(choices)s)"
 msgstr ""
 
-#: ../../../.local/share/uv/python/cpython-3.13.2-linux-x86_64-gnu/lib/python3.13/argparse.py:2649
-#: ../../../.local/share/uv/python/cpython-3.14.0a5-linux-x86_64-gnu/lib/python3.14/argparse.py:2679
+#: ../../../.local/share/uv/python/cpython-3.10.16-linux-x86_64-gnu/lib/python3.10/argparse.py:2594
+#: ../../../.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/argparse.py:2640
+#: ../../../.local/share/uv/python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/argparse.py:2665
+#: ../../../.local/share/uv/python/cpython-3.12.9-linux-x86_64-gnu/lib/python3.12/argparse.py:2650
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2645
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2675
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:2508
+#: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:2582
+#: ../../../.local/share/uv/python/pypy-3.10.16-linux-x86_64-gnu/lib/pypy3.10/argparse.py:2606
+#: ../../../.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu/lib/pypy3.11/argparse.py:2652
+#, python-format
+msgid "%(prog)s: error: %(message)s\n"
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.13.3-linux-x86_64-gnu/lib/python3.13/argparse.py:2649
+#: ../../../.local/share/uv/python/cpython-3.14.0a6-linux-x86_64-gnu/lib/python3.14/argparse.py:2679
 #, python-format
 msgid "%(prog)s: warning: %(message)s\n"
 msgstr ""
 
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1210
+#, python-format
+msgid "can't open '%s': %s"
+msgstr ""
+
+#: ../../../.local/share/uv/python/cpython-3.7.9-linux-x86_64-gnu/lib/python3.7/argparse.py:1659
 #: ../../../.local/share/uv/python/cpython-3.9.21-linux-x86_64-gnu/lib/python3.9/argparse.py:1729
 msgid "optional arguments"
 msgstr ""

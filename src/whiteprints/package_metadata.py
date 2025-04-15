@@ -8,9 +8,8 @@ import importlib
 import sys
 from collections.abc import Iterable
 from functools import cache
-from typing import Final, Optional
-
-from whiteprints.exception import NotAPackageError
+from importlib.metadata import PackageMetadata
+from typing import Final
 
 
 if sys.version_info >= (3, 10):
@@ -20,9 +19,9 @@ else:
 
 
 __all__: Final = [
+    "distribution_name",
     "find_license_expression",
     "find_license_files",
-    "find_present_package_name",
     "find_version",
 ]
 """Public module attributes."""
@@ -64,25 +63,17 @@ def _find_license_files(
 
 
 @cache
-def find_present_package_name(
-    package_name: Optional[str] = __package__,
-) -> str:
-    """Find the present package name.
+def distribution_name() -> str:
+    """Find the present distribution name.
 
-    Example:
-        >>> find_present_package_name() == __package__
-        True
-
-    Raises:
-        NotAPackageError: the current project is not a package.
+    The distribution name cannot be inferred safely from `__package__ and
+    `packages_distribution` as `packages_distribution` might miss editable
+    install. Hence it is safer to hard code the distribution name.
 
     Returns:
         the present package name.
     """
-    if package_name is None:
-        raise NotAPackageError
-
-    return package_name
+    return "whiteprints"
 
 
 @cache
@@ -93,7 +84,14 @@ def find_version() -> str:
         The package version.
     """
     return importlib.import_module("importlib.metadata").version(
-        find_present_package_name()
+        distribution_name()
+    )
+
+
+@cache
+def find_metadata() -> PackageMetadata:
+    return importlib.import_module("importlib.metadata").metadata(
+        distribution_name()
     )
 
 
@@ -104,9 +102,7 @@ def find_license_expression() -> str:
     Returns:
         the license expression.
     """
-    return importlib.import_module("importlib.metadata").metadata(
-        find_present_package_name()
-    )["License-Expression"]
+    return find_metadata()["License-Expression"]
 
 
 @cache
@@ -122,10 +118,10 @@ def find_license_files() -> list[PackagePath]:
         files = importlib.import_module("importlib_metadata").files
 
     return _find_license_files(
-        license_paths=files(find_present_package_name()) or [],
+        license_paths=files(distribution_name()) or [],
         license_files=(
             importlib.import_module("importlib.metadata")
-            .metadata(find_present_package_name())
+            .metadata(distribution_name())
             .get_all("License-File")
             or []
         ),

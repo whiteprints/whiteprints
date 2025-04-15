@@ -7,7 +7,7 @@
 from typing import Final
 
 
-__all__: Final = ["NotAPackageError", "WhiteprintsError"]
+__all__: Final = ["WhiteprintsError"]
 
 
 class WhiteprintsError(Exception):
@@ -17,7 +17,3 @@ class WhiteprintsError(Exception):
         >>> class NewError(ValueError, WhiteprintsError):
         >>>     ...
     """
-
-
-class NotAPackageError(WhiteprintsError, ValueError):
-    """The current project is not a package."""

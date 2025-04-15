@@ -9,7 +9,6 @@
 import contextlib
 import importlib
 import importlib.metadata
-import os
 import sys
 from functools import cache
 from pathlib import Path
@@ -98,9 +97,9 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
         importlib.import_module("argcomplete").autocomplete(entrypoint_parser)
 
     namespace = entrypoint_parser.parse_args(args)
-    if namespace.cmd is None:
-        entrypoint_parser.print_help()
-        sys.exit(os.EX_OK)
+    importlib.import_module("whiteprints.cli.entrypoint_parser").resolve_flags(
+        entrypoint_parser, namespace
+    )
 
     importlib.import_module(
         "whiteprints.cli.logs",

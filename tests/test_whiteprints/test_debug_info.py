@@ -28,8 +28,8 @@ class TestGatherDebugInfo:
         "key",
         [
             "platform",
-            "python_version",
-            "package_version",
+            "package",
+            "logs",
         ],
     )
     def test_gather_debug_info_keys(key: str) -> None:
@@ -41,41 +41,41 @@ class TestGatherDebugInfo:
     def test_dependencies_is_list() -> None:
         """Test that 'dependencies' is a list in debug_info."""
         debug_info = gather_debug_info()
-        assert isinstance(debug_info["dependencies"], list), (
+        assert isinstance(debug_info["package"]["dependencies"], list), (
             "'dependencies' should be a list, "
-            f"but got {type(debug_info['dependencies']).__name__}"
+            f"but got {type(debug_info['package']['dependencies']).__name__}"
         )
 
     @staticmethod
     def test_pythonpath_is_list() -> None:
         """Test that 'pythonpath' is a list in debug_info."""
         debug_info = gather_debug_info()
-        assert isinstance(debug_info["pythonpath"], list), (
+        assert isinstance(debug_info["platform"]["pythonpath"], list), (
             "'pythonpath' should be a list, "
-            f"but got {type(debug_info['pythonpath']).__name__}"
+            f"but got {type(debug_info['platform']['pythonpath']).__name__}"
         )
 
     @staticmethod
     def test_pythonpath_elements_are_paths() -> None:
         """Test that all elements in 'pythonpath' are valid Paths."""
         debug_info = gather_debug_info()
-        assert all(isinstance(p, str) for p in debug_info["pythonpath"]), (
-            "All elements in 'pythonpath' should be strings."
-        )
+        assert all(
+            isinstance(p, str) for p in debug_info["platform"]["pythonpath"]
+        ), "All elements in 'pythonpath' should be strings."
 
     @staticmethod
     @pytest.mark.parametrize("field", ["name", "version"])
     def test_dependencies_have_required_fields(field: str) -> None:
         """Test that each dependency contains required fields."""
         debug_info = gather_debug_info()
-        for dependency in debug_info["dependencies"]:
+        for dependency in debug_info["package"]["dependencies"]:
             assert field in dependency, f"Dependency missing '{field}' field."
 
     @staticmethod
     def test_dependency_name_is_str() -> None:
         """Test that 'name' is a string in each dependency."""
         debug_info = gather_debug_info()
-        for dependency in debug_info["dependencies"]:
+        for dependency in debug_info["package"]["dependencies"]:
             assert isinstance(dependency["name"], str), (
                 "'name' should be a string in dependency, "
                 f"but got {type(dependency['name']).__name__}."
@@ -85,7 +85,7 @@ class TestGatherDebugInfo:
     def test_dependency_version_is_str() -> None:
         """Test that 'version' is a string in each dependency."""
         debug_info = gather_debug_info()
-        for dependency in debug_info["dependencies"]:
+        for dependency in debug_info["package"]["dependencies"]:
             assert isinstance(dependency["version"], str), (
                 "'version' should be a string in dependency, "
                 f"but got {type(dependency['version']).__name__}."
@@ -95,7 +95,7 @@ class TestGatherDebugInfo:
     def test_dependency_origin_is_path_if_present() -> None:
         """Test that 'origin' is a valid Path."""
         debug_info = gather_debug_info()
-        for dependency in debug_info["dependencies"]:
+        for dependency in debug_info["package"]["dependencies"]:
             origin = dependency.get("origin")
             assert origin is None or Path(origin).is_dir(), (
                 "'origin' should be a valid Path or NoneType in dependency, "

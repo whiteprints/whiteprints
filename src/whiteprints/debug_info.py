@@ -23,27 +23,46 @@ environment configuration across different systems.
 """
 
 import importlib
+import os
 import sys
+from collections.abc import Mapping
+from dataclasses import dataclass
 from functools import cache
 from importlib import metadata
-from importlib.metadata import Distribution
 from importlib.util import find_spec
 from pathlib import Path
-from typing import Final, Optional, TypedDict
+from re import Pattern
+from typing import Final, Optional, TypedDict, Union
 
 
 if sys.version_info >= (3, 11):
-    from typing import NotRequired
+    from typing import Self
 else:
-    from typing_extensions import NotRequired
+    from typing_extensions import Self
 
 if sys.version_info >= (3, 10):
-    from importlib.metadata import packages_distributions
+    from importlib.metadata import (
+        Distribution,
+        PathDistribution,
+        packages_distributions,
+    )
 else:
-    from importlib_metadata import packages_distributions
+    from importlib_metadata import (
+        Distribution,
+        PathDistribution,
+        packages_distributions,
+    )
 
 
-__all__: Final = ["DebugInfo", "PackageInfo", "gather_debug_info"]
+__all__: Final = ["DebugInfo", "gather_debug_info"]
+
+
+@dataclass(frozen=True)
+class _DistributionPackage:
+    """Holds a distribution with its corresponding package name."""
+
+    distribution: Union[Distribution, PathDistribution]
+    package_name: Optional[str]
 
 
 class PackageInfo(TypedDict):
@@ -51,7 +70,8 @@ class PackageInfo(TypedDict):
 
     name: str
     version: str
-    origin: NotRequired[str]
+    origin: Optional[str]
+    dependencies: Optional[list[Self]]
 
 
 class LogsInfo(TypedDict):
@@ -61,114 +81,52 @@ class LogsInfo(TypedDict):
     default_configuration: Optional[str]
 
 
+class PythonInfo(TypedDict):
+    """Holds the Python interpreter information."""
+
+    executable: str
+    version: list[Union[str, int]]
+    implementation: str
+    build: str
+    compiler: str
+
+
+class EnvironmentInfo(TypedDict):
+    """Holds the environment information."""
+
+    VIRTUAL_ENV: Optional[str]
+    base_exec_prefix: str
+    pythonpath: list[str]
+
+
 class PlatformInfo(TypedDict):
     """Holds the platform configuration."""
 
     name: str
-    python_version: str
-    python_executable: str
-    pythonpath: list[str]
+    python: PythonInfo
+    environment: EnvironmentInfo
 
 
 class DebugInfo(TypedDict):
     """Holds runtime debug information."""
 
     platform: PlatformInfo
-    package: PackageInfo
-    direct_dependencies: list[PackageInfo]
+    package: Optional[PackageInfo]
     logs: Optional[LogsInfo]
 
 
-class _DistributionPackage(TypedDict):
-    """Holds a distribution with its corresponding package name."""
-
-    distribution: Distribution
-    package_name: str
-
-
-def _add_spec(package_info: PackageInfo, *, package_name: str) -> None:
-    """Add the origin path of a package to its information if available.
-
-    Uses `find_spec` to locate the module specification for the given package
-    name. If a valid origin (file path) is found, it adds this path to the
-    `origin` field of the `package_info` dictionary.
-
-    Args:
-        package_info: A dictionary holding package information, including
-            its name and version.
-        package_name: The name of the package to locate and add the origin
-            path for.
-
-    Example:
-        >>> package_info = {"name": "example", "version": "1.0"}
-        >>> _add_spec(package_info, package_name="os")
-        >>> "origin" in package_info
-        True
-        >>> isinstance(package_info["origin"], str)
-        True
-        >>> package_info = {"name": "nonexistent-package", "version": "1.0"}
-        >>> _add_spec(package_info, package_name="some_nonexistent_package")
-        >>> "origin" not in package_info
-        True
-    """
-    spec = find_spec(package_name)
-    if spec is not None and spec.origin is not None:
-        package_info["origin"] = str(Path(spec.origin).parent)
-
-
-def _package_info_from_name(
-    distribution_package: _DistributionPackage,
-) -> PackageInfo:
-    """Construct a package information dictionary for a given distribution.
-
-    Args:
-        distribution_package: The metadata distribution object representing the
-            package and name of the package to find, which may differ from the
-            distribution name.
+@cache
+def _gather_packages_distributions() -> Mapping[str, list[str]]:
+    """Cache wrapper for packages_distributions function.
 
     Returns:
-        A dictionary containing:
-            - name: The name of the package as provided by the distribution.
-            - version: The version of the package.
-            - origin: The file path where the package is installed, if
-              available.
+        a package distributions mapping.
     """
-    distribution = distribution_package["distribution"]
-    package_info = PackageInfo(
-        name=distribution.metadata["Name"],
-        version=distribution.version,
-    )
-    _add_spec(
-        package_info,
-        package_name=distribution_package["package_name"],
-    )
-
-    return package_info
+    return packages_distributions()
 
 
 @cache
-def _gather_required_packages() -> list[str]:
-    """Gather the list of required packages for the current module.
-
-    Parses the dependencies of the current module to identify required packages
-    and normalizes their names by replacing hyphens with underscores.
-
-    Returns:
-        A list of normalized package names extracted from the requirements.
-    """
-    package_name_regex = importlib.import_module("re").compile(
-        r"==|===|~=|!=|>=|>|<=|<"
-    )
-    return [
-        package_name_regex.split(package, maxsplit=1)[0].replace("-", "_")
-        for package in (
-            metadata.distribution(__package__ or "").requires or []
-        )
-    ]
-
-
-@cache
-def _gather_distribution_packages() -> dict[str, str]:
+def _gather_distributions_packages() -> dict[str, str]:
     """Map installed distributions to their corresponding package names.
 
     Retrieves a mapping of distribution names to the package names that
@@ -180,24 +138,126 @@ def _gather_distribution_packages() -> dict[str, str]:
         are package names.
     """
     return {
-        str(distribution).replace("-", "_"): str(package)
-        for package, distributions in packages_distributions().items()
+        str(distribution).lower().replace("-", "_"): str(package)
+        for package, distributions in _gather_packages_distributions().items()
         for distribution in distributions
     }
 
 
-def _find_required_distributions(
+@cache
+def _package_info_from_name(
+    distribution_package: _DistributionPackage,
     *,
-    required: list[str],
+    dependencies: bool = True,
+    ancestors_distributions: frozenset[str] = frozenset[str](),
+) -> PackageInfo:
+    """Construct a package information dictionary for a given distribution.
+
+    Args:
+        distribution_package: The metadata distribution object representing the
+            package and name of the package to find, which may differ from the
+            distribution name.
+        dependencies: add dependency list to each distribution.
+        ancestors_distributions: set of parents distributions.
+
+    Returns:
+        A dictionary containing:
+            - name: The name of the package as provided by the distribution.
+            - version: The version of the package.
+            - origin: The file path where the package is installed, if
+              available.
+    """
+    distribution = distribution_package.distribution
+    package_name = distribution_package.package_name
+
+    spec = None if package_name is None else find_spec(package_name)
+    distribution_name = distribution.metadata["name"]
+    if distribution_name in ancestors_distributions:
+        return PackageInfo(
+            name=distribution_name,
+            version=distribution.version,
+            origin=(
+                str(Path(spec.origin).parent)
+                if spec is not None and spec.origin is not None
+                else None
+            ),
+            dependencies=None,
+        )
+
+    return PackageInfo(
+        name=distribution_name,
+        version=distribution.version,
+        origin=(
+            str(Path(spec.origin).parent)
+            if spec is not None and spec.origin is not None
+            else None
+        ),
+        dependencies=[
+            _package_info_from_name(
+                dependency_distribution_package,
+                ancestors_distributions=frozenset[str].union(
+                    ancestors_distributions,
+                    {distribution_name},
+                ),
+            )
+            for dependency_distribution_package in (
+                _find_requested_distributions
+            )(
+                requested=_gather_requested_packages(distribution_name),
+                distributions_packages=_gather_distributions_packages(),
+            )
+        ]
+        if dependencies
+        else None,
+    )
+
+
+@cache
+def _package_name_regex() -> Pattern[str]:
+    """A regex to split package name from its version.
+
+    Returns:
+        the regex.
+    """
+    return importlib.import_module("re").compile(
+        r" |\(|==|===|~=|!=|>=|>|<=|<"
+    )
+
+
+@cache
+def _gather_requested_packages(module: str) -> list[str]:
+    """Gather the list of requested packages for a given current module.
+
+    Parses the dependencies of the current module to identify requested
+    packages and normalizes their names by replacing hyphens with underscores.
+
+    Returns:
+        A list of normalized package names extracted from the requirements.
+    """
+    return [
+        _package_name_regex()
+        .split(
+            package.split(";", maxsplit=1)[0],  # remove comments
+            maxsplit=1,
+        )[0]
+        .lower()
+        .replace("-", "_")
+        for package in (metadata.distribution(module).requires or [])
+    ]
+
+
+def _find_requested_distributions(
+    *,
+    requested: list[str],
     distributions_packages: dict[str, str],
 ) -> list[_DistributionPackage]:
-    """Find distribution objects for the required packages.
+    """Find distribution objects for the requested packages.
 
-    Uses a list of required package names and a mapping of distribution
+    Uses a list of requested package names and a mapping of distribution
     packages to identify the corresponding distribution metadata objects.
 
     Args:
-        required: A list of package names that are required.
+        requested: A list of package names that are requested.
         distributions_packages: A dictionary mapping normalized distribution
             names to their corresponding package names.
 
@@ -207,22 +267,22 @@ def _find_required_distributions(
             - package_name: The name of the package that corresponds to the
               distribution.
     """
-    required_distribution: list[_DistributionPackage] = []
-    for distribution in required:
+    requested_distribution: list[_DistributionPackage] = []
+    for distribution in requested:
         package_name = distributions_packages.get(distribution)
         if package_name is not None:
-            required_distribution.append(
+            requested_distribution.append(
                 _DistributionPackage(
                     distribution=metadata.distribution(distribution),
                     package_name=package_name,
                 )
             )
 
-    return required_distribution
+    return requested_distribution
 
 
 @cache
-def gather_debug_info() -> DebugInfo:
+def gather_debug_info(*, dependencies: bool = True) -> DebugInfo:
     """Gather detailed runtime debug information of the current environment.
 
     This function collects information about the operating system, the Python
@@ -237,51 +297,43 @@ def gather_debug_info() -> DebugInfo:
         { ... }
 
     Returns:
-        DebugInfo: A dictionary containing:
-            - operating_system: Details about the current OS
-              distribution including name, version, and ID.
-            - platform: A string representing the underlying platform,
-              e.g., 'Linux-5.15.0-76-generic-x86_64-with-glibc2.31'.
-            - python_version: The full version string of the Python interpreter
-              being used, e.g., '3.12.0'.
-            - package_version: The version of the `whiteprints` package.
-            - pythonpath: A list of paths where Python searches for
-              modules.
-            - dependencies: A list of dictionaries where each
-              entry represents a runtime dependency with its name, version,
-              and, if available, the path to the module's origin file.
+        DebugInfo: useful debugging information.
     """
-    required_distribution = _find_required_distributions(
-        required=_gather_required_packages(),
-        distributions_packages=_gather_distribution_packages(),
-    )
     logs = importlib.import_module(
         "whiteprints.cli.logs",
+        __package__,
     )
     log_config = logs.user_log_config()
+    distribution_name = importlib.import_module(
+        "whiteprints.package_metadata",
+        __package__,
+    ).distribution_name()
+
+    platform = importlib.import_module("platform")
 
     return DebugInfo(
         platform=PlatformInfo(
-            name=importlib.import_module("platform").platform(),
-            python_executable=str(Path(sys.executable)),
-            python_version=sys.version,
-            pythonpath=list(map(str, map(Path, sys.path))),
+            name=platform.uname(),
+            python=PythonInfo(
+                executable=str(Path(sys.executable)),
+                version=platform.python_version(),
+                implementation=platform.python_implementation(),
+                build=platform.python_build(),
+                compiler=platform.python_compiler(),
+            ),
+            environment=EnvironmentInfo(
+                VIRTUAL_ENV=os.environ.get("VIRTUAL_ENV"),
+                base_exec_prefix=sys.base_exec_prefix,
+                pythonpath=list(map(str, map(Path, sys.path))),
+            ),
         ),
-        package=PackageInfo(
-            name=importlib.import_module(
-                "whiteprints.package_metadata",
-                __package__,
-            ).find_present_package_name(),
-            version=importlib.import_module(
-                "whiteprints.package_metadata",
-                __package__,
-            ).find_version(),
-            origin=str(Path(__file__).parent),
+        package=_package_info_from_name(
+            _DistributionPackage(
+                distribution=metadata.distribution(distribution_name),
+                package_name=__package__,
+            ),
+            dependencies=dependencies,
         ),
-        direct_dependencies=[
-            _package_info_from_name(distribution_package)
-            for distribution_package in required_distribution
-        ],
         logs=LogsInfo(
             USER_LOG_DIR=str(logs.user_log_dir()),
             default_configuration=(
