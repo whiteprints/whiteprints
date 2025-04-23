@@ -8,14 +8,13 @@ import importlib
 import sys
 from collections.abc import Iterable
 from functools import cache
-from importlib.metadata import PackageMetadata
-from typing import Final
+from typing import Final, no_type_check
 
 
 if sys.version_info >= (3, 10):
-    from importlib.metadata import PackagePath
+    from importlib.metadata import PackageMetadata, PackagePath
 else:
-    from importlib_metadata import PackagePath
+    from importlib_metadata import PackageMetadata, PackagePath
 
 
 __all__: Final = [
@@ -40,12 +39,15 @@ def _find_license_files(
 
     Example:
         >>> from importlib import metadata
+        >>> from whiteprints.package_metadata import distribution_name
         >>>
+        >>> distribution_name = distribution_name()
         >>> licenses = _find_license_files(
-        >>>     license_paths=metadata.files(__package__) or [],
+        >>>     license_paths=metadata.files(distribution_name) or [],
         >>>     license_files=(
-        >>>         metadata.metadata(__package__).get_all("License-File")
-        >>>         or []
+        >>>         metadata.metadata(distribution_name).get_all(
+        >>>             "License-File"
+        >>>         ) or []
         >>>     )
         >>> )
         >>> len(licenses) > 0
@@ -88,7 +90,9 @@ def find_version() -> str:
     )
 
 
+# We ignore type checking here since PackageMetadata is not runtime checkable.
 @cache
+@no_type_check
 def find_metadata() -> PackageMetadata:
     return importlib.import_module("importlib.metadata").metadata(
         distribution_name()

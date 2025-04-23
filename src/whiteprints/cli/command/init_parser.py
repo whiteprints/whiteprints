@@ -4,12 +4,12 @@
 
 """The 'init' subcommand."""
 
-import importlib
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Final
+from typing import Final, cast
 
-from whiteprints import _
+from whiteprints import _, maybe_import_module
+from whiteprints.cli.action import CompleterAction
 
 
 __all__: Final = ["setup_init_parser"]
@@ -94,18 +94,18 @@ def setup_init_parser(parser: ArgumentParser) -> None:
         ),
         action="store_true",
     )
-    project_directory_arg = parser.add_argument(
-        "project_directory",
-        default=str(Path.cwd()),
-        nargs="?",
-        help=_("Directory in which to initialize the Python project."),
-        metavar="PROJECT_DIRECTORY",
+    project_directory_arg = cast(
+        "CompleterAction",
+        parser.add_argument(
+            "project_directory",
+            default=str(Path.cwd()),
+            nargs="?",
+            help=_("Directory in which to initialize the Python project."),
+            metavar="PROJECT_DIRECTORY",
+        ),
     )
-    completer = getattr(project_directory_arg, "completer", None)
-    if completer is not None:
-        completer = importlib.import_module(
-            "argcomplete"
-        ).DirectoriesCompleter()
+    if (argcomplete := maybe_import_module("argcomplete")) is not None:
+        project_directory_arg.completer = argcomplete.DirectoriesCompleter()
 
     project_directory_arg = parser.add_argument(
         "copier_args",

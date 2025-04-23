@@ -1,8 +1,8 @@
-#: src/whiteprints/__init__.py:147
+#: src/whiteprints/cli/__init__.py:101
 msgid "Execution stopped by user"
 msgstr ""
 
-#: src/whiteprints/cli/command/init.py:241
+#: src/whiteprints/cli/command/init.py:242
 msgid "Project creation failed"
 msgstr ""
 
@@ -44,99 +44,114 @@ msgstr ""
 msgid "Additional arguments forwarded to each Copier invocations."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint.py:76
+#: src/whiteprints/cli/entrypoint.py:73
 msgid "Subcommands"
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint.py:86 src/whiteprints/cli/entrypoint.py:87
+#: src/whiteprints/cli/entrypoint.py:82 src/whiteprints/cli/entrypoint.py:83
 msgid "Initialize a Python project."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint.py:91
+#: src/whiteprints/cli/entrypoint.py:87
 msgid ""
 "Note: see https://copier.readthedocs.io/en/stable/configuring/ for help "
 "on how to use Copier and COPIER_ARGS (optional)."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:44
+#: src/whiteprints/cli/entrypoint_parser.py:58
 #, python-brace-format
 msgid "{}: error: {}\n"
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:64
-#, python-brace-format
-msgid ""
-"error: no shell detection plugin installed. reinstall `{prog}` with the "
-"`qol` extra (e.g. `pip install {prog}\\[qol]`) to use autocompletion."
-msgstr ""
-
-#: src/whiteprints/cli/entrypoint_parser.py:70
-#, python-brace-format
-msgid ""
-"error: no shell detection plugin installed. Reinstall `{prog}` with the "
-"`qol` extra (e.g. `pip install {prog}[qol]`) to use autocompletion."
-msgstr ""
-
-#: src/whiteprints/cli/entrypoint_parser.py:123
-#, python-brace-format
-msgid ""
-"error: no autocompletion plugin installed. reinstall `{prog}` with the "
-"`qol` extra (e.g. `pip install {prog}\\[qol]`) to use autocompletion."
-msgstr ""
-
-#: src/whiteprints/cli/entrypoint_parser.py:129
-#, python-brace-format
-msgid ""
-"error: no autocompletion plugin installed. Reinstall `{prog}` with the "
-"`qol` extra (e.g. `pip install {prog}[qol]`) to use autocompletion."
-msgstr ""
-
-#: src/whiteprints/cli/entrypoint_parser.py:160
+#: src/whiteprints/cli/entrypoint_parser.py:125
 msgid "Copyright © 2024 The \"Whiteprints\" contributors <whiteprints@pm.me>."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:183
+#: src/whiteprints/cli/entrypoint_parser.py:142
+msgid "error: invalid_argument"
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:181
 #, python-brace-format
 msgid "error: license {} not found"
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:220
-msgid ""
-"This project is REUSE compliant. Check the SPDX header of each individual"
-" source code file for detailed licensing information."
+#: src/whiteprints/cli/entrypoint_parser.py:241
+#, python-brace-format
+msgid "You may change the CLI color theme with the environment variable `{}`."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:266
-msgid "A Copier-based cookiecutter for creating Python projects managed by uv."
+#: src/whiteprints/cli/entrypoint_parser.py:250
+msgid "Program Info"
 msgstr ""
 
 #: src/whiteprints/cli/command/init_parser.py:35
-#: src/whiteprints/cli/entrypoint_parser.py:277
+#: src/whiteprints/cli/entrypoint_parser.py:255
 msgid "Show this help message and exit."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:288
+#: src/whiteprints/cli/entrypoint_parser.py:264
 msgid "Show program's version number and exit."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:296
+#: src/whiteprints/cli/entrypoint_parser.py:271
 msgid "Show the copyright information and exit."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:311
-msgid "Show the license information and exit."
+#: src/whiteprints/cli/entrypoint_parser.py:276
+msgid "Licensing Info"
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:318
-msgid "Show debugging information and exit. "
+#: src/whiteprints/cli/entrypoint_parser.py:282
+msgid ""
+"Show the license expression and exit. Repeat the flag to show REUSE "
+"information."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:328
+#: src/whiteprints/cli/entrypoint_parser.py:298
+msgid "Show the license text and exit."
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:303
+msgid "Debug Info"
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:309
+msgid ""
+"Show platform and environment information and exit. Repeat the flag to "
+"add distribution information."
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:317
+msgid "Completion"
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:324
 msgid "Show the completion script code and exit."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:338
+#: src/whiteprints/cli/entrypoint_parser.py:332
+msgid "Configuration"
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:349
 #, python-brace-format
-msgid "JSON logging configuration (env: {})."
+msgid ""
+"Loads the logging configuration file (JSON format) at this location. {}If"
+" the file does not exists, a default configuration file is created at the"
+" specified location and loaded. You may change the default path with the "
+"environment variable `{}`."
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:356
+msgid ""
+"If an empty string is passed, the default Python configuration is used, "
+"with LOGLEVEL=\"CRITICAL\". "
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:432
+msgid ""
+"This project is REUSE compliant. Check the SPDX header of each individual"
+" source code file for detailed licensing information."
 msgstr ""
 

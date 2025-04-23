@@ -6,10 +6,7 @@
 
 import re
 
-import pytest
-
 from whiteprints import package_metadata
-from whiteprints.exception import NotAPackageError
 
 
 VERSION_PATTERN = r"""
@@ -46,12 +43,6 @@ VERSION_PATTERN = r"""
 
 See: https://packaging.python.org/en/latest/specifications/version-specifiers/
 """
-
-
-def test_find_present_package_name() -> None:
-    """Test that find present package name fails on None."""
-    with pytest.raises(NotAPackageError):
-        package_metadata.find_present_package_name(None)
 
 
 class TestVersion:

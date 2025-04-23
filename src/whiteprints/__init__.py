@@ -4,184 +4,90 @@
 
 """Top-level module."""
 
-import contextlib
-import gettext
 import importlib
-import sys
+from functools import cache, cached_property
 from pathlib import Path
-from types import FrameType
-from typing import IO, Callable, Final, NoReturn, Optional
+from types import ModuleType
+from typing import Callable, Final, Optional
 
 
-__all__: Final = ["LOCALE_DIRECTORY", "_", "robust_print", "robust_print_json"]
+__all__: Final = ["_", "has_module", "maybe_import_module"]
 """Public module attributes."""
 
-LOCALE_DIRECTORY: Final = Path(__file__).parent / "locale"
-"""Path to the directory containing the locales."""
 
-_: Final = gettext.translation(
-    __name__,
-    LOCALE_DIRECTORY,
-    fallback=True,
-).gettext
-"""A Gettext translation."""
+class LazyGettext:
+    """Lazily initializes gettext translation when first used.
+
+    This class provides a callable `_` object that behaves like a standard
+    gettext translation function but defers loading translation files
+    until the first actual call.
+    """
+
+    def __init__(
+        self,
+        locale_directory: Optional[Path] = None,
+        *,
+        fallback: bool = True,
+    ) -> None:
+        """Initializes the LazyGettext instance.
+
+        Args:
+            locale_directory: Path to the directory containing locale files.
+                Set to None to disable translation.
+            fallback: use a fallback if translation is not found.
+        """
+        self.locale_directory = locale_directory
+        self.fallback = fallback
+
+    @cached_property
+    def __call__(self) -> Callable[[str], str]:
+        """Performs the actual import and binding of gettext translation.
+
+        Returns:
+            The gettext translation function.
+        """
+        if self.locale_directory is None:
+            return lambda x: x
+
+        return (
+            importlib.import_module("gettext")
+            .translation(
+                __name__,
+                self.locale_directory,
+                fallback=self.fallback,
+            )
+            .gettext
+        )
 
 
-def robust_print(
-    *objects: object,
-    sep: str = " ",
-    end: str = "\n",
-    file: Optional[IO[str]] = None,
-    flush: bool = False,
-    fallback_message: Optional[str] = None,
-) -> None:
-    r"""Try to print a message using Rich.
-
-    If rich is not installed use standard Python print with a fallback message.
-    If the fallback message is None, then the original message is printed.
+@cache
+def maybe_import_module(module_name: str) -> Optional[ModuleType]:
+    """Import a module.
 
     Args:
-        objects: Any object, and as many as you like. Will be converted to
-            string before printed
-        sep: Specify how to separate the objects, if there is more
-            than one.
-        end: Specify what to print at the end.
-        file: An object with a write method.
-        flush: An object with a write method.
-        fallback_message: A fallback message, used when Rich is not installed.
+        module_name: the name of the module to import, as it would be done with
+            `importlib.import_module`. Always use absolute import name.
+
+    Returns:
+        None if the module is not found, otherwise returns the module.
     """
     try:
-        importlib.import_module("rich").print(
-            *objects,
-            sep=sep,
-            end=end,
-            file=file,
-            flush=flush,
-        )
+        return importlib.import_module(module_name)
     except ModuleNotFoundError:
-        print(
-            *(objects if fallback_message is None else (fallback_message,)),
-            sep=sep,
-            end=end,
-            file=file,
-            flush=flush,
-        )
+        return None
 
 
-def robust_print_json(  # noqa: PLR0913
-    data: object,
-    *,
-    indent: Optional[int] = None,
-    skip_keys: bool = False,
-    ensure_ascii: bool = True,
-    check_circular: bool = True,
-    allow_nan: bool = False,
-    sort_keys: bool = False,
-    default: Optional[Callable[..., object]] = None,
-) -> None:
-    # we disable PLR0913 (too-many-arguments) are we want to mimic json.dump.
-    """Try to print a JSON using Rich.
-
-    If rich is not installed use standard Python json.dump with a fallback
-    message. If the fallback message is None, then the original message is
-    printed.
+def has_module(module_name: str) -> bool:
+    """Import a module.
 
     Args:
-        data: The Python object to be serialized.
-        indent: If a positive integer or string, JSON array elements and object
-            members will be pretty-printed with that indent level. A positive
-            integer indents that many spaces per level. If zero, negative, or
-            "" (the empty string), only newlines are inserted. If None (the
-            default), the most compact representation is used.
-        skip_keys: If True, keys that are not of a basic type (str, int, float,
-            bool, None) will be skipped instead of raising a TypeError.
-        ensure_ascii: If True (the default), the output is guaranteed to have
-            all incoming non-ASCII characters escaped. If False, these
-            characters will be outputted as-is.
-        check_circular: If False, the circular reference check for container
-            types is skipped and a circular reference will result in a
-            RecursionError (or worse).
-        allow_nan:  If False, serialization of out-of-range float values (nan,
-            inf, -inf) will result in a ValueError, in strict compliance with
-            the JSON specification. If True (the default), their JavaScript
-            equivalents (NaN, Infinity, -Infinity) are used.
-        sort_keys: If True, dictionaries will be outputted sorted by key.
-        default: A function that is called for objects that can't otherwise be
-            serialized. It should return a JSON encodable version of the object
-            or raise a TypeError. If None (the default), TypeError is raised.
+        module_name: the name of the module to import, as it would be done with
+        `importlib.import_module`. Always use absolute import name.
+
+    Returns:
+        True if the module is importable, False otherwise
     """
-    try:
-        importlib.import_module("rich").print_json(
-            data=data,
-            indent=indent,
-            skip_keys=skip_keys,
-            check_circular=check_circular,
-            allow_nan=allow_nan,
-            sort_keys=sort_keys,
-            default=default,
-        )
-    except ModuleNotFoundError:
-        importlib.import_module("json").dump(
-            data,
-            sys.stdout,
-            indent=indent,
-            skipkeys=skip_keys,
-            ensure_ascii=ensure_ascii,
-            check_circular=check_circular,
-            allow_nan=allow_nan,
-            sort_keys=sort_keys,
-            default=default,
-        )
-        sys.stdout.write("\n")
-
-
-def _exit_gracefully_action(signalnum: int, frame: FrameType) -> NoReturn:
-    """Exit gracefully when a signal is caught.
-
-    The programs exit with the error code being the signal number.
-
-    Args:
-        signalnum: the signal number.
-        frame: the stack frame.
-    """
-    error_message = _("Execution stopped by user")
-    robust_print(
-        f"[red]{error_message}[/]",
-        file=sys.stderr,
-        fallback_message=error_message,
-    )
-
-    logger = importlib.import_module("logging").getLogger(__name__)
-    logger.info(
-        "%s received, exiting program.",
-        importlib.import_module("signal").Signals(signalnum).name,
-        extra={
-            "stack": importlib.import_module("traceback").format_stack(frame),
-        },
-    )
-    sys.exit(signalnum)
-
-
-def _exit_gracefully_on_sigint() -> None:
-    """Register a sigint signal handler.
-
-    Example:
-        >>> import signal
-        >>> import os
-        >>>
-        >>> _exit_gracefully_on_sigint()
-        >>>
-        >>> try:
-        >>>     os.kill(os.getpid(), signal.SIGINT)
-        >>> except SystemExit:
-        >>>     print("Bye")
-        Bye
-
-    When sigint is caught, the event is logged and the program exits with the
-    SIGINT error code.
-    """
-    signal = importlib.import_module("signal")
-    signal.signal(signal.SIGINT, _exit_gracefully_action)
+    return maybe_import_module(module_name) is not None
 
 
 def _setup_package() -> None:
@@ -193,13 +99,14 @@ def _setup_package() -> None:
         >>> _setup_package()
         None
     """
-    with contextlib.suppress(ModuleNotFoundError):
-        importlib.import_module("beartype.claw").beartype_this_package()
+    if (claw := maybe_import_module("beartype.claw")) is not None:
+        claw.beartype_this_package()
 
-    with contextlib.suppress(ModuleNotFoundError):
-        importlib.import_module("dotenv").load_dotenv()
-
-    _exit_gracefully_on_sigint()
+    if (dotenv := maybe_import_module("dotenv")) is not None:
+        dotenv.load_dotenv()
 
 
 _setup_package()
+
+_: Final = LazyGettext(Path(__file__).parent / "locale")
+"""A Gettext translation."""

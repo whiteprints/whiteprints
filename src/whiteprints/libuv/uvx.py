@@ -53,6 +53,8 @@ class UVX:
                 self.bin,
                 "tool",
                 "run",
+                "--isolated",
+                "--no-progress",
                 *command,
             ],
             shell=False,

@@ -6,15 +6,17 @@
 
 """Command Line Interface app entrypoint."""
 
-import contextlib
 import importlib
 import importlib.metadata
 import sys
+from argparse import Namespace
+from collections.abc import Iterator
+from contextlib import contextmanager
 from functools import cache
 from pathlib import Path
 from typing import Final, Optional
 
-from whiteprints import LOCALE_DIRECTORY, _
+from whiteprints import _, maybe_import_module
 
 
 __all__: Final = ["entrypoint", "prog_name"]
@@ -26,10 +28,10 @@ def prog_name() -> str:
     """Determine the program name from the entrypoint metadata.
 
     Returns:
-        The program name
+        The program name.
     """
-    entrypoints = importlib.metadata.entry_points()
     entrypoint_value = f"{__name__}:entrypoint"
+    entrypoints = importlib.metadata.entry_points()
 
     if sys.version_info >= (3, 10):
         return entrypoints.select(
@@ -42,6 +44,112 @@ def prog_name() -> str:
         for entrypoint in entrypoints["console_scripts"]
         if entrypoint.value == entrypoint_value
     )
+
+
+@contextmanager
+def gc_disabled() -> Iterator[None]:
+    """Temporarily disable the garbage collector for performances."""
+    (gc := importlib.import_module("gc")).disable()
+    yield
+    gc.enable()
+    gc.collect()
+
+
+def _create_namespace(args: Optional[list[str]]) -> Namespace:
+    """Create a namespace from the arguments.
+
+    Args:
+        args: the command line arguments.
+
+    Returns:
+        The namespace corresponding to the arguments passed.
+    """
+    (gettext := importlib.import_module("gettext")).bindtextdomain(
+        "argparse",
+        _.locale_directory,
+    )
+    gettext.textdomain("argparse")
+
+    entrypoint_parser = importlib.import_module(
+        "whiteprints.cli.entrypoint_parser",
+    ).create_entrypoint_parser(prog_name())
+
+    subparsers = entrypoint_parser.add_subparsers(
+        title=_("Subcommands"),
+        dest="cmd",
+    )
+    importlib.import_module(
+        "whiteprints.cli.command.init_parser",
+    ).setup_init_parser(
+        subparsers.add_parser(
+            "init",
+            formatter_class=entrypoint_parser.formatter_class,
+            description=_("Initialize a Python project."),
+            help=_("Initialize a Python project."),
+            exit_on_error=False,
+            add_help=False,
+            epilog=_(
+                "Note: see https://copier.readthedocs.io/en/stable/configuring/"
+                " for help on how to use Copier and COPIER_ARGS"
+                " (optional)."
+            ),
+        )
+    )
+
+    if argcomplete := maybe_import_module("argcomplete"):
+        argcomplete.autocomplete(entrypoint_parser)
+
+    importlib.import_module(
+        "whiteprints.cli.entrypoint_parser",
+    ).resolve_flags(
+        entrypoint_parser, namespace := entrypoint_parser.parse_args(args)
+    )
+
+    return namespace
+
+
+def _setup_logging(namespace: Namespace) -> None:
+    """Setup the logging.
+
+    Use the configuration provided in the namespace.
+
+    Args:
+        namespace: the arguments namespace.
+    """
+    importlib.import_module(
+        "whiteprints.cli.logs",
+    ).setup_logging(
+        Path(namespace.log_config) if namespace.log_config else None,
+    )
+    logger = importlib.import_module("logging").getLogger(__name__)
+    logger.debug(
+        "program start",
+        extra={
+            "debug_info": (
+                lambda: (
+                    importlib.import_module(
+                        "whiteprints.debug_info",
+                    ).gather_debug_info()
+                )
+            ),
+            "namespace": namespace.__dict__,
+        },
+    )
+
+
+def _call_command(namespace: Namespace) -> None:
+    """Call a command.
+
+    This is done by lazily loading the whiteprint module named after the
+    command and the calling a function with the same name as the module name.
+
+    Args:
+        namespace: the arguments namespace.
+    """
+    command = importlib.import_module(
+        f"whiteprints.cli.command.{namespace.cmd}",
+    )
+    getattr(command, namespace.cmd)(namespace)
 
 
 def entrypoint(args: Optional[list[str]] = None) -> None:
@@ -59,72 +167,17 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
     Args:
         args: the arguments forwarded to argparse. For example sys.argv.
     """
-    gettext = importlib.import_module("gettext")
-    gettext.bindtextdomain(
-        "argparse",
-        LOCALE_DIRECTORY,
-    )
-    gettext.textdomain("argparse")
+    with gc_disabled():
+        # Delay the gc for a short time to have the CLI as responsive as
+        # possible.
+        # There should be no objects with cyclic references created. Even
+        # if some are created for this short amount they will be collected
+        # as soon as the namespace is created.
+        namespace = _create_namespace(args)
 
-    entrypoint_parser = importlib.import_module(
-        "whiteprints.cli.entrypoint_parser",
-        __package__,
-    ).create_entrypoint_parser(prog_name())
+    _setup_logging(namespace)
+    _call_command(namespace)
 
-    subparsers = entrypoint_parser.add_subparsers(
-        title=_("Subcommands"),
-        dest="cmd",
+    importlib.import_module("logging").getLogger(__name__).debug(
+        "program exit without error"
     )
-    importlib.import_module(
-        "whiteprints.cli.command.init_parser",
-        __package__,
-    ).setup_init_parser(
-        subparsers.add_parser(
-            "init",
-            formatter_class=entrypoint_parser.formatter_class,
-            description=_("Initialize a Python project."),
-            help=_("Initialize a Python project."),
-            exit_on_error=False,
-            add_help=False,
-            epilog=_(
-                "Note: see https://copier.readthedocs.io/en/stable/configuring/"
-                " for help on how to use Copier and COPIER_ARGS (optional)."
-            ),
-        )
-    )
-
-    with contextlib.suppress(ModuleNotFoundError):
-        importlib.import_module("argcomplete").autocomplete(entrypoint_parser)
-
-    namespace = entrypoint_parser.parse_args(args)
-    importlib.import_module("whiteprints.cli.entrypoint_parser").resolve_flags(
-        entrypoint_parser, namespace
-    )
-
-    importlib.import_module(
-        "whiteprints.cli.logs",
-        __package__,
-    ).setup_logging(
-        Path(namespace.log_config) if namespace.log_config else None,
-    )
-    logger = importlib.import_module("logging").getLogger(__name__)
-    logger.debug(
-        "program started",
-        extra={
-            "debug_info": (
-                lambda: (
-                    importlib.import_module(
-                        "whiteprints.debug_info",
-                        __package__,
-                    ).gather_debug_info()
-                )
-            ),
-            "namespace": namespace.__dict__,
-        },
-    )
-    command = importlib.import_module(
-        f"whiteprints.cli.command.{namespace.cmd}",
-        __package__,
-    )
-    getattr(command, namespace.cmd)(namespace)
-    logger.debug("program finished without errors")

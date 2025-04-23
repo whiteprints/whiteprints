@@ -4,11 +4,12 @@
 
 """Logging configuration for the CLI."""
 
-import contextlib
 import importlib
 from functools import cache
 from pathlib import Path
 from typing import Final, Optional
+
+from whiteprints import maybe_import_module
 
 
 __all__: Final = ["setup_logging", "user_log_config", "user_log_dir"]
@@ -28,15 +29,14 @@ def user_log_dir() -> Path:
     Returns:
         The path to the log directory.
     """
-    with contextlib.suppress(ModuleNotFoundError):
-        return importlib.import_module("platformdirs").user_log_path(
-            importlib.import_module(
-                "whiteprints.cli.entrypoint",
-                __package__,
-            ).prog_name()
-        )
+    if (platformdirs := maybe_import_module("platformdirs")) is None:
+        return Path.cwd()
 
-    return Path.cwd()
+    return platformdirs.user_log_path(
+        importlib.import_module(
+            "whiteprints.cli.entrypoint",
+        ).prog_name()
+    )
 
 
 @cache
@@ -51,16 +51,17 @@ def user_log_config() -> Optional[Path]:
         The path to the logging configuration file if `platformdirs` is
         installed, None otherwise.
     """
-    with contextlib.suppress(ModuleNotFoundError):
-        return (
-            importlib.import_module("platformdirs").user_config_path(
-                importlib.import_module(
-                    "whiteprints.cli.entrypoint",
-                    __package__,
-                ).prog_name()
-            )
-            / "logs.json"
+    if (platformdirs := maybe_import_module("platformdirs")) is None:
+        return None
+
+    return (
+        platformdirs.user_config_path(
+            importlib.import_module(
+                "whiteprints.cli.entrypoint",
+            ).prog_name()
         )
+        / "logs.json"
+    )
 
 
 def _generate_configuration(log_config_path: Path) -> None:
@@ -116,13 +117,16 @@ def setup_logging(log_config_path: Optional[Path] = None) -> None:
     """Setup logging.
 
     It loads the configuration file specified in the arguments. If the file
-    does not exists, it is created.
+    does not exists, it is created. If None, a basic default configuration is
+    provided.
 
     Args:
         log_config_path: path to the logging configuration file.
     """
-    log_config_path = log_config_path or user_log_config()
-    if log_config_path is not None:
+    logging = importlib.import_module("logging")
+    if log_config_path is None:
+        logging.basicConfig(level=logging.CRITICAL)
+    else:
         if not log_config_path.is_file():
             log_config_path.parent.mkdir(parents=True, exist_ok=True)
             _generate_configuration(log_config_path)
@@ -137,4 +141,4 @@ def setup_logging(log_config_path: Optional[Path] = None) -> None:
             )
         )
 
-    importlib.import_module("logging").captureWarnings(capture=True)
+    logging.captureWarnings(capture=True)
