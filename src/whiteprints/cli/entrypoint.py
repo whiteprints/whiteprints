@@ -14,7 +14,7 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from functools import cache
 from pathlib import Path
-from typing import Final, Optional
+from typing import Final, Optional, no_type_check
 
 from whiteprints import _, maybe_import_module
 
@@ -46,6 +46,7 @@ def prog_name() -> str:
     )
 
 
+@no_type_check
 @contextmanager
 def gc_disabled() -> Iterator[None]:
     """Temporarily disable the garbage collector for performances."""
