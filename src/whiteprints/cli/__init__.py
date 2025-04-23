@@ -31,7 +31,7 @@ def robust_print_json(  # noqa: PLR0913
     check_circular: bool = True,
     allow_nan: bool = False,
     sort_keys: bool = False,
-    default: Optional[Callable[..., object]] = None,
+    default: Optional[Callable] = None,
 ) -> None:
     # we disable PLR0913 (too-many-arguments) are we want to mimic json.dump.
     """Try to print a JSON using Rich.
