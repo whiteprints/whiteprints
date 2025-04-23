@@ -38,7 +38,7 @@ RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
 
 ARG UV_BIN
 
-COPY --from=uv_image /uv ${UV_BIN}/uv
+COPY --from=uv_image /usr/local/bin/uv ${UV_BIN}/uv
 
 ARG UV_COMPILE_BYTECODE
 ARG PYTHONDONTWRITEBYTECODE
@@ -65,7 +65,8 @@ RUN --mount=type=cache,target=/root/.cache/uv \
         --python="${VIRTUAL_ENV}/bin/python" \
         --format="requirements-txt" \
         --output-file requirements.txt \
-        --all-extras \
+        --extra qol \
+        --extra color \
         --frozen \
         --no-dev \
         --no-emit-project && \

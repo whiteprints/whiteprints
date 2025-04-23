@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-ARG TAG=3.13.2-slim-bookworm@sha256:f3614d98f38b0525d670f287b0474385952e28eb43016655dd003d0e28cf8652
+ARG TAG=3.13.3-slim-bookworm@sha256:21e39cf1815802d4c6f89a0d3a166cc67ce58f95b6d1639e68a394c99310d2e5
 ARG UV_COMPILE_BYTECODE=1
 ARG PYTHONDONTWRITEBYTECODE=1
 ARG PYTHONBUFFERED=1
@@ -22,7 +22,7 @@ ARG VIRTUAL_ENV=/opt/venv
 #   - These Python packages usually only provide binary wheels for GLIBC, so
 #   the packages will need to be recompiled fully within the container images,
 #   increasing build times.
-ARG UV_TAG=0.5.30@sha256:bb74263127d6451222fe7f71b330edfb189ab1c98d7898df2401fbf4f272d9b9
+ARG UV_TAG=0.6.16-python3.13-alpine@sha256:1c0baf18db60cf0103013cc43806847ab4727c3c7cca1055dfd96c44743964e7
 ARG UV_BIN="/usr/local/bin"
 
 FROM ghcr.io/astral-sh/uv:${UV_TAG} AS uv_image
@@ -40,7 +40,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 ARG UV_BIN
 
-COPY --from=uv_image /uv ${UV_BIN}/uv
+COPY --from=uv_image /usr/local/bin/uv ${UV_BIN}/uv
 
 ARG UV_COMPILE_BYTECODE
 ARG PYTHONDONTWRITEBYTECODE
@@ -60,13 +60,14 @@ ARG WORKDIR=/src
 WORKDIR ${WORKDIR}
 
 # Install the project dependencies
-COPY pyproject.toml *.lock ./
+COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
     ${UV_BIN}/uv export \
         --python="${VIRTUAL_ENV}/bin/python" \
         --format="requirements-txt" \
         --output-file requirements.txt \
-        --all-extras \
+        --extra qol \
+        --extra color \
         --frozen \
         --no-dev \
         --no-emit-project && \
