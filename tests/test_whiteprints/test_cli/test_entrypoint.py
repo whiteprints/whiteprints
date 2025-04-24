@@ -11,7 +11,7 @@ import pytest
 
 from whiteprints.cli.entrypoint import entrypoint
 from whiteprints.cli.entrypoint_parser import Completion
-from whiteprints.package_metadata import find_license_files, find_version
+from whiteprints.package_metadata import find_version
 
 
 def test_help(capsys: pytest.CaptureFixture[str]) -> None:
@@ -97,26 +97,10 @@ def test_license_full(capsys: pytest.CaptureFixture[str]) -> None:
     )
 
 
-def test_license_invalid(capsys: pytest.CaptureFixture[str]) -> None:
-    """Test wether a license text flag exists and fail on invalid license."""
-    with pytest.raises(SystemExit) as ext:
-        entrypoint(["--license-text", "SHOULD-NOT_BE-A-VALID-SPDX-IDENTIFIER"])
-
-    assert ext.value.code == os.EX_USAGE, "Unexpected exit code."
-
-    captured = capsys.readouterr()
-    assert "error" in captured.err.lower(), (
-        "There should be an error message on invalid license choice"
-    )
-
-
 def test_license_valid(capsys: pytest.CaptureFixture[str]) -> None:
     """Test wether a license text flag exists and works."""
-    impossible_license_name = "-".join([
-        path.stem for path in find_license_files()
-    ])
     with pytest.raises(SystemExit) as ext:
-        entrypoint(["--license-text", impossible_license_name])
+        entrypoint(["--license-text"])
 
     assert ext.value.code == os.EX_OK, "Unexpected exit code."
 
