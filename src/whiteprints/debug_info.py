@@ -26,6 +26,7 @@ import importlib
 import os
 import sys
 from functools import cache
+from importlib.metadata import distributions
 from importlib.util import find_spec
 from pathlib import Path
 from typing import Final, Optional, TypedDict, Union
@@ -34,13 +35,11 @@ from typing import Final, Optional, TypedDict, Union
 if sys.version_info >= (3, 10):
     from importlib.metadata import (
         distribution,
-        distributions,
         packages_distributions,
     )
 else:
     from importlib_metadata import (
         distribution,
-        distributions,
         packages_distributions,
     )
 

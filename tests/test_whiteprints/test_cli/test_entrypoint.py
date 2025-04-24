@@ -50,9 +50,9 @@ def test_version(capsys: pytest.CaptureFixture[str]) -> None:
 
 
 def test_debug(capsys: pytest.CaptureFixture[str]) -> None:
-    """Test wether a debug flag exists and works."""
+    """Test wether a platform flag exists and works."""
     with pytest.raises(SystemExit) as ext:
-        entrypoint(["--debug"])
+        entrypoint(["--platform"])
 
     assert ext.value.code == os.EX_OK, "Unexpected exit code."
 
@@ -87,9 +87,9 @@ def test_license(capsys: pytest.CaptureFixture[str]) -> None:
 
 
 def test_license_invalid(capsys: pytest.CaptureFixture[str]) -> None:
-    """Test wether a license flag exists and works."""
+    """Test wether a license text flag exists and fail on invalid license."""
     with pytest.raises(SystemExit) as ext:
-        entrypoint(["--license", "SHOULD-NOT_BE-A-VALID-SPDX-IDENTIFIER"])
+        entrypoint(["--license-text", "SHOULD-NOT_BE-A-VALID-SPDX-IDENTIFIER"])
 
     assert ext.value.code == os.EX_USAGE, "Unexpected exit code."
 
@@ -100,12 +100,12 @@ def test_license_invalid(capsys: pytest.CaptureFixture[str]) -> None:
 
 
 def test_license_valid(capsys: pytest.CaptureFixture[str]) -> None:
-    """Test wether a license flag exists and works."""
+    """Test wether a license text flag exists and works."""
     impossible_license_name = "-".join([
         path.stem for path in find_license_files()
     ])
     with pytest.raises(SystemExit) as ext:
-        entrypoint(["--license", impossible_license_name])
+        entrypoint(["--license-text", impossible_license_name])
 
     assert ext.value.code == os.EX_OK, "Unexpected exit code."
 
