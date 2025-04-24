@@ -59,27 +59,29 @@ class Completion(CompleterAction):
     )
 
     @staticmethod
-    def _autodetect_shell(arg: Optional[Union[str, Sequence[str]]]) -> str:
+    def _autodetect_shell(args: Optional[Union[str, Sequence[str]]]) -> str:
         """Try to autotect the shell if not given.
+
+        Args:
+            args: the arguments forwarded to the action.
 
         Example:
             >>> Completion._autodetect_shell("bash")
             bash
             >>> Completion._autodetect_shell(["bash"])
             bash
-            >>> shell = Completion._autodetect_shell(None)
-            assert isinstance(shell, str)
+            >>> assert isinstance(Completion._autodetect_shell(None), str)
 
         Returns:
             The current shell name.
         """
-        if arg is None:
+        if args is None:
             return importlib.import_module("shellingham").detect_shell()[0]
 
-        if isinstance(arg, str):
-            return arg
+        if isinstance(args, str):
+            return args
 
-        return arg[0]
+        return args[0]
 
     @override
     def __call__(
@@ -135,44 +137,38 @@ class Copyright(CompleterAction):
 class License(CompleterAction):
     """Print the code licenses information."""
 
-    @staticmethod
-    def _check_sequence(
-        args: Sequence[Union[Sequence[str], str, None]],
-    ) -> Union[Sequence[str], str, None]:
-        if not isinstance(arg_values := args[0], Sequence):
-            error_message = _("error: invalid_argument")
-            robust_print(
-                f"[red]{error_message}[/]"
-                if has_module("rich")
-                else error_message,
-            )
-            sys.exit(os.EX_SOFTWARE)
-
-        return arg_values
-
     @override
     def __call__(
         self,
         parser: ArgumentParser,
         namespace: Namespace,
         *args: Union[Sequence[str], str, None],
-    ) -> None:
+    ) -> NoReturn:
         """The action callback.
+
+        If the arguments values is empty, there is only a signle license to
+        print, the one defined in the package.
+
+        If the arguments is a sequence it means that the package have multiple
+        licenses. Then the arguments should contains a single element,
+        which correspond to the requested license to print among the licenses
+        present in the package.
 
         Args:
             parser: the argument parser
             namespace: the arguments namespace
             args: the arguments passed to the parser
         """
-        arg_values = self._check_sequence(args)
-
         license_files = importlib.import_module(
             "whiteprints.package_metadata",
         ).find_license_files()
-        if not arg_values:
+
+        # package with a single license
+        if not (arg_values := args[0]):
             robust_print(license_files[0].read_text(encoding="utf-8"))
             sys.exit(os.EX_OK)
 
+        # package with multiple licenses
         requested_license = str(arg_values[0])
         for license_path in license_files:
             if requested_license in license_path.stem:
