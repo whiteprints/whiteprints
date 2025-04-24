@@ -114,43 +114,43 @@ def test_license_valid(capsys: pytest.CaptureFixture[str]) -> None:
 
 
 @pytest.mark.no_extras
-def test_shell_completion_fail_when_no_extras(
+def test_shell_autocompletion_fail_when_no_extras(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """Test wether a completion-script flag exists and works."""
+    """Test wether an autocompletion-script flag exists and works."""
     with pytest.raises(SystemExit) as ext:
-        entrypoint(["--completion-script"])
+        entrypoint(["--autocompletion-script"])
 
     assert ext.value.code == os.EX_SOFTWARE, "Unexpected exit code."
 
     captured = capsys.readouterr()
     assert "error" in captured.err.lower(), (
-        "There should be an error when trying to get a completion script"
+        "There should be an error when trying to get an autocompletion script"
         " when extra `qol` is not installed"
     )
 
 
-def test_shell_completion(
+def test_shell_autocompletion(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """Test wether a completion-script flag exists and works."""
+    """Test wether an autocompletion-script flag exists and works."""
     with pytest.raises(SystemExit) as ext:
-        entrypoint(["--completion-script", Completion.SUPPORTED_SHELLS[0]])
+        entrypoint(["--autocompletion-script", Completion.SUPPORTED_SHELLS[0]])
 
     assert ext.value.code == os.EX_OK, "Unexpected exit code."
 
     captured = capsys.readouterr()
-    assert captured.out, "There should be a shell completion displayed"
+    assert captured.out, "There should be a shell autocompletion displayed"
 
 
-def test_shell_completion_auto(
+def test_shell_autocompletion_auto(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """Test wether a completion-script flag exists and works."""
+    """Test wether an autocompletion-script flag exists and works."""
     with pytest.raises(SystemExit) as ext:
-        entrypoint(["--completion-script"])
+        entrypoint(["--autocompletion-script"])
 
     assert ext.value.code == os.EX_OK, "Unexpected exit code."
 
     captured = capsys.readouterr()
-    assert captured.out, "There should be a shell completion displayed"
+    assert captured.out, "There should be a shell autocompletion displayed"
