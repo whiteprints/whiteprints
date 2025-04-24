@@ -73,10 +73,21 @@ def test_copyright(capsys: pytest.CaptureFixture[str]) -> None:
     assert captured.out, "Could not print application copyright message"
 
 
-def test_license(capsys: pytest.CaptureFixture[str]) -> None:
+def test_license_simple(capsys: pytest.CaptureFixture[str]) -> None:
     """Test wether a license flag exists and works."""
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--license"])
+
+    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+
+    captured = capsys.readouterr()
+    assert captured.out, "Could not print application license informations"
+
+
+def test_license_full(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test wether a license flag exists and works."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--license", "--license"])
 
     assert ext.value.code == os.EX_OK, "Unexpected exit code."
 
