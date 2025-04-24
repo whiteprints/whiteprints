@@ -112,11 +112,11 @@ def test_license_valid(capsys: pytest.CaptureFixture[str]) -> None:
 def test_shell_autocompletion_fail_when_no_extras(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """Test wether an autocompletion-script flag exists and works."""
+    """Test that autocompletion flag is unavailable when no extras."""
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--autocompletion-script"])
 
-    assert ext.value.code == os.EX_SOFTWARE, "Unexpected exit code."
+    assert ext.value.code == os.EX_USAGE, "Unexpected exit code."
 
     captured = capsys.readouterr()
     assert "error" in captured.err.lower(), (
