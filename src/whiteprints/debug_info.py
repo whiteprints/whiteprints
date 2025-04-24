@@ -97,10 +97,12 @@ class DebugInfo(TypedDict):
     logs: Optional[LogsInfo]
 
 
-def _find_origin(package_name: Optional[str]) -> Optional[str]:
-    if package_name is None:
-        return None
+def _find_origin(package_name: str) -> Optional[str]:
+    """Find the origin path of a package.
 
+    Returns:
+        The path to the package origin. None if no path is found.
+    """
     if (spec := find_spec(package_name)) is None or spec.origin is None:
         return None
 
@@ -175,7 +177,7 @@ def gather_debug_info(*, site_packages: bool = True) -> DebugInfo:
             name=distribution_name,
             version=root_distribution.version,
             origin=_find_origin(
-                _gather_distributions_packages().get(distribution_name)
+                _gather_distributions_packages()[distribution_name],
             ),
         ),
         site_packages=(
@@ -184,9 +186,9 @@ def gather_debug_info(*, site_packages: bool = True) -> DebugInfo:
                     name=distribution.metadata["name"],
                     version=distribution.version,
                     origin=_find_origin(
-                        _gather_distributions_packages().get(
+                        _gather_distributions_packages()[
                             distribution.metadata["name"]
-                        )
+                        ]
                     ),
                 )
                 for distribution in distributions()
