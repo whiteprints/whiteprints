@@ -6,8 +6,9 @@
 
 import importlib
 import sys
+from collections.abc import Callable
 from types import FrameType
-from typing import Callable, Final, NoReturn, Optional
+from typing import Final, NoReturn, Optional
 
 from whiteprints import _, has_module, maybe_import_module
 
