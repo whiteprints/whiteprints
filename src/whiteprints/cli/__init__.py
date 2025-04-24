@@ -15,10 +15,6 @@ from whiteprints import _, has_module, maybe_import_module
 __all__: Final = ["robust_print", "robust_print_json"]
 """Public module attributes."""
 
-if maybe_import_module("beartype") is None:
-    from typing import Callable
-else:
-    from beartype.typing import Callable
 
 if (rich := maybe_import_module("rich")) is None:
     robust_print = print

@@ -49,10 +49,25 @@ def test_version(capsys: pytest.CaptureFixture[str]) -> None:
     )
 
 
-def test_debug(capsys: pytest.CaptureFixture[str]) -> None:
+@pytest.mark.no_extras
+def test_platform(capsys: pytest.CaptureFixture[str]) -> None:
     """Test wether a platform flag exists and works."""
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--platform"])
+
+    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+
+    captured = capsys.readouterr()
+    assert json.loads(captured.out), (
+        "Could not print application debug informations"
+    )
+
+
+@pytest.mark.no_extras
+def test_platform_full(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test wether a platform flag exists and works."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--platform", "--platform"])
 
     assert ext.value.code == os.EX_OK, "Unexpected exit code."
 

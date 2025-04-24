@@ -18,6 +18,13 @@ __all__: Final = ["_", "has_module", "maybe_import_module"]
 class LazyGettext:
     """Lazily initializes gettext translation when first used.
 
+    If no locale directory is given, no localization is performed.
+
+    Example:
+        >>> _ = LazyGettext()
+        >>> _("No localization is performed")
+        No localization is performed
+
     This class provides a callable `_` object that behaves like a standard
     gettext translation function but defers loading translation files
     until the first actual call.
@@ -90,23 +97,30 @@ def has_module(module_name: str) -> bool:
     return maybe_import_module(module_name) is not None
 
 
-def _setup_package() -> None:
+def _setup_package(
+    *,
+    claw: Optional[ModuleType] = None,
+    dotenv: Optional[ModuleType] = None,
+) -> None:
     """Setup the package.
 
-    Load the modules dotenv and beartype if found.
+    Load the modules dotenv and beartype if given.
 
     Example:
         >>> _setup_package()
         None
     """
-    if (claw := maybe_import_module("beartype.claw")) is not None:
+    if claw is not None:
         claw.beartype_this_package()
 
-    if (dotenv := maybe_import_module("dotenv")) is not None:
+    if dotenv is not None:
         dotenv.load_dotenv()
 
 
-_setup_package()
+_setup_package(
+    claw=maybe_import_module("beartype.claw"),
+    dotenv=maybe_import_module("dotenv"),
+)
 
 _: Final = LazyGettext(Path(__file__).parent / "locale")
 """A Gettext translation."""
