@@ -19,6 +19,7 @@ from typing import (
     ClassVar,
     Final,
     NoReturn,
+    Optional,
     Union,
 )
 
@@ -57,6 +58,29 @@ class Completion(CompleterAction):
         "powershell",
     )
 
+    @staticmethod
+    def _autodetect_shell(arg: Optional[Union[str, Sequence[str]]]) -> str:
+        """Try to autotect the shell if not given.
+
+        Example:
+            >>> Completion._autodetect_shell("bash")
+            bash
+            >>> Completion._autodetect_shell(["bash"])
+            bash
+            >>> shell = Completion._autodetect_shell(None)
+            assert isinstance(shell, str)
+
+        Returns:
+            The current shell name.
+        """
+        if arg is None:
+            return importlib.import_module("shellingham").detect_shell()[0]
+
+        if isinstance(arg, str):
+            return arg
+
+        return arg[0]
+
     @override
     def __call__(
         self,
@@ -71,20 +95,12 @@ class Completion(CompleterAction):
             namespace: the arguments namespace
             args: the arguments passed to the parser
         """
-        maybe_shell = args[0]
-        if (maybe_shell := args[0]) is None:
-            shell = importlib.import_module("shellingham").detect_shell()[0]
-        elif isinstance(maybe_shell, str):
-            shell = maybe_shell
-        else:
-            shell = maybe_shell[0]
-
         # Bandit has a false positive. Here shell is a string not a
         # boolean. More importantly it is not related to a subprocess
         # execution simply the shell choice for completion.
         robust_print(
             importlib.import_module("argcomplete.shell_integration")
-            .shellcode([parser.prog], shell=shell)  # nosec
+            .shellcode([parser.prog], shell=self._autodetect_shell(args[0]))
             .strip()
         )
         sys.exit(os.EX_OK)
