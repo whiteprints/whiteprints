@@ -97,7 +97,6 @@ dev = [
     { include-group = "coverage" },
     { include-group = "editor" },
     { include-group = "localization" },
-    { include-group = "profile" },
     { include-group = "serve-documentation" },
     { include-group = "tests" },
 ]
@@ -123,9 +122,6 @@ tests = [
     "pytest-randomly==3.16.0",
     "pytest-xdist==3.6.1",
     "xdoctest[colors]==1.2.0",
-]
-profile = [
-    "scalene==1.5.51",
 ]
 editor = [
     "pynvim==0.5.2",

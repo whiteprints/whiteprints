@@ -177,9 +177,9 @@ class License(CompleterAction):
             >>> from whiteprints.package_metadata import find_license_files
             >>>
             >>> license_files = find_license_files()
-            >>> License._print_license_text(license_files[0].stem)
+            >>> License._print_license_text(license_files.pop().stem)
             ...
-            >>> License._print_license_text([license_files[0].stem])
+            >>> License._print_license_text([license_files.pop().stem])
             ...
             >>> License._print_license_text(None)
             ...
@@ -195,8 +195,8 @@ class License(CompleterAction):
         ).find_license_files()
 
         # package with a single license
-        if not args or isinstance(args, str):
-            robust_print(license_files[0].read_text(encoding="utf-8"))
+        if args is None or isinstance(args, str):
+            robust_print(license_files.pop().read_text(encoding="utf-8"))
             return
 
         # package with multiple licenses

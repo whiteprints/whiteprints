@@ -38,6 +38,24 @@ def _is_license(file: str) -> bool:
     return file.startswith("LICENSES/") and file.endswith(r".txt")
 
 
+def _match_license_path_and_filename(
+    license_path: PackagePath,
+    license_file_set: set[str],
+) -> bool:
+    """Find the licenses in the wheel defined in the package metadata.
+
+    Args:
+        license_path: a icense path found in the package wheel.
+        license_file_set: set of licenses found in the wheel metadata.
+
+    Returns:
+        True if the license path and filename matches, False otherwise.
+    """
+    return any(
+        license_path.stem in license_file for license_file in license_file_set
+    )
+
+
 def _find_license_files(
     *,
     license_paths: Iterable[PackagePath],
@@ -46,8 +64,8 @@ def _find_license_files(
     """Find the licenses in the wheel defined in the package metadata.
 
     Args:
-        license_paths: list of license paths found in the package wheel.
-        license_files: list of licenses found in the wheel metadata.
+        license_paths: license paths found in the package wheel.
+        license_files: licenses found in the wheel metadata.
 
     Example:
         >>> from importlib import metadata
@@ -68,16 +86,11 @@ def _find_license_files(
     Returns:
         the list of code licenses used by the present package.
     """
-    # Convert license_files to a set for faster lookups
-    license_file_set = {file for file in license_files if _is_license(file)}
-
-    # Filter license_paths by whether they match any of the license_files
     return {
         license_path
         for license_path in license_paths
-        if any(
-            license_path.stem in license_file
-            for license_file in license_file_set
+        if _match_license_path_and_filename(
+            license_path, {file for file in license_files if _is_license(file)}
         )
     }
 
@@ -153,12 +166,12 @@ def find_license_expression() -> str:
 
 
 @cache
-def find_license_files() -> list[PackagePath]:
+def find_license_files() -> set[PackagePath]:
     """Find the license files for the current package.
 
     Example:
         >>> find_license_files()
-        [...]
+        {...}
 
     Returns:
         A list containing the path to the license(s) of the package code.
