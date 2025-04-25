@@ -14,6 +14,7 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from functools import cache
 from pathlib import Path
+from types import ModuleType
 from typing import Final, Optional, no_type_check
 
 from whiteprints import _, maybe_import_module
@@ -34,16 +35,21 @@ def prog_name() -> str:
     entrypoints = importlib.metadata.entry_points()
 
     if sys.version_info >= (3, 10):
-        return entrypoints.select(
+        names = entrypoints.select(
             group="console_scripts",
             value=entrypoint_value,
-        ).names.pop()
+        ).names
+    else:
+        names = {
+            entrypoint.name
+            for entrypoint in entrypoints["console_scripts"]
+            if entrypoint.value == entrypoint_value
+        }
 
-    return next(
-        entrypoint.name
-        for entrypoint in entrypoints["console_scripts"]
-        if entrypoint.value == entrypoint_value
-    )
+    if names:
+        return names.pop()
+
+    return Path(sys.argv[0]).stem
 
 
 @no_type_check
@@ -56,11 +62,15 @@ def gc_disabled() -> Iterator[None]:
     gc.collect()
 
 
-def _create_namespace(args: Optional[list[str]]) -> Namespace:
+def _create_namespace(
+    args: Optional[list[str]],
+    argcomplete: Optional[ModuleType],
+) -> Namespace:
     """Create a namespace from the arguments.
 
     Args:
         args: the command line arguments.
+        argcomplete: an optional argcomplete module.
 
     Returns:
         The namespace corresponding to the arguments passed.
@@ -71,11 +81,11 @@ def _create_namespace(args: Optional[list[str]]) -> Namespace:
     )
     gettext.textdomain("argparse")
 
-    entrypoint_parser = importlib.import_module(
-        "whiteprints.cli.entrypoint_parser",
-    ).create_entrypoint_parser(prog_name())
-
-    subparsers = entrypoint_parser.add_subparsers(
+    subparsers = (
+        entrypoint_parser := importlib.import_module(
+            "whiteprints.cli.entrypoint_parser",
+        ).create_entrypoint_parser(prog_name())
+    ).add_subparsers(
         title=_("Subcommands"),
         dest="cmd",
     )
@@ -97,7 +107,7 @@ def _create_namespace(args: Optional[list[str]]) -> Namespace:
         )
     )
 
-    if argcomplete := maybe_import_module("argcomplete"):
+    if argcomplete is not None:
         argcomplete.autocomplete(entrypoint_parser)
 
     importlib.import_module(
@@ -174,7 +184,10 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
         # There should be no objects with cyclic references created. Even
         # if some are created for this short amount they will be collected
         # as soon as the namespace is created.
-        namespace = _create_namespace(args)
+        namespace = _create_namespace(
+            args,
+            maybe_import_module("argcomplete"),
+        )
 
     _setup_logging(namespace)
     _call_command(namespace)

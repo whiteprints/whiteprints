@@ -23,7 +23,7 @@ from typing import (
     Union,
 )
 
-from whiteprints import _, has_module
+from whiteprints import _
 from whiteprints.cli import robust_print
 
 
@@ -38,6 +38,7 @@ __all__: Final = [
     "Completion",
     "Copyright",
     "License",
+    "Version",
 ]
 
 
@@ -102,7 +103,10 @@ class Completion(CompleterAction):
         # execution simply the shell choice for completion.
         robust_print(
             importlib.import_module("argcomplete.shell_integration")
-            .shellcode([parser.prog], shell=self._autodetect_shell(args[0]))
+            .shellcode(
+                [parser.prog],
+                shell=self._autodetect_shell(args[0]),  # nosec
+            )
             .strip()
         )
         sys.exit(os.EX_OK)
@@ -134,8 +138,73 @@ class Copyright(CompleterAction):
         sys.exit(os.EX_OK)
 
 
+class Version(CompleterAction):
+    """Print the code licenses information."""
+
+    @override
+    def __call__(
+        self,
+        parser: ArgumentParser,
+        namespace: Namespace,
+        *args: Union[Sequence[str], str, None],
+    ) -> NoReturn:
+        """Print the code copyright information.
+
+        Args:
+            parser: the argument parser
+            namespace: the arguments namespace
+            args: the arguments passed to the parser
+        """
+        robust_print(
+            importlib.import_module(
+                "whiteprints.package_metadata",
+            ).find_version()
+        )
+        sys.exit(os.EX_OK)
+
+
 class License(CompleterAction):
     """Print the code licenses information."""
+
+    @staticmethod
+    def _print_license_text(args: Union[Sequence[str], str, None]) -> None:
+        """Print the license text.
+
+        Args:
+            args: the license name to print.
+
+        Example:
+            >>> from whiteprints.package_metadata import find_license_files
+            >>>
+            >>> license_files = find_license_files()
+            >>> License._print_license_text(license_files[0].stem)
+            ...
+            >>> License._print_license_text([license_files[0].stem])
+            ...
+            >>> License._print_license_text(None)
+            ...
+            >>> License._print_license_text("")
+            ...
+            >>> License._print_license_text([])
+            ...
+            >>> License._print_license_text([""])
+            ...
+        """
+        license_files = importlib.import_module(
+            "whiteprints.package_metadata",
+        ).find_license_files()
+
+        # package with a single license
+        if not args or isinstance(args, str):
+            robust_print(license_files[0].read_text(encoding="utf-8"))
+            return
+
+        # package with multiple licenses
+        requested_license = args[0]
+        for license_path in license_files:
+            if requested_license == license_path.stem:
+                robust_print(license_path.read_text(encoding="utf-8"))
+                return
 
     @override
     def __call__(
@@ -159,28 +228,5 @@ class License(CompleterAction):
             namespace: the arguments namespace
             args: the arguments passed to the parser
         """
-        license_files = importlib.import_module(
-            "whiteprints.package_metadata",
-        ).find_license_files()
-
-        # package with a single license
-        if not (arg_values := args[0]):
-            robust_print(license_files[0].read_text(encoding="utf-8"))
-            sys.exit(os.EX_OK)
-
-        # package with multiple licenses
-        requested_license = str(arg_values[0])
-        for license_path in license_files:
-            if requested_license in license_path.stem:
-                robust_print(license_path.read_text(encoding="utf-8"))
-                sys.exit(os.EX_OK)
-
-        error_message = _("error: license {} not found").format(
-            requested_license
-        )
-        robust_print(
-            f"[red]{error_message}[/]"
-            if has_module("rich")
-            else error_message,
-        )
-        sys.exit(os.EX_SOFTWARE)
+        self._print_license_text(args[0])
+        sys.exit(os.EX_OK)

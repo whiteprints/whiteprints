@@ -14,10 +14,12 @@ from argparse import (
 )
 from functools import partial
 from pathlib import Path
+from types import ModuleType
 from typing import (
     Final,
     Literal,
     NoReturn,
+    Optional,
     cast,
 )
 
@@ -28,6 +30,7 @@ from whiteprints.cli.action import (
     Completion,
     Copyright,
     License,
+    Version,
 )
 
 
@@ -55,7 +58,7 @@ class ArgumentParserExUsage(ArgumentParser):
 
 
 def _nargs_completion_script() -> Literal["?", 1]:
-    """Find how many args '--autocompletion-script' should take.
+    """Find how many arguments '--autocompletion-script' should take.
 
     Returns:
         '?' if shellingham is installed, 1 otherwise.
@@ -64,30 +67,53 @@ def _nargs_completion_script() -> Literal["?", 1]:
 
 
 def _nargs_license_text(licenses: list[str]) -> Literal[0, 1]:
+    """Find how many arguments --license-text should take.
+
+    Returns:
+        0 if the program have a single license, 1 otherwise.
+    """
     return 0 if len(licenses) <= 1 else 1
 
 
 def _initialize_parser(
     prog: str,
     app_name_env_prefix: str,
+    theme: Optional[str],
+    epilog: Optional[str],
+    rich_argparse_plus: Optional[ModuleType],
 ) -> ArgumentParserExUsage:
-    theme_env = ""
-    if rich_argparse_plus := maybe_import_module("rich_argparse_plus"):
+    """Initialize the argument parser.
+
+    Args:
+        prog: the program name.
+        app_name_env_prefix: a prefix for the environment variables used to
+            configure the program.
+        theme: an optional theme (supported by rich-argparse-plus).
+        epilog: the program epilog text.
+        rich_argparse_plus: an optional rich_argparse_plus module.
+
+    Returns:
+        The argument parse.
+    """
+    if rich_argparse_plus is not None:
         formatter_class = rich_argparse_plus.RichHelpFormatterPlus
-        theme_env = f"{app_name_env_prefix}_THEME"
         try:
-            formatter_class.choose_theme(
-                os.environ.get(theme_env, "default"),
-            )
+            formatter_class.choose_theme(theme)
         except ValueError as value_error:
             robust_print(value_error)
             sys.exit(os.EX_USAGE)
 
-        help_width_env = f"{app_name_env_prefix}_HELP_WIDTH"
-        width = os.environ.get(help_width_env)
         formatter_class = partial(
             formatter_class,
-            width=None if width is None else str(width),
+            width=(
+                str(width)
+                if (
+                    width := os.environ.get(
+                        f"{app_name_env_prefix}_HELP_WIDTH"
+                    )
+                )
+                else None
+            ),
         )
     else:
         formatter_class = HelpFormatter
@@ -99,20 +125,14 @@ def _initialize_parser(
             "whiteprints.package_metadata",
         ).find_metadata()["Summary"],
         add_help=False,
-        epilog=(
-            _(
-                "You may change the CLI color theme with the environment"
-                " variable `{}`."
-            ).format(theme_env)
-            if theme_env
-            else None
-        ),
+        epilog=epilog,
     )
 
 
 def _add_program_info(parser: ArgumentParser) -> None:
-    program_info = parser.add_argument_group(_("Program Info"))
-    program_info.add_argument(
+    (
+        program_info := parser.add_argument_group(_("Program Info"))
+    ).add_argument(
         "-h",
         "--help",
         action="help",
@@ -121,10 +141,8 @@ def _add_program_info(parser: ArgumentParser) -> None:
     program_info.add_argument(
         "-v",
         "--version",
-        action="version",
-        version=importlib.import_module(
-            "whiteprints.package_metadata",
-        ).find_version(),
+        nargs=0,
+        action=Version,
         help=_("Show program's version number and exit."),
     )
     program_info.add_argument(
@@ -137,8 +155,7 @@ def _add_program_info(parser: ArgumentParser) -> None:
 
 
 def _add_licensing_info(parser: ArgumentParser) -> None:
-    licensing = parser.add_argument_group(_("Licensing Info"))
-    licensing.add_argument(
+    (licensing := parser.add_argument_group(_("Licensing Info"))).add_argument(
         "-l",
         "--license",
         action="count",
@@ -147,16 +164,17 @@ def _add_licensing_info(parser: ArgumentParser) -> None:
             " Repeat the flag to show REUSE information."
         ),
     )
-    licenses = [
-        license_path.stem
-        for license_path in importlib.import_module(
-            "whiteprints.package_metadata",
-        ).find_license_files()
-    ]
     licensing.add_argument(
         "-t",
         "--license-text",
-        nargs=_nargs_license_text(licenses),
+        nargs=_nargs_license_text(
+            licenses := [
+                license_path.stem
+                for license_path in importlib.import_module(
+                    "whiteprints.package_metadata",
+                ).find_license_files()
+            ]
+        ),
         action=License,
         choices=licenses,
         help=_("Show the license text and exit."),
@@ -164,8 +182,7 @@ def _add_licensing_info(parser: ArgumentParser) -> None:
 
 
 def _add_debug_info(parser: ArgumentParser) -> None:
-    debug = parser.add_argument_group(_("Debug Info"))
-    debug.add_argument(
+    parser.add_argument_group(_("Debug Info")).add_argument(
         "-p",
         "--platform",
         action="count",
@@ -178,8 +195,7 @@ def _add_debug_info(parser: ArgumentParser) -> None:
 
 def _add_autocompletion(parser: ArgumentParser) -> None:
     if has_module("argcomplete"):
-        completion = parser.add_argument_group(_("Completion"))
-        completion.add_argument(
+        parser.add_argument_group(_("Completion")).add_argument(
             "-a",
             "--autocompletion-script",
             nargs=_nargs_completion_script(),
@@ -192,19 +208,11 @@ def _add_autocompletion(parser: ArgumentParser) -> None:
 def _add_configuration_parsers(
     parser: ArgumentParser,
     app_name_env_prefix: str,
+    argcomplete: Optional[ModuleType],
 ) -> None:
-    logs = parser.add_argument_group(_("Configuration"))
-    logs_conf_env = f"{app_name_env_prefix}_DEFAULT_LOGS_CONF"
-    logs_conf_default = os.environ.get(
-        logs_conf_env,
-        (
-            importlib.import_module("whiteprints.cli.logs").user_log_config()
-            or ""
-        ),
-    )
     logs_arg = cast(
         "CompleterAction",
-        logs.add_argument(
+        parser.add_argument_group(_("Configuration")).add_argument(
             "-L",
             "--log-config",
             action="store",
@@ -218,14 +226,29 @@ def _add_configuration_parsers(
                     " location and loaded. You may change the default path"
                     " with the environment variable `{}`."
                 ).format(
-                    "" if logs_conf_default else _(" or None"), logs_conf_env
+                    ""
+                    if (
+                        logs_conf_default := os.environ.get(
+                            logs_conf_env := (
+                                f"{app_name_env_prefix}_DEFAULT_LOGS_CONF"
+                            ),
+                            (
+                                importlib.import_module(
+                                    "whiteprints.cli.logs"
+                                ).user_log_config()
+                                or ""
+                            ),
+                        )
+                    )
+                    else _(" or None"),
+                    logs_conf_env,
                 )
             ),
             metavar="PATH",
             default=logs_conf_default,
         ),
     )
-    if (argcomplete := maybe_import_module("argcomplete")) is not None:
+    if argcomplete is not None:
         logs_arg.completer = argcomplete.FilesCompleter(allowednames=".json")
 
 
@@ -240,19 +263,37 @@ def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
         True
 
     Args:
-        prog: the program name
+        prog: the program name.
 
     Returns:
-        the arguments namespace.
+        the program namespace.
     """
-    app_name_env_prefix = prog.upper()
-    parser = _initialize_parser(prog, app_name_env_prefix)
+    parser = _initialize_parser(
+        prog,
+        app_name_env_prefix := prog.upper(),
+        os.environ.get(theme_env := f"{app_name_env_prefix}_THEME", "default"),
+        (
+            _(
+                "You may change the CLI color theme with the environment"
+                " variable `{}`."
+            ).format(theme_env)
+            if (
+                rich_argparse_plus := maybe_import_module("rich_argparse_plus")
+            )
+            else None
+        ),
+        rich_argparse_plus,
+    )
 
     _add_program_info(parser)
     _add_licensing_info(parser)
     _add_debug_info(parser)
     _add_autocompletion(parser)
-    _add_configuration_parsers(parser, app_name_env_prefix)
+    _add_configuration_parsers(
+        parser,
+        app_name_env_prefix,
+        maybe_import_module("argcomplete"),
+    )
 
     return parser
 
@@ -261,7 +302,7 @@ def _resolve_platform_flag(namespace: Namespace) -> None:
     """Resolve the `--platform` flag.
 
     Args:
-        namespace: the argument namespace.
+        namespace: the program namespace.
     """
     if isinstance(namespace.platform, int) and namespace.platform > 0:
         robust_print_json(
@@ -277,7 +318,7 @@ def _resolve_license_flag(namespace: Namespace) -> None:
     """Resolve the `--license` flag.
 
     Args:
-        namespace: the argument namespace.
+        namespace: the program namespace.
     """
     if isinstance(namespace.license, int):
         license_expression = importlib.import_module(
@@ -311,8 +352,8 @@ def _resolve_help_action(
     """Resolve the `--help` flag.
 
     Args:
-        namespace: the argument namespace.
-        argument_parser: the argument parser.
+        namespace: the program namespace.
+        argument_parser: the program argument parser.
     """
     if namespace.cmd is None:
         argument_parser.print_help()
@@ -323,6 +364,12 @@ def resolve_flags(
     argument_parser: ArgumentParser,
     namespace: Namespace,
 ) -> None:
+    """Resolve remaining flags.
+
+    Args:
+        argument_parser: the program argument parser.
+        namespace: the program namespace.
+    """
     _resolve_platform_flag(namespace)
     _resolve_license_flag(namespace)
     _resolve_help_action(namespace, argument_parser)

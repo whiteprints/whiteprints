@@ -105,6 +105,8 @@ def _find_origin(package_name: Optional[str]) -> Optional[str]:
     Example:
         >>> _find_origin(None)
         >>> None
+        >>> _find_origin(__package__)
+        ...
 
     Returns:
         The path to the package origin. None if no path is found or the
@@ -127,6 +129,10 @@ def _gather_distributions_packages() -> dict[str, str]:
     Retrieves a mapping of distribution names to the package names that
     they provide, with distribution names normalized by replacing hyphens
     with underscores.
+
+    Example:
+        >>> _gather_distributions_packages()
+        { ... }
 
     Returns:
         A dictionary where keys are normalized distribution names and values

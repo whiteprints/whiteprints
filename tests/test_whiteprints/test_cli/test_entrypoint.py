@@ -8,13 +8,14 @@ import json
 import os
 
 import pytest
+from pytest import CaptureFixture, MonkeyPatch
 
 from whiteprints.cli.entrypoint import entrypoint
 from whiteprints.cli.entrypoint_parser import Completion
 from whiteprints.package_metadata import find_version
 
 
-def test_help(capsys: pytest.CaptureFixture[str]) -> None:
+def test_help(capsys: CaptureFixture[str]) -> None:
     """Test wether a help flag exists and works."""
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--help"])
@@ -25,7 +26,40 @@ def test_help(capsys: pytest.CaptureFixture[str]) -> None:
     assert captured.out, "Could not print application help message"
 
 
-def test_wrong_usage(capsys: pytest.CaptureFixture[str]) -> None:
+def test_no_args_is_help(capsys: CaptureFixture[str]) -> None:
+    """Test wether no args prints help."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint([])
+
+    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+
+    captured_1 = capsys.readouterr()
+
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--help"])
+
+    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+
+    captured_2 = capsys.readouterr()
+    assert captured_1.out == captured_2.out, "no args output should match help"
+
+
+def test_help_wrong_theme(
+    capsys: CaptureFixture[str],
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Test wether a help flag exists and works."""
+    monkeypatch.setenv("WHITEPRINTS_THEME", "this-theme-does-not-exists")
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--help"])
+
+    assert ext.value.code == os.EX_USAGE, "Unexpected exit code."
+
+    captured = capsys.readouterr()
+    assert captured.out, "Application should fail on invalid theme selection"
+
+
+def test_wrong_usage(capsys: CaptureFixture[str]) -> None:
     """Test wether the app handles properly wrong usage."""
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--this-flag-does-not-exists"])
@@ -36,7 +70,7 @@ def test_wrong_usage(capsys: pytest.CaptureFixture[str]) -> None:
     assert "error" in captured.err, "Could not print application help message"
 
 
-def test_version(capsys: pytest.CaptureFixture[str]) -> None:
+def test_version(capsys: CaptureFixture[str]) -> None:
     """Test wether a version flag exists and works."""
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--version"])
@@ -50,7 +84,7 @@ def test_version(capsys: pytest.CaptureFixture[str]) -> None:
 
 
 @pytest.mark.no_extras
-def test_platform(capsys: pytest.CaptureFixture[str]) -> None:
+def test_platform(capsys: CaptureFixture[str]) -> None:
     """Test wether a platform flag exists and works."""
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--platform"])
@@ -64,7 +98,7 @@ def test_platform(capsys: pytest.CaptureFixture[str]) -> None:
 
 
 @pytest.mark.no_extras
-def test_platform_full(capsys: pytest.CaptureFixture[str]) -> None:
+def test_platform_full(capsys: CaptureFixture[str]) -> None:
     """Test wether a platform flag exists and works."""
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--platform", "--platform"])
@@ -77,7 +111,7 @@ def test_platform_full(capsys: pytest.CaptureFixture[str]) -> None:
     )
 
 
-def test_copyright(capsys: pytest.CaptureFixture[str]) -> None:
+def test_copyright(capsys: CaptureFixture[str]) -> None:
     """Test wether a copyright flag exists and works."""
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--copyright"])
@@ -88,7 +122,7 @@ def test_copyright(capsys: pytest.CaptureFixture[str]) -> None:
     assert captured.out, "Could not print application copyright message"
 
 
-def test_license_simple(capsys: pytest.CaptureFixture[str]) -> None:
+def test_license_simple(capsys: CaptureFixture[str]) -> None:
     """Test wether a license flag exists and works."""
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--license"])
@@ -99,7 +133,7 @@ def test_license_simple(capsys: pytest.CaptureFixture[str]) -> None:
     assert captured.out, "Could not print application license informations"
 
 
-def test_license_full(capsys: pytest.CaptureFixture[str]) -> None:
+def test_license_full(capsys: CaptureFixture[str]) -> None:
     """Test wether a license flag exists and works."""
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--license", "--license"])
@@ -112,7 +146,7 @@ def test_license_full(capsys: pytest.CaptureFixture[str]) -> None:
     )
 
 
-def test_license_valid(capsys: pytest.CaptureFixture[str]) -> None:
+def test_license_valid(capsys: CaptureFixture[str]) -> None:
     """Test wether a license text flag exists and works."""
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--license-text"])
@@ -125,7 +159,7 @@ def test_license_valid(capsys: pytest.CaptureFixture[str]) -> None:
 
 @pytest.mark.no_extras
 def test_shell_autocompletion_fail_when_no_extras(
-    capsys: pytest.CaptureFixture[str],
+    capsys: CaptureFixture[str],
 ) -> None:
     """Test that autocompletion flag is unavailable when no extras."""
     with pytest.raises(SystemExit) as ext:
@@ -141,7 +175,7 @@ def test_shell_autocompletion_fail_when_no_extras(
 
 
 def test_shell_autocompletion(
-    capsys: pytest.CaptureFixture[str],
+    capsys: CaptureFixture[str],
 ) -> None:
     """Test wether an autocompletion-script flag exists and works."""
     with pytest.raises(SystemExit) as ext:
@@ -154,7 +188,7 @@ def test_shell_autocompletion(
 
 
 def test_shell_autocompletion_auto(
-    capsys: pytest.CaptureFixture[str],
+    capsys: CaptureFixture[str],
 ) -> None:
     """Test wether an autocompletion-script flag exists and works."""
     with pytest.raises(SystemExit) as ext:

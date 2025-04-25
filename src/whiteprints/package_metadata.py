@@ -68,9 +68,16 @@ def _find_license_files(
 def distribution_name() -> str:
     """Find the present distribution name.
 
-    The distribution name cannot be inferred safely from `__package__ and
-    `packages_distribution` as `packages_distribution` might miss editable
-    install. Hence it is safer to hard code the distribution name.
+    This function exists because the distribution name cannot be inferred
+    safely from `__package__ and `packages_distribution` as
+    `packages_distribution` might miss editable install. Hence it is safer to
+    hard code the distribution name.
+
+    The result is cached.
+
+    Example:
+        >>> distribution_name()
+        whiteprints
 
     Returns:
         the present package name.
@@ -80,7 +87,11 @@ def distribution_name() -> str:
 
 @cache
 def find_version() -> str:
-    """Find the package version number.
+    """Find present the package version number.
+
+    Example:
+        >>> find_version()
+        ...
 
     Returns:
         The package version.
@@ -94,6 +105,17 @@ def find_version() -> str:
 @cache
 @no_type_check
 def find_metadata() -> PackageMetadata:
+    """Find the present package metadata.
+
+    The result is cached.
+
+    Example:
+        >>> find_metadata()
+        ...
+
+    Returns:
+        The package metadata.
+    """
     return importlib.import_module("importlib.metadata").metadata(
         distribution_name()
     )
@@ -103,8 +125,11 @@ def find_metadata() -> PackageMetadata:
 def find_license_expression() -> str:
     """Find the license expression for the current package.
 
+    Example:
+        >>> assert isinstance(find_license_expression(), str)
+
     Returns:
-        the license expression.
+        The license expression.
     """
     return find_metadata()["License-Expression"]
 
@@ -112,6 +137,10 @@ def find_license_expression() -> str:
 @cache
 def find_license_files() -> list[PackagePath]:
     """Find the license files for the current package.
+
+    Example:
+        >>> find_license_files()
+        [...]
 
     Returns:
         A list containing the path to the license(s) of the package code.
