@@ -32,6 +32,8 @@ if sys.version_info >= (3, 11):
         return function
 
 else:
+    # beartype does not support contextmanager for older Python so we disable
+    # type checking for context managers
     no_type_check_context_manager = no_type_check
 
 
