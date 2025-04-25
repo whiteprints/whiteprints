@@ -26,6 +26,18 @@ __all__: Final = [
 """Public module attributes."""
 
 
+def _is_license(file: str) -> bool:
+    """Check if a license file path is valid.
+
+    Args:
+        file: The file path to check.
+
+    Returns:
+        True if the file path is valid, False otherwise
+    """
+    return file.startswith("LICENSES/") and file.endswith(r".txt")
+
+
 def _find_license_files(
     *,
     license_paths: Iterable[PackagePath],
@@ -57,11 +69,7 @@ def _find_license_files(
         the list of code licenses used by the present package.
     """
     # Convert license_files to a set for faster lookups
-    license_file_set = {
-        file
-        for file in license_files
-        if ("LICENSES" in file and file.endswith(r".txt"))
-    }
+    license_file_set = {file for file in license_files if _is_license(file)}
 
     # Filter license_paths by whether they match any of the license_files
     return {
