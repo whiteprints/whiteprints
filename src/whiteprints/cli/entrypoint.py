@@ -10,18 +10,29 @@ import importlib
 import importlib.metadata
 import sys
 from argparse import Namespace
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from functools import cache
 from pathlib import Path
 from types import ModuleType
-from typing import Final, Optional, no_type_check
+from typing import Any, Final, Optional, no_type_check
 
 from whiteprints import _, maybe_import_module
 
 
 __all__: Final = ["entrypoint", "prog_name"]
 """Public module attributes."""
+
+
+if sys.version_info >= (3, 11):
+
+    def no_type_check_context_manager(
+        function: Callable[..., Any],
+    ) -> Callable[..., Any]:
+        return function
+
+else:
+    no_type_check_context_manager = no_type_check
 
 
 @cache
@@ -52,7 +63,7 @@ def prog_name() -> str:
     return Path(sys.argv[0]).stem
 
 
-@no_type_check
+@no_type_check_context_manager
 @contextmanager
 def gc_disabled() -> Iterator[None]:
     """Temporarily disable the garbage collector for performances."""
