@@ -202,7 +202,7 @@ class License(CompleterAction):
         # package with multiple licenses
         requested_license = args[0]
         for license_path in license_files:
-            if requested_license == license_path.stem:
+            if requested_license in license_path.stem:
                 robust_print(license_path.read_text(encoding="utf-8"))
                 return
 

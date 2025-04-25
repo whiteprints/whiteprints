@@ -30,7 +30,7 @@ def _find_license_files(
     *,
     license_paths: Iterable[PackagePath],
     license_files: Iterable[str],
-) -> list[PackagePath]:
+) -> set[PackagePath]:
     """Find the licenses in the wheel defined in the package metadata.
 
     Args:
@@ -56,12 +56,22 @@ def _find_license_files(
     Returns:
         the list of code licenses used by the present package.
     """
-    return [
+    # Convert license_files to a set for faster lookups
+    license_file_set = {
+        file
+        for file in license_files
+        if ("LICENSES" in file and file.endswith(r".txt"))
+    }
+
+    # Filter license_paths by whether they match any of the license_files
+    return {
         license_path
         for license_path in license_paths
-        for license_file in license_files
-        if license_path.match(license_file)
-    ]
+        if any(
+            license_path.stem in license_file
+            for license_file in license_file_set
+        )
+    }
 
 
 @cache

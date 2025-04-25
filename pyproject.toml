@@ -50,7 +50,6 @@ dynamic = [
 ]
 dependencies = [
     "importlib-metadata==8.6.1; python_full_version<'3.10.0'",
-    "pyinstaller>=6.13.0",
     "typing-extensions==4.13.2; python_full_version<'3.12.0'",
     "uv==0.6.16",
 ]
