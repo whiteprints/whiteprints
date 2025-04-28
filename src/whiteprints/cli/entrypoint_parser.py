@@ -23,7 +23,7 @@ from typing import (
     cast,
 )
 
-from whiteprints import _, has_module, import_module
+from whiteprints import _, has_extra, import_extra
 from whiteprints.cli import robust_print, robust_print_json
 from whiteprints.cli.action import (
     CompleterAction,
@@ -63,7 +63,7 @@ def _nargs_completion_script() -> Literal["?", 1]:
     Returns:
         '?' if shellingham is installed, 1 otherwise.
     """
-    return "?" if has_module("shellingham") else 1
+    return "?" if has_extra("shellingham") else 1
 
 
 def _nargs_license_text(licenses: list[str]) -> Literal[0, 1]:
@@ -194,7 +194,7 @@ def _add_debug_info(parser: ArgumentParser) -> None:
 
 
 def _add_autocompletion(parser: ArgumentParser) -> None:
-    if has_module("argcomplete"):
+    if has_extra("argcomplete"):
         parser.add_argument_group(_("Completion")).add_argument(
             "-a",
             "--autocompletion-script",
@@ -277,7 +277,7 @@ def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
                 "You may change the CLI color theme with the environment"
                 " variable `{}`."
             ).format(theme_env)
-            if (rich_argparse_plus := import_module("rich_argparse_plus"))
+            if (rich_argparse_plus := import_extra("rich_argparse_plus"))
             else None
         ),
         rich_argparse_plus,
@@ -290,7 +290,7 @@ def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
     _add_configuration_parsers(
         parser,
         app_name_env_prefix,
-        import_module("argcomplete"),
+        import_extra("argcomplete"),
     )
 
     return parser

@@ -12,7 +12,7 @@ from collections.abc import Iterable
 from subprocess import CalledProcessError  # nosec
 from typing import Final, TypedDict
 
-from whiteprints import _, has_module
+from whiteprints import _, has_extra
 from whiteprints.cli import robust_print
 from whiteprints.libuv.copier import Copier
 
@@ -243,7 +243,7 @@ def init(namespace: Namespace) -> None:
         robust_print(
             (
                 f"[red]{error_message}[/]"
-                if has_module("rich")
+                if has_extra("rich")
                 else error_message
             ),
             file=sys.stderr,

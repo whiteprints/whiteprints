@@ -11,7 +11,7 @@ from types import ModuleType
 from typing import Callable, Final, Optional
 
 
-__all__: Final = ["_", "has_module", "import_module"]
+__all__: Final = ["_", "has_extra", "import_extra"]
 """Public module attributes."""
 
 
@@ -68,7 +68,7 @@ class LazyGettext:
 
 
 @cache
-def import_module(module_name: str) -> Optional[ModuleType]:
+def import_extra(module_name: str) -> Optional[ModuleType]:
     """Import a plugin module.
 
     Args:
@@ -78,13 +78,13 @@ def import_module(module_name: str) -> Optional[ModuleType]:
     Returns:
         None if the module is not found, otherwise returns the module.
     """
-    with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
+    with importlib.import_module("lib").suppress(ModuleNotFoundError):
         return importlib.import_module(module_name)
 
     return None
 
 
-def has_module(module_name: str) -> bool:
+def has_extra(module_name: str) -> bool:
     """Check if a plugin is installed.
 
     Args:
@@ -94,7 +94,7 @@ def has_module(module_name: str) -> bool:
     Returns:
         True if the module is importable, False otherwise
     """
-    return import_module(module_name) is not None
+    return import_extra(module_name) is not None
 
 
 def _setup_package(
@@ -118,8 +118,8 @@ def _setup_package(
 
 
 _setup_package(
-    claw=import_module("beartype.claw"),
-    dotenv=import_module("dotenv"),
+    claw=import_extra("beartype.claw"),
+    dotenv=import_extra("dotenv"),
 )
 
 _: Final = LazyGettext(Path(__file__).parent / "locale")

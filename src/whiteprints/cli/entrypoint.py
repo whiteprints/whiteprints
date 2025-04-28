@@ -17,7 +17,7 @@ from pathlib import Path
 from types import ModuleType
 from typing import Final, Optional
 
-from whiteprints import _, import_module
+from whiteprints import _, import_extra
 
 
 __all__: Final = ["entrypoint", "prog_name"]
@@ -195,7 +195,7 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
     """
     namespace = _create_namespace(
         args,
-        import_module("argcomplete"),
+        import_extra("argcomplete"),
     )
 
     _setup_logging(namespace)

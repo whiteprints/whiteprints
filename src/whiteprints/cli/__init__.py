@@ -11,14 +11,14 @@ from collections.abc import Callable
 from types import FrameType
 from typing import Final, NoReturn, Optional
 
-from whiteprints import _, has_module, import_module
+from whiteprints import _, has_extra, import_extra
 
 
 __all__: Final = ["robust_print", "robust_print_json"]
 """Public module attributes."""
 
 
-robust_print = print if (rich := import_module("rich")) is None else rich.print
+robust_print = print if (rich := import_extra("rich")) is None else rich.print
 
 
 def robust_print_json(  # noqa: PLR0913
@@ -63,7 +63,7 @@ def robust_print_json(  # noqa: PLR0913
             serialized. It should return a JSON encodable version of the object
             or raise a TypeError. If None (the default), TypeError is raised.
     """
-    if (rich := import_module("rich")) is None:
+    if (rich := import_extra("rich")) is None:
         importlib.import_module("json").dump(
             data,
             sys.stdout,
@@ -99,7 +99,7 @@ def _exit_gracefully_action(signalnum: int, frame: FrameType) -> NoReturn:
     """
     error_message = _("Execution stopped by user")
     robust_print(
-        f"[red]{error_message}[/]" if has_module("rich") else error_message,
+        f"[red]{error_message}[/]" if has_extra("rich") else error_message,
         file=sys.stderr,
     )
 
