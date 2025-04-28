@@ -23,7 +23,7 @@ from typing import (
     cast,
 )
 
-from whiteprints import _, has_module, maybe_import_module
+from whiteprints import _, has_module, import_module
 from whiteprints.cli import robust_print, robust_print_json
 from whiteprints.cli.action import (
     CompleterAction,
@@ -277,9 +277,7 @@ def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
                 "You may change the CLI color theme with the environment"
                 " variable `{}`."
             ).format(theme_env)
-            if (
-                rich_argparse_plus := maybe_import_module("rich_argparse_plus")
-            )
+            if (rich_argparse_plus := import_module("rich_argparse_plus"))
             else None
         ),
         rich_argparse_plus,
@@ -292,7 +290,7 @@ def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
     _add_configuration_parsers(
         parser,
         app_name_env_prefix,
-        maybe_import_module("argcomplete"),
+        import_module("argcomplete"),
     )
 
     return parser

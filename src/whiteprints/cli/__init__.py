@@ -4,23 +4,21 @@
 
 """Everything related to the command line interface."""
 
+import gettext
 import importlib
 import sys
 from collections.abc import Callable
 from types import FrameType
 from typing import Final, NoReturn, Optional
 
-from whiteprints import _, has_module, maybe_import_module
+from whiteprints import _, has_module, import_module
 
 
 __all__: Final = ["robust_print", "robust_print_json"]
 """Public module attributes."""
 
 
-if (rich := maybe_import_module("rich")) is None:
-    robust_print = print
-else:
-    robust_print = rich.print
+robust_print = print if (rich := import_module("rich")) is None else rich.print
 
 
 def robust_print_json(  # noqa: PLR0913
@@ -65,7 +63,7 @@ def robust_print_json(  # noqa: PLR0913
             serialized. It should return a JSON encodable version of the object
             or raise a TypeError. If None (the default), TypeError is raised.
     """
-    if (rich := maybe_import_module("rich")) is None:
+    if (rich := import_module("rich")) is None:
         importlib.import_module("json").dump(
             data,
             sys.stdout,
@@ -139,3 +137,9 @@ def _exit_gracefully_on_sigint() -> None:
 
 
 _exit_gracefully_on_sigint()
+
+gettext.bindtextdomain(
+    "argparse",
+    _.locale_directory,
+)
+gettext.textdomain("argparse")

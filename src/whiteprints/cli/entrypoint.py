@@ -10,31 +10,61 @@ import importlib
 import importlib.metadata
 import sys
 from argparse import Namespace
-from collections.abc import Callable, Iterator
-from contextlib import contextmanager
+from collections.abc import Iterable
 from functools import cache
+from importlib.metadata import EntryPoint
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Final, Optional, no_type_check
+from typing import Final, Optional
 
-from whiteprints import _, maybe_import_module
+from whiteprints import _, import_module
 
 
 __all__: Final = ["entrypoint", "prog_name"]
 """Public module attributes."""
 
 
-if sys.version_info >= (3, 11):
+(_gettext := importlib.import_module("gettext")).bindtextdomain(
+    "argparse",
+    _.locale_directory,
+)
+_gettext.textdomain("argparse")
 
-    def no_type_check_context_manager(
-        function: Callable[..., Any],
-    ) -> Callable[..., Any]:
-        return function
+
+if sys.version_info >= (3, 10):
+
+    @cache
+    def get_entrypoints(
+        group: str, name: Optional[str] = None
+    ) -> Iterable[EntryPoint]:
+        """Cross-version wrapper around importlib.metadata.entry_points().
+
+        Returns:
+            an iterable of entrypoints
+        """
+        entrypoints = importlib.metadata.entry_points()
+        return (
+            importlib.metadata.entry_points().select(group=group, value=name)
+            if name is not None
+            else entrypoints.select(group=group)
+        )
 
 else:
-    # beartype does not support contextmanager for older Python so we disable
-    # type checking for context managers
-    no_type_check_context_manager = no_type_check
+
+    @cache
+    def get_entrypoints(
+        group: str, name: Optional[str] = None
+    ) -> Iterable[EntryPoint]:
+        """Cross-version wrapper around importlib.metadata.entry_points().
+
+        Returns:
+            an iterable of entrypoints
+        """
+        entries = importlib.metadata.entry_points().get(group, [])
+        if name is not None:
+            entries = [ep for ep in entries if ep.value == name]
+
+        return entries
 
 
 @cache
@@ -44,35 +74,13 @@ def prog_name() -> str:
     Returns:
         The program name.
     """
-    entrypoint_value = f"{__name__}:entrypoint"
-    entrypoints = importlib.metadata.entry_points()
-
-    if sys.version_info >= (3, 10):
-        names = entrypoints.select(
-            group="console_scripts",
-            value=entrypoint_value,
-        ).names
-    else:
-        names = {
-            entrypoint.name
-            for entrypoint in entrypoints["console_scripts"]
-            if entrypoint.value == entrypoint_value
-        }
-
-    if names:
+    if names := {
+        ep.name
+        for ep in get_entrypoints("console_scripts", f"{__name__}:entrypoint")
+    }:
         return names.pop()
 
     return Path(sys.argv[0]).stem
-
-
-@no_type_check_context_manager
-@contextmanager
-def gc_disabled() -> Iterator[None]:
-    """Temporarily disable the garbage collector for performances."""
-    (gc := importlib.import_module("gc")).disable()
-    yield
-    gc.enable()
-    gc.collect()
 
 
 def _create_namespace(
@@ -88,12 +96,6 @@ def _create_namespace(
     Returns:
         The namespace corresponding to the arguments passed.
     """
-    (gettext := importlib.import_module("gettext")).bindtextdomain(
-        "argparse",
-        _.locale_directory,
-    )
-    gettext.textdomain("argparse")
-
     subparsers = (
         entrypoint_parser := importlib.import_module(
             "whiteprints.cli.entrypoint_parser",
@@ -191,16 +193,10 @@ def entrypoint(args: Optional[list[str]] = None) -> None:
     Args:
         args: the arguments forwarded to argparse. For example sys.argv.
     """
-    with gc_disabled():
-        # Delay the gc for a short time to have the CLI as responsive as
-        # possible.
-        # There should be no objects with cyclic references created. Even
-        # if some are created for this short amount they will be collected
-        # as soon as the namespace is created.
-        namespace = _create_namespace(
-            args,
-            maybe_import_module("argcomplete"),
-        )
+    namespace = _create_namespace(
+        args,
+        import_module("argcomplete"),
+    )
 
     _setup_logging(namespace)
     _call_command(namespace)

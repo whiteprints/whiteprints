@@ -11,7 +11,7 @@ from types import ModuleType
 from typing import Callable, Final, Optional
 
 
-__all__: Final = ["_", "has_module", "maybe_import_module"]
+__all__: Final = ["_", "has_module", "import_module"]
 """Public module attributes."""
 
 
@@ -68,8 +68,8 @@ class LazyGettext:
 
 
 @cache
-def maybe_import_module(module_name: str) -> Optional[ModuleType]:
-    """Import a module.
+def import_module(module_name: str) -> Optional[ModuleType]:
+    """Import a plugin module.
 
     Args:
         module_name: the name of the module to import, as it would be done with
@@ -78,23 +78,23 @@ def maybe_import_module(module_name: str) -> Optional[ModuleType]:
     Returns:
         None if the module is not found, otherwise returns the module.
     """
-    try:
+    with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
         return importlib.import_module(module_name)
-    except ModuleNotFoundError:
-        return None
+
+    return None
 
 
 def has_module(module_name: str) -> bool:
-    """Import a module.
+    """Check if a plugin is installed.
 
     Args:
         module_name: the name of the module to import, as it would be done with
-        `importlib.import_module`. Always use absolute import name.
+            `importlib.import_module`. Always use absolute import name.
 
     Returns:
         True if the module is importable, False otherwise
     """
-    return maybe_import_module(module_name) is not None
+    return import_module(module_name) is not None
 
 
 def _setup_package(
@@ -118,8 +118,8 @@ def _setup_package(
 
 
 _setup_package(
-    claw=maybe_import_module("beartype.claw"),
-    dotenv=maybe_import_module("dotenv"),
+    claw=import_module("beartype.claw"),
+    dotenv=import_module("dotenv"),
 )
 
 _: Final = LazyGettext(Path(__file__).parent / "locale")

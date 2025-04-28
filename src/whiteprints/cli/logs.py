@@ -9,7 +9,7 @@ from functools import cache
 from pathlib import Path
 from typing import Final, Optional
 
-from whiteprints import maybe_import_module
+from whiteprints import import_module
 
 
 __all__: Final = ["setup_logging", "user_log_config", "user_log_dir"]
@@ -29,7 +29,7 @@ def user_log_dir() -> Path:
     Returns:
         The path to the log directory.
     """
-    if (platformdirs := maybe_import_module("platformdirs")) is None:
+    if (platformdirs := import_module("platformdirs")) is None:
         return Path.cwd()
 
     return platformdirs.user_log_path(
@@ -51,7 +51,7 @@ def user_log_config() -> Optional[Path]:
         The path to the logging configuration file if `platformdirs` is
         installed, None otherwise.
     """
-    if (platformdirs := maybe_import_module("platformdirs")) is None:
+    if (platformdirs := import_module("platformdirs")) is None:
         return None
 
     return (
