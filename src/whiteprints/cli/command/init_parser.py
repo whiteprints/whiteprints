@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 from typing import Final, cast
 
-from whiteprints import _, import_module
+from whiteprints import _, import_extra
 from whiteprints.cli.action import CompleterAction
 
 
@@ -104,7 +104,7 @@ def setup_init_parser(parser: ArgumentParser) -> None:
             metavar="PROJECT_DIRECTORY",
         ),
     )
-    if (argcomplete := import_module("argcomplete")) is not None:
+    if (argcomplete := import_extra("argcomplete")) is not None:
         project_directory_arg.completer = argcomplete.DirectoriesCompleter()
 
     project_directory_arg = parser.add_argument(

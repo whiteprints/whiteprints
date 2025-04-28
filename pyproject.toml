@@ -50,6 +50,7 @@ dynamic = [
 ]
 dependencies = [
     "importlib-metadata==8.7.0; python_full_version<'3.10.0'",
+    "tach>=0.29.0",
     "typing-extensions==4.13.2; python_full_version<'3.12.0'",
     "uv==0.6.17",
 ]
@@ -57,7 +58,7 @@ optional-dependencies.autocompletion = [
     "argcomplete==3.6.2",
 ]
 optional-dependencies.color = [
-    "rich==14.0.0",
+    "rich>=13.0.0",
     "rich-argparse-plus==0.3.1.4",
 ]
 optional-dependencies.debug = [

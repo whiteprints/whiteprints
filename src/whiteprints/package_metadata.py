@@ -183,10 +183,5 @@ def find_license_files() -> set[PackagePath]:
 
     return _find_license_files(
         license_paths=files(distribution_name()) or [],
-        license_files=(
-            importlib.import_module("importlib.metadata")
-            .metadata(distribution_name())
-            .get_all("License-File")
-            or []
-        ),
+        license_files=(find_metadata().get_all("License-File") or []),
     )
