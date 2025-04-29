@@ -7,12 +7,9 @@
 """Command Line Interface app entrypoint."""
 
 import importlib
-import importlib.metadata
 import sys
 from argparse import Namespace
-from collections.abc import Iterable
 from functools import cache
-from importlib.metadata import EntryPoint
 from pathlib import Path
 from types import ModuleType
 from typing import Final, Optional
@@ -32,30 +29,16 @@ _gettext.textdomain("argparse")
 
 
 @cache
-def get_entrypoints(
-    group: str, name: Optional[str] = None
-) -> Iterable[EntryPoint]:
-    """Cross-version wrapper around importlib.metadata.entry_points().
-
-    Returns:
-        an iterable of entrypoints
-    """
-    entrypoints = importlib.metadata.entry_points()
-    return (
-        entrypoints.select(group=group, value=name)
-        if name is not None
-        else entrypoints.select(group=group)
-    )
-
-
-@cache
 def prog_name() -> str:
     """Determine the program name from the entrypoint metadata.
 
     Returns:
         The program name.
     """
-    entrypoints = get_entrypoints("console_scripts", f"{__name__}:entrypoint")
+    entrypoints = importlib.import_module("importlib.metadata").entry_points(
+        group="console_scripts",
+        value=f"{__name__}:entrypoint",
+    )
     if names := {ep.name for ep in entrypoints}:
         return names.pop()
 

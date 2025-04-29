@@ -26,12 +26,7 @@ import importlib
 import os
 import sys
 from functools import cache
-from importlib.metadata import (
-    Distribution,
-    distribution,
-    distributions,
-    packages_distributions,
-)
+from importlib.metadata import Distribution
 from importlib.util import find_spec
 from pathlib import Path
 from typing import Final, Optional, TypedDict, Union
@@ -133,12 +128,24 @@ def _gather_distributions_packages() -> dict[str, str]:
     """
     return {
         str(distribution): str(package)
-        for package, distributions in packages_distributions().items()
+        for package, distributions in (
+            importlib.import_module("importlib.metadata")
+            .packages_distributions()
+            .items()
+        )
         for distribution in distributions
     }
 
 
 def _list_site_packages(root_distribution: Distribution) -> list[PackageInfo]:
+    """List the distribution in a site package.
+
+    Args:
+        root_distribution: the root distribution to remove from the list.
+
+    Returns:
+        A list of distributions present in the site package.
+    """
     return [
         PackageInfo(
             name=distribution.metadata["name"],
@@ -149,7 +156,9 @@ def _list_site_packages(root_distribution: Distribution) -> list[PackageInfo]:
                 )
             ),
         )
-        for distribution in distributions()
+        for distribution in (
+            importlib.import_module("importlib.metadata").distributions()
+        )
         if (
             distribution.metadata["name"] != root_distribution.metadata["name"]
         )
@@ -203,7 +212,9 @@ def gather_debug_info(*, site_packages: bool = True) -> DebugInfo:
         package=PackageInfo(
             name=distribution_name,
             version=(
-                root_distribution := distribution(distribution_name)
+                root_distribution := importlib.import_module(
+                    "importlib.metadata"
+                ).distribution(distribution_name)
             ).version,
             origin=_find_origin(
                 _gather_distributions_packages().get(distribution_name)
