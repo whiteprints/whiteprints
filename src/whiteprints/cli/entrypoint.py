@@ -7,10 +7,12 @@
 """Command Line Interface app entrypoint."""
 
 import importlib
+import importlib.metadata
 import sys
 from argparse import Namespace
 from collections.abc import Iterable
 from functools import cache
+from importlib.metadata import EntryPoint
 from pathlib import Path
 from types import ModuleType
 from typing import Final, Optional
@@ -29,45 +31,21 @@ __all__: Final = ["entrypoint", "prog_name"]
 _gettext.textdomain("argparse")
 
 
-if sys.version_info >= (3, 10):
-    import importlib.metadata
-    from importlib.metadata import EntryPoint
+@cache
+def get_entrypoints(
+    group: str, name: Optional[str] = None
+) -> Iterable[EntryPoint]:
+    """Cross-version wrapper around importlib.metadata.entry_points().
 
-    @cache
-    def get_entrypoints(
-        group: str, name: Optional[str] = None
-    ) -> Iterable[EntryPoint]:
-        """Cross-version wrapper around importlib.metadata.entry_points().
-
-        Returns:
-            an iterable of entrypoints
-        """
-        entrypoints = importlib.metadata.entry_points()
-        return (
-            importlib.metadata.entry_points().select(group=group, value=name)
-            if name is not None
-            else entrypoints.select(group=group)
-        )
-
-else:
-    import importlib.metadata
-
-    from importlib_metadata import EntryPoint
-
-    @cache
-    def get_entrypoints(
-        group: str, name: Optional[str] = None
-    ) -> Iterable[EntryPoint]:
-        """Cross-version wrapper around importlib.metadata.entry_points().
-
-        Returns:
-            an iterable of entrypoints
-        """
-        entries = importlib.metadata.entry_points().get(group, [])
-        if name is not None:
-            entries = [ep for ep in entries if ep.value == name]
-
-        return entries
+    Returns:
+        an iterable of entrypoints
+    """
+    entrypoints = importlib.metadata.entry_points()
+    return (
+        entrypoints.select(group=group, value=name)
+        if name is not None
+        else entrypoints.select(group=group)
+    )
 
 
 @cache

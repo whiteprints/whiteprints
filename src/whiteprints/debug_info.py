@@ -26,22 +26,15 @@ import importlib
 import os
 import sys
 from functools import cache
-from importlib.metadata import distributions
+from importlib.metadata import (
+    Distribution,
+    distribution,
+    distributions,
+    packages_distributions,
+)
 from importlib.util import find_spec
 from pathlib import Path
 from typing import Final, Optional, TypedDict, Union
-
-
-if sys.version_info >= (3, 10):
-    from importlib.metadata import (
-        distribution,
-        packages_distributions,
-    )
-else:
-    from importlib_metadata import (
-        distribution,
-        packages_distributions,
-    )
 
 
 __all__: Final = ["DebugInfo", "gather_debug_info"]
@@ -145,6 +138,24 @@ def _gather_distributions_packages() -> dict[str, str]:
     }
 
 
+def _list_site_packages(root_distribution: Distribution) -> list[PackageInfo]:
+    return [
+        PackageInfo(
+            name=distribution.metadata["name"],
+            version=distribution.version,
+            origin=_find_origin(
+                _gather_distributions_packages().get(
+                    distribution.metadata["name"]
+                )
+            ),
+        )
+        for distribution in distributions()
+        if (
+            distribution.metadata["name"] != root_distribution.metadata["name"]
+        )
+    ]
+
+
 @cache
 def gather_debug_info(*, site_packages: bool = True) -> DebugInfo:
     """Gather detailed runtime debug information of the current environment.
@@ -172,7 +183,6 @@ def gather_debug_info(*, site_packages: bool = True) -> DebugInfo:
     distribution_name = importlib.import_module(
         "whiteprints.package_metadata"
     ).distribution_name()
-    root_distribution = distribution(distribution_name)
 
     return DebugInfo(
         platform=PlatformInfo(
@@ -192,30 +202,15 @@ def gather_debug_info(*, site_packages: bool = True) -> DebugInfo:
         ),
         package=PackageInfo(
             name=distribution_name,
-            version=root_distribution.version,
+            version=(
+                root_distribution := distribution(distribution_name)
+            ).version,
             origin=_find_origin(
                 _gather_distributions_packages().get(distribution_name)
             ),
         ),
         site_packages=(
-            [
-                PackageInfo(
-                    name=distribution.metadata["name"],
-                    version=distribution.version,
-                    origin=_find_origin(
-                        _gather_distributions_packages().get(
-                            distribution.metadata["name"]
-                        )
-                    ),
-                )
-                for distribution in distributions()
-                if (
-                    distribution.metadata["name"]
-                    != root_distribution.metadata["name"]
-                )
-            ]
-            if site_packages
-            else None
+            _list_site_packages(root_distribution) if site_packages else None
         ),
         logs=LogsInfo(
             USER_LOG_DIR=str(logs.user_log_dir()),

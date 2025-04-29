@@ -5,16 +5,10 @@
 """Discover the package's version number."""
 
 import importlib
-import sys
 from collections.abc import Iterable
 from functools import cache
+from importlib.metadata import PackageMetadata, PackagePath
 from typing import Final, no_type_check
-
-
-if sys.version_info >= (3, 10):
-    from importlib.metadata import PackageMetadata, PackagePath
-else:
-    from importlib_metadata import PackageMetadata, PackagePath
 
 
 __all__: Final = [
@@ -176,12 +170,10 @@ def find_license_files() -> set[PackagePath]:
     Returns:
         A list containing the path to the license(s) of the package code.
     """
-    if sys.version_info >= (3, 10):
-        files = importlib.import_module("importlib.metadata").files
-    else:
-        files = importlib.import_module("importlib_metadata").files
-
     return _find_license_files(
-        license_paths=files(distribution_name()) or [],
+        license_paths=importlib.import_module("importlib.metadata").files(
+            distribution_name()
+        )
+        or [],
         license_files=(find_metadata().get_all("License-File") or []),
     )
