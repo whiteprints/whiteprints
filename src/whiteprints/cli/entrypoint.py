@@ -7,12 +7,10 @@
 """Command Line Interface app entrypoint."""
 
 import importlib
-import importlib.metadata
 import sys
 from argparse import Namespace
 from collections.abc import Iterable
 from functools import cache
-from importlib.metadata import EntryPoint
 from pathlib import Path
 from types import ModuleType
 from typing import Final, Optional
@@ -32,6 +30,8 @@ _gettext.textdomain("argparse")
 
 
 if sys.version_info >= (3, 10):
+    import importlib.metadata
+    from importlib.metadata import EntryPoint
 
     @cache
     def get_entrypoints(
@@ -50,6 +50,9 @@ if sys.version_info >= (3, 10):
         )
 
 else:
+    import importlib.metadata
+
+    from importlib_metadata import EntryPoint
 
     @cache
     def get_entrypoints(
@@ -74,10 +77,8 @@ def prog_name() -> str:
     Returns:
         The program name.
     """
-    if names := {
-        ep.name
-        for ep in get_entrypoints("console_scripts", f"{__name__}:entrypoint")
-    }:
+    entrypoints = get_entrypoints("console_scripts", f"{__name__}:entrypoint")
+    if names := {ep.name for ep in entrypoints}:
         return names.pop()
 
     return Path(sys.argv[0]).stem
