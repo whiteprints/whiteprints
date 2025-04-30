@@ -4,7 +4,7 @@
 
 """Discover the package's metadata."""
 
-import sys
+import site
 from functools import cache
 from pathlib import Path
 from typing import Final, Literal
@@ -64,12 +64,17 @@ def _locate_dist_info_directory(distribution_name: str) -> Path | None:
     Returns:
         The path to the .dist-info directory if found, otherwise None.
     """
+    sites: list[Path] = [
+        Path(site)
+        for site in (
+            site.getusersitepackages(),
+            *site.getsitepackages(),
+        )
+    ]
     return next(
         (
             candidate
-            for directory in map(Path, sys.path)
-            if directory.is_dir()
-            for candidate in directory.iterdir()
+            for candidate in sites
             if _is_dist_info(candidate, distribution_name)
         ),
         None,
@@ -126,19 +131,15 @@ def extract_field(
 ) -> str | None:
     """Extract a single value for a specific metadata field.
 
-    This is a stricter version of `extract_fields`, returning only if exactly
-    one value is found.
+    This is a stricter version of `extract_fields`.
 
     Args:
         field: One of the allowed metadata fields.
 
     Returns:
-        The field value as a string, or None if zero or multiple matches.
+        The field value as a string, or None if zero matches.
     """
-    if len(fields := extract_fields(field)) == 1:
-        return fields.pop()
-
-    return None
+    return next(iter(extract_fields(field)), None)
 
 
 @cache
@@ -170,7 +171,7 @@ def _read_entry_points(dist_dir: Path) -> list[str]:
     return []
 
 
-def _extract_console_scripts_section(lines: list[str]) -> list[str]:
+def _extract_console_scripts_section(lines: list[str]) -> set[str]:
     """Extract only the [console_scripts] section.
 
     This slices the entry points data after the section header, stopping
@@ -182,25 +183,24 @@ def _extract_console_scripts_section(lines: list[str]) -> list[str]:
     Returns:
         A list of lines belonging to [console_scripts].
     """
-    section_start = next(
+    if section_start := next(
         (
             i + 1
             for i, line in enumerate(lines)
             if line.strip() == "[console_scripts]"
         ),
         None,
-    )
-    if section_start is None:
-        return []
+    ):
+        return set()
 
-    return [
+    return {
         line
         for line in lines[section_start:]
         if not line.strip().startswith("[")  # Stop at new section
-    ]
+    }
 
 
-def _match_entry_point(lines: list[str], target: str) -> str | None:
+def _match_entry_point(lines: set[str], target: str) -> str | None:
     """Match a module:function target against entry point declarations.
 
     Args:
