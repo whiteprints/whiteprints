@@ -29,6 +29,19 @@ def distribution_name() -> str:
     return "whiteprints"
 
 
+def _is_dist_info(
+    path: Path,
+    distribution_name: str,
+) -> bool:
+    return (
+        path.is_dir()
+        and (name := path.name.lower()).startswith(
+            distribution_name.replace("-", "_").lower()
+        )
+        and name.endswith(".dist-info")
+    )
+
+
 @cache
 def _locate_dist_info_directory(distribution_name: str) -> Path | None:
     """Locate the .dist-info directory for a given package.
@@ -48,11 +61,7 @@ def _locate_dist_info_directory(distribution_name: str) -> Path | None:
             for directory in map(Path, sys.path)
             if directory.is_dir()
             for candidate in directory.iterdir()
-            if candidate.is_dir()
-            and (name := candidate.name.lower()).startswith(
-                distribution_name.replace("-", "_").lower()
-            )
-            and name.endswith(".dist-info")
+            if _is_dist_info(candidate, distribution_name)
         ),
         None,
     )
