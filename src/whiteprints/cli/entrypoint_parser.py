@@ -121,9 +121,8 @@ def _initialize_parser(
         prog=prog,
         formatter_class=formatter_class,
         description=_(
-            importlib.import_module(
-                "whiteprints.package_metadata",
-            ).extract_field("Summary")
+            "A Copier-based cookiecutter for creating Python projects managed"
+            "by UV."
         ),
         add_help=False,
         epilog=epilog,
@@ -241,7 +240,7 @@ def _add_configuration_parsers(
                             ),
                         )
                     )
-                    else _(" or None"),
+                    else _(" or none"),
                     logs_conf_env,
                 )
             ),
