@@ -77,7 +77,10 @@ def _locate_dist_info_directory(distribution_name: str) -> Path | None:
 
 
 @cache
-def _extract_metadata_fields(metadata_text: str, field_name: str) -> list[str]:
+def _extract_metadata_fields(
+    metadata_text: str,
+    field: Literal["Version", "Summary", "License-Expression", "License-File"],
+) -> set[str]:
     """Extract all metadata values for a given field.
 
     This searches for all lines in the metadata text that begin with the
@@ -85,22 +88,22 @@ def _extract_metadata_fields(metadata_text: str, field_name: str) -> list[str]:
 
     Args:
         metadata_text: The raw content of the METADATA file.
-        field_name: The field to search for (e.g., "Version", "License-File").
+        field: The field to search for (e.g., "Version", "License-File").
 
     Returns:
         A list of field values in order of appearance.
     """
-    prefix = f"{field_name}: "
-    return [
+    prefix = f"{field}: "
+    return {
         line[len(prefix) :].strip()
         for line in metadata_text.splitlines()
         if line.startswith(prefix)
-    ]
+    }
 
 
 def extract_fields(
-    field: Literal["Version", "Summary", "License-Expression"],
-) -> list[str]:
+    field: Literal["Version", "Summary", "License-Expression", "License-File"],
+) -> set[str]:
     """Extract all values of a specific metadata field from the package.
 
     The output is cached to avoid re-parsing the METADATA file.
@@ -112,7 +115,7 @@ def extract_fields(
         A list of values found in the METADATA file.
     """
     if not (dist_dir := _locate_dist_info_directory(distribution_name())):
-        return []
+        return set()
 
     return _extract_metadata_fields((dist_dir / "METADATA").read_text(), field)
 
@@ -133,7 +136,7 @@ def extract_field(
         The field value as a string, or None if zero or multiple matches.
     """
     if len(fields := extract_fields(field)) == 1:
-        return fields[0]
+        return fields.pop()
 
     return None
 
@@ -148,16 +151,7 @@ def find_license_files() -> set[Path]:
     Returns:
         A set of paths to license files found.
     """
-    if not (dist_dir := _locate_dist_info_directory(distribution_name())):
-        return set()
-
-    files = _extract_metadata_fields(
-        (dist_dir / "METADATA").read_text(), "License-File"
-    )
-    root = dist_dir.parent
-    found = {root / f for f in files if (root / f).is_file()}
-
-    return found or {p for p in root.glob("LICENSE*") if p.is_file()}
+    return {Path(file) for file in extract_fields("License-File")}
 
 
 def _read_entry_points(dist_dir: Path) -> list[str]:
