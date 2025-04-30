@@ -155,7 +155,7 @@ class Version(CompleterAction):
         robust_print(
             importlib.import_module(
                 "whiteprints.package_metadata",
-            ).find_version()
+            ).extract_field("Version")
         )
         sys.exit(os.EX_OK)
 

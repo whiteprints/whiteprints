@@ -122,7 +122,7 @@ def _initialize_parser(
         formatter_class=formatter_class,
         description=importlib.import_module(
             "whiteprints.package_metadata",
-        ).find_metadata()["Summary"],
+        ).extract_field("Summary"),
         add_help=False,
         epilog=epilog,
     )
@@ -320,7 +320,7 @@ def _resolve_license_flag(namespace: Namespace) -> None:
     if isinstance(namespace.license, int):
         license_expression = importlib.import_module(
             "whiteprints.package_metadata",
-        ).find_license_expression()
+        ).extract_field("License-Expression")
         if namespace.license == 1:
             robust_print(license_expression)
 

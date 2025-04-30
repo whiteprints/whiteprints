@@ -35,14 +35,14 @@ def prog_name() -> str:
     Returns:
         The program name.
     """
-    entrypoints = importlib.import_module("importlib.metadata").entry_points(
-        group="console_scripts",
-        value=f"{__name__}:entrypoint",
-    )
-    if names := {ep.name for ep in entrypoints}:
-        return names.pop()
+    if (
+        entrypoint_name := importlib.import_module(
+            "whiteprints.package_metadata"
+        ).entry_point_name(__name__, "entrypoint")
+    ) is None:
+        return Path(sys.argv[0]).stem
 
-    return Path(sys.argv[0]).stem
+    return entrypoint_name
 
 
 def _create_namespace(
