@@ -65,12 +65,8 @@ def _is_dist_info(
     Returns:
         True if the given path is a dist-info, False otherwise.
     """
-    return (
-        path.is_dir()
-        and (name := path.name.lower()).startswith(
-            distribution_name.replace("-", "_").lower()
-        )
-        and name.endswith(".dist-info")
+    return path.is_dir() and path.name.lower().startswith(
+        distribution_name.replace("-", "_").lower()
     )
 
 
@@ -87,17 +83,11 @@ def _locate_dist_info_directory(distribution_name: str) -> Path | None:
     Returns:
         The path to the .dist-info directory if found, otherwise None.
     """
-    sites: list[Path] = [
-        Path(site)
-        for site in (
-            site.getusersitepackages(),
-            *site.getsitepackages(),
-        )
-    ]
     return next(
         (
             candidate
-            for candidate in sites
+            for site in map(Path, site.getsitepackages())
+            for candidate in site.glob("*.dist-info")
             if _is_dist_info(candidate, distribution_name)
         ),
         None,
