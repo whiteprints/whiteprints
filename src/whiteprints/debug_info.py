@@ -20,6 +20,10 @@ The collected data includes:
 
 This is useful for debugging issues related to dependency resolution,
 environment configuration across different systems.
+
+Note: we cannot do the .dist-info hypothesis as in package_metadata.py since we
+do not know how the dependencies were installed (they could use deprecated or
+legacy packaging). Hence we use the slower but more robust importlib.metadata
 """
 
 import importlib

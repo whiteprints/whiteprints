@@ -1,5 +1,9 @@
-#: src/whiteprints/cli/__init__.py:101
+#: src/whiteprints/cli/__init__.py:100
 msgid "Execution stopped by user"
+msgstr ""
+
+#: src/whiteprints/cli/action.py:131
+msgid "Copyright © 2024 The \"Whiteprints\" contributors <whiteprints@pm.me>."
 msgstr ""
 
 #: src/whiteprints/cli/command/init.py:242
@@ -36,7 +40,7 @@ msgstr ""
 msgid "Full GitHub configuration. This imply `-pp`, `-cc`, `rd`, and `-pr`."
 msgstr ""
 
-#: src/whiteprints/cli/command/init_parser.py:101
+#: src/whiteprints/cli/command/init_parser.py:103
 msgid "Directory in which to initialize the Python project."
 msgstr ""
 
@@ -44,112 +48,98 @@ msgstr ""
 msgid "Additional arguments forwarded to each Copier invocations."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint.py:73
+#: src/whiteprints/cli/entrypoint.py:66
 msgid "Subcommands"
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint.py:82 src/whiteprints/cli/entrypoint.py:83
+#: src/whiteprints/cli/entrypoint.py:75 src/whiteprints/cli/entrypoint.py:76
 msgid "Initialize a Python project."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint.py:87
+#: src/whiteprints/cli/entrypoint.py:80
 msgid ""
 "Note: see https://copier.readthedocs.io/en/stable/configuring/ for help "
 "on how to use Copier and COPIER_ARGS (optional)."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:58
+#: src/whiteprints/cli/entrypoint_parser.py:56
 #, python-brace-format
 msgid "{}: error: {}\n"
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:125
-msgid "Copyright © 2024 The \"Whiteprints\" contributors <whiteprints@pm.me>."
-msgstr ""
-
-#: src/whiteprints/cli/entrypoint_parser.py:142
-msgid "error: invalid_argument"
-msgstr ""
-
-#: src/whiteprints/cli/entrypoint_parser.py:181
-#, python-brace-format
-msgid "error: license {} not found"
-msgstr ""
-
-#: src/whiteprints/cli/entrypoint_parser.py:241
-#, python-brace-format
-msgid "You may change the CLI color theme with the environment variable `{}`."
-msgstr ""
-
-#: src/whiteprints/cli/entrypoint_parser.py:250
+#: src/whiteprints/cli/entrypoint_parser.py:133
 msgid "Program Info"
 msgstr ""
 
 #: src/whiteprints/cli/command/init_parser.py:35
-#: src/whiteprints/cli/entrypoint_parser.py:255
+#: src/whiteprints/cli/entrypoint_parser.py:138
 msgid "Show this help message and exit."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:264
+#: src/whiteprints/cli/entrypoint_parser.py:145
 msgid "Show program's version number and exit."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:271
+#: src/whiteprints/cli/entrypoint_parser.py:152
 msgid "Show the copyright information and exit."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:276
+#: src/whiteprints/cli/entrypoint_parser.py:157
 msgid "Licensing Info"
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:282
+#: src/whiteprints/cli/entrypoint_parser.py:162
 msgid ""
 "Show the license expression and exit. Repeat the flag to show REUSE "
 "information."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:298
+#: src/whiteprints/cli/entrypoint_parser.py:179
 msgid "Show the license text and exit."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:303
+#: src/whiteprints/cli/entrypoint_parser.py:184
 msgid "Debug Info"
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:309
+#: src/whiteprints/cli/entrypoint_parser.py:189
 msgid ""
 "Show platform and environment information and exit. Repeat the flag to "
 "add distribution information."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:317
+#: src/whiteprints/cli/entrypoint_parser.py:197
 msgid "Completion"
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:324
+#: src/whiteprints/cli/entrypoint_parser.py:203
 msgid "Show the completion script code and exit."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:332
+#: src/whiteprints/cli/entrypoint_parser.py:214
 msgid "Configuration"
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:349
+#: src/whiteprints/cli/entrypoint_parser.py:220
 #, python-brace-format
 msgid ""
-"Loads the logging configuration file (JSON format) at this location. {}If"
-" the file does not exists, a default configuration file is created at the"
-" specified location and loaded. You may change the default path with the "
-"environment variable `{}`."
+"Loads the logging configuration file (JSON format) at this location. If "
+"an empty string{} is passed, the default Python configuration is used, "
+"with LOGLEVEL=\"CRITICAL\". If the file does not exists, a default "
+"configuration file is created at the specified location and loaded. You "
+"may change the default path with the environment variable `{}`."
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:356
-msgid ""
-"If an empty string is passed, the default Python configuration is used, "
-"with LOGLEVEL=\"CRITICAL\". "
+#: src/whiteprints/cli/entrypoint_parser.py:242
+msgid " or None"
 msgstr ""
 
-#: src/whiteprints/cli/entrypoint_parser.py:432
+#: src/whiteprints/cli/entrypoint_parser.py:276
+#, python-brace-format
+msgid "You may change the CLI color theme with the environment variable `{}`."
+msgstr ""
+
+#: src/whiteprints/cli/entrypoint_parser.py:332
 msgid ""
 "This project is REUSE compliant. Check the SPDX header of each individual"
 " source code file for detailed licensing information."

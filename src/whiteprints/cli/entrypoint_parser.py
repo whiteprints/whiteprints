@@ -120,9 +120,11 @@ def _initialize_parser(
     return ArgumentParserExUsage(
         prog=prog,
         formatter_class=formatter_class,
-        description=importlib.import_module(
-            "whiteprints.package_metadata",
-        ).extract_field("Summary"),
+        description=_(
+            importlib.import_module(
+                "whiteprints.package_metadata",
+            ).extract_field("Summary")
+        ),
         add_help=False,
         epilog=epilog,
     )
