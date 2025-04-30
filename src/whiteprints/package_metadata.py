@@ -171,6 +171,27 @@ def _read_entry_points(dist_dir: Path) -> list[str]:
     return []
 
 
+def _find_section_start_index(
+    lines: list[str],
+) -> int | None:
+    """Find the line index of the [console_scripts] section.
+
+    Args:
+        lines: Lines from entry_points.txt.
+
+    Returns:
+        The section start index
+    """
+    return next(
+        (
+            i + 1
+            for i, line in enumerate(lines)
+            if line.strip() == "[console_scripts]"
+        ),
+        None,
+    )
+
+
 def _extract_console_scripts_section(lines: list[str]) -> set[str]:
     """Extract only the [console_scripts] section.
 
@@ -183,14 +204,7 @@ def _extract_console_scripts_section(lines: list[str]) -> set[str]:
     Returns:
         A list of lines belonging to [console_scripts].
     """
-    if section_start := next(
-        (
-            i + 1
-            for i, line in enumerate(lines)
-            if line.strip() == "[console_scripts]"
-        ),
-        None,
-    ):
+    if (section_start := _find_section_start_index(lines)) is None:
         return set()
 
     return {
@@ -211,12 +225,10 @@ def _match_entry_point(lines: set[str], target: str) -> str | None:
         The entry point name if found, otherwise None.
     """
     for line in lines:
-        if "=" not in line:
-            continue
-
-        name_part, value_part = map(str.strip, line.split("=", 1))
-        if value_part == target:
-            return name_part
+        if "=" in line:
+            name_part, value_part = map(str.strip, line.split("=", 1))
+            if value_part == target:
+                return name_part
 
     return None
 
