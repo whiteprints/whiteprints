@@ -2,7 +2,30 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""Discover the package's metadata."""
+"""Discover the installed package's metadata from its .dist-info directory.
+
+This module provides fast, read-only access to distribution metadata such as
+version, license files, and entry points, assuming the package is installed
+using a modern PEP-compliant packaging tool (e.g., pip, build, hatch, poetry).
+
+We deliberately avoid `importlib.metadata` for performance reasons: by scanning
+known site-packages locations directly, we bypass internal caching, import
+overhead, and entry point resolution logic that is unnecessary in our case.
+
+This implementation assumes the presence of a `.dist-info` directory as
+mandated by [PEP 376](https://peps.python.org/pep-0376/) and
+[PEP 427](https://peps.python.org/pep-0427/), which define the modern standard
+for installed Python distributions. These metadata directories are required for
+all compliant wheel installs.
+
+Caveats:
+- Packages installed via `setup.py develop` (i.e., legacy `.egg-info`) are
+  unsupported.
+- Broken or non-standard environments may yield incomplete results.
+
+This module prioritizes startup time and metadata locality over generality or
+fallback mechanisms.
+"""
 
 import site
 from functools import cache
@@ -246,8 +269,7 @@ def entry_point_name(module_name: str, entrypoint_function: str) -> str | None:
     Returns:
         The name of the script entry point if found, otherwise None.
     """
-    dist_dir = _locate_dist_info_directory(distribution_name())
-    if not dist_dir:
+    if (dist_dir := _locate_dist_info_directory(distribution_name())) is None:
         return None
 
     lines = _read_entry_points(dist_dir)
