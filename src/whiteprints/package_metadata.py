@@ -33,6 +33,15 @@ def _is_dist_info(
     path: Path,
     distribution_name: str,
 ) -> bool:
+    """Check if a directory is a dist-info.
+
+    Args:
+        path: the directory to check
+        distribution_name: The normalized name of the package.
+
+    Returns:
+        True if the given path is a dist-info, False otherwise.
+    """
     return (
         path.is_dir()
         and (name := path.name.lower()).startswith(
