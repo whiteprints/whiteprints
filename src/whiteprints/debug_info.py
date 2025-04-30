@@ -29,7 +29,7 @@ from functools import cache
 from importlib.metadata import Distribution
 from importlib.util import find_spec
 from pathlib import Path
-from typing import Final, Optional, TypedDict, Union
+from typing import Final, TypedDict
 
 
 __all__: Final = ["DebugInfo", "gather_debug_info"]
@@ -40,21 +40,21 @@ class PackageInfo(TypedDict):
 
     name: str
     version: str
-    origin: Optional[str]
+    origin: str | None
 
 
 class LogsInfo(TypedDict):
     """Holds the logging configuration."""
 
     USER_LOG_DIR: str
-    default_configuration: Optional[str]
+    default_configuration: str | None
 
 
 class PythonInfo(TypedDict):
     """Holds the Python interpreter information."""
 
     executable: str
-    version: list[Union[str, int]]
+    version: list[str | int]
     implementation: str
     build: str
     compiler: str
@@ -63,7 +63,7 @@ class PythonInfo(TypedDict):
 class EnvironmentInfo(TypedDict):
     """Holds the environment information."""
 
-    VIRTUAL_ENV: Optional[str]
+    VIRTUAL_ENV: str | None
     base_exec_prefix: str
     pythonpath: list[str]
 
@@ -81,11 +81,11 @@ class DebugInfo(TypedDict):
 
     platform: PlatformInfo
     package: PackageInfo
-    site_packages: Optional[list[PackageInfo]]
-    logs: Optional[LogsInfo]
+    site_packages: list[PackageInfo] | None
+    logs: LogsInfo | None
 
 
-def _find_origin(package_name: Optional[str]) -> Optional[str]:
+def _find_origin(package_name: str | None) -> str | None:
     """Find the origin path of a package.
 
     If the package_name is None, returns None.

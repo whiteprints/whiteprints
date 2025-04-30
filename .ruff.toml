@@ -32,7 +32,7 @@ exclude = [
 ]
 force-exclude = true
 
-target-version = "py39"
+target-version = "py310"
 
 [lint]
 # Allow unused variables when underscore-prefixed.
