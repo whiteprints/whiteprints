@@ -12,15 +12,12 @@ from argparse import (
     ArgumentParser,
     Namespace,
 )
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from typing import (
     Any,
-    Callable,
     ClassVar,
     Final,
     NoReturn,
-    Optional,
-    Union,
 )
 
 from whiteprints import _
@@ -60,7 +57,7 @@ class Completion(CompleterAction):
     )
 
     @staticmethod
-    def _autodetect_shell(args: Optional[Union[str, Sequence[str]]]) -> str:
+    def _autodetect_shell(args: str | Sequence[str] | None) -> str:
         """Try to autotect the shell if not given.
 
         Args:
@@ -89,7 +86,7 @@ class Completion(CompleterAction):
         self,
         parser: ArgumentParser,
         namespace: Namespace,
-        *args: Union[Sequence[str], str, None],
+        *args: Sequence[str] | str | None,
     ) -> NoReturn:
         """Generate the autocompletion code.
 
@@ -120,7 +117,7 @@ class Copyright(CompleterAction):
         self,
         parser: ArgumentParser,
         namespace: Namespace,
-        *args: Union[Sequence[str], str, None],
+        *args: Sequence[str] | str | None,
     ) -> NoReturn:
         """Print the code copyright information.
 
@@ -146,7 +143,7 @@ class Version(CompleterAction):
         self,
         parser: ArgumentParser,
         namespace: Namespace,
-        *args: Union[Sequence[str], str, None],
+        *args: Sequence[str] | str | None,
     ) -> NoReturn:
         """Print the code copyright information.
 
@@ -167,7 +164,7 @@ class License(CompleterAction):
     """Print the code licenses information."""
 
     @staticmethod
-    def _print_license_text(args: Union[Sequence[str], str, None]) -> None:
+    def _print_license_text(args: Sequence[str] | str | None) -> None:
         """Print the license text.
 
         Args:
@@ -209,7 +206,7 @@ class License(CompleterAction):
         self,
         parser: ArgumentParser,
         namespace: Namespace,
-        *args: Union[Sequence[str], str, None],
+        *args: Sequence[str] | str | None,
     ) -> NoReturn:
         """The action callback.
 

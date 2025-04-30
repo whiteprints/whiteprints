@@ -9,7 +9,7 @@ import importlib
 import sys
 from collections.abc import Callable
 from types import FrameType
-from typing import Final, NoReturn, Optional
+from typing import Final, NoReturn
 
 from whiteprints import _, has_extra, import_extra
 
@@ -24,13 +24,13 @@ robust_print = print if (rich := import_extra("rich")) is None else rich.print
 def robust_print_json(  # noqa: PLR0913
     data: object,
     *,
-    indent: Optional[int] = None,
+    indent: int | None = None,
     skip_keys: bool = False,
     ensure_ascii: bool = True,
     check_circular: bool = True,
     allow_nan: bool = False,
     sort_keys: bool = False,
-    default: Optional[Callable[..., object]] = None,
+    default: Callable[..., object] | None = None,
 ) -> None:
     # we disable PLR0913 (too-many-arguments) are we want to mimic json.dump.
     """Try to print a JSON using Rich.

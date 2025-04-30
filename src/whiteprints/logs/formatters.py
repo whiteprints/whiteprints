@@ -13,7 +13,6 @@ from typing import (
     Any,
     ClassVar,
     Final,
-    Optional,
     TypedDict,
 )
 
@@ -30,14 +29,14 @@ __all__: Final = ["JSONFormatter"]
 class _TraceBackJSON(TypedDict):
     """JSONserializable representation of an exception trace."""
 
-    exception_type: Optional[str]
+    exception_type: str | None
     exception_message: str
     traceback: list[list[str]]
 
 
 def _logrecord_exception_to_dict(
     record: LogRecord,
-) -> Optional[_TraceBackJSON]:
+) -> _TraceBackJSON | None:
     """Convert a LogRecord exception into a _TraceBackJSON.
 
     Returns:

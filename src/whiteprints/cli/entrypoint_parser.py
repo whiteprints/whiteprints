@@ -19,7 +19,6 @@ from typing import (
     Final,
     Literal,
     NoReturn,
-    Optional,
     cast,
 )
 
@@ -78,9 +77,9 @@ def _nargs_license_text(licenses: list[str]) -> Literal[0, 1]:
 def _initialize_parser(
     prog: str,
     app_name_env_prefix: str,
-    theme: Optional[str],
-    epilog: Optional[str],
-    rich_argparse_plus: Optional[ModuleType],
+    theme: str | None,
+    epilog: str | None,
+    rich_argparse_plus: ModuleType | None,
 ) -> ArgumentParserExUsage:
     """Initialize the argument parser.
 
@@ -208,7 +207,7 @@ def _add_autocompletion(parser: ArgumentParser) -> None:
 def _add_configuration_parsers(
     parser: ArgumentParser,
     app_name_env_prefix: str,
-    argcomplete: Optional[ModuleType],
+    argcomplete: ModuleType | None,
 ) -> None:
     logs_arg = cast(
         "CompleterAction",

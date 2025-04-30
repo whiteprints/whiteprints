@@ -12,7 +12,7 @@ from argparse import Namespace
 from functools import cache
 from pathlib import Path
 from types import ModuleType
-from typing import Final, Optional
+from typing import Final
 
 from whiteprints import _, import_extra
 
@@ -46,8 +46,8 @@ def prog_name() -> str:
 
 
 def _create_namespace(
-    args: Optional[list[str]],
-    argcomplete: Optional[ModuleType],
+    args: list[str] | None,
+    argcomplete: ModuleType | None,
 ) -> Namespace:
     """Create a namespace from the arguments.
 
@@ -140,7 +140,7 @@ def _call_command(namespace: Namespace) -> None:
     getattr(command, namespace.cmd)(namespace)
 
 
-def entrypoint(args: Optional[list[str]] = None) -> None:
+def entrypoint(args: list[str] | None = None) -> None:
     """The Whiteprint CLI.
 
     Example:

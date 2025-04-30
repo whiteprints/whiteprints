@@ -5,10 +5,11 @@
 """Top-level module."""
 
 import importlib
+from collections.abc import Callable
 from functools import cache, cached_property
 from pathlib import Path
 from types import ModuleType
-from typing import Callable, Final, Optional
+from typing import Final
 
 
 __all__: Final = ["_", "has_extra", "import_extra"]
@@ -32,7 +33,7 @@ class LazyGettext:
 
     def __init__(
         self,
-        locale_directory: Optional[Path] = None,
+        locale_directory: Path | None = None,
         *,
         fallback: bool = True,
     ) -> None:
@@ -68,7 +69,7 @@ class LazyGettext:
 
 
 @cache
-def import_extra(module_name: str) -> Optional[ModuleType]:
+def import_extra(module_name: str) -> ModuleType | None:
     """Import a plugin module.
 
     Args:
@@ -99,8 +100,8 @@ def has_extra(module_name: str) -> bool:
 
 def _setup_package(
     *,
-    claw: Optional[ModuleType] = None,
-    dotenv: Optional[ModuleType] = None,
+    claw: ModuleType | None = None,
+    dotenv: ModuleType | None = None,
 ) -> None:
     """Setup the package.
 

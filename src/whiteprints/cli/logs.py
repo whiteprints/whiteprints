@@ -7,7 +7,7 @@
 import importlib
 from functools import cache
 from pathlib import Path
-from typing import Final, Optional
+from typing import Final
 
 from whiteprints import import_extra
 
@@ -40,7 +40,7 @@ def user_log_dir() -> Path:
 
 
 @cache
-def user_log_config() -> Optional[Path]:
+def user_log_config() -> Path | None:
     """The default user logging configuration file Path.
 
     If platformdirs is not installed, returns None.
@@ -113,7 +113,7 @@ def _generate_configuration(log_config_path: Path) -> None:
         )
 
 
-def setup_logging(log_config_path: Optional[Path] = None) -> None:
+def setup_logging(log_config_path: Path | None = None) -> None:
     """Setup logging.
 
     It loads the configuration file specified in the arguments. If the file
