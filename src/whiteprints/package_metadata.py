@@ -65,9 +65,7 @@ def _is_dist_info(
     Returns:
         True if the given path is a dist-info, False otherwise.
     """
-    return path.is_dir() and path.name.lower().startswith(
-        distribution_name.replace("-", "_").lower()
-    )
+    return path.is_dir() and path.name.lower().startswith(distribution_name)
 
 
 @cache
@@ -88,7 +86,9 @@ def _locate_dist_info_directory(distribution_name: str) -> Path | None:
             candidate
             for site in map(Path, site.getsitepackages())
             for candidate in site.glob("*.dist-info")
-            if _is_dist_info(candidate, distribution_name)
+            if _is_dist_info(
+                candidate, distribution_name.replace("-", "_").lower()
+            )
         ),
         None,
     )
