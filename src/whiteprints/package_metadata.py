@@ -76,6 +76,7 @@ def _locate_dist_info_directory(distribution_name: str) -> Path | None:
     )
 
 
+@cache
 def _extract_metadata_fields(metadata_text: str, field_name: str) -> list[str]:
     """Extract all metadata values for a given field.
 
@@ -97,7 +98,6 @@ def _extract_metadata_fields(metadata_text: str, field_name: str) -> list[str]:
     ]
 
 
-@cache
 def extract_fields(
     field: Literal["Version", "Summary", "License-Expression"],
 ) -> list[str]:
@@ -148,8 +148,7 @@ def find_license_files() -> set[Path]:
     Returns:
         A set of paths to license files found.
     """
-    dist_dir = _locate_dist_info_directory(distribution_name())
-    if not dist_dir:
+    if not (dist_dir := _locate_dist_info_directory(distribution_name())):
         return set()
 
     files = _extract_metadata_fields(
@@ -161,7 +160,6 @@ def find_license_files() -> set[Path]:
     return found or {p for p in root.glob("LICENSE*") if p.is_file()}
 
 
-@cache
 def _read_entry_points(dist_dir: Path) -> list[str]:
     """Read the entry_points.txt file lines.
 
