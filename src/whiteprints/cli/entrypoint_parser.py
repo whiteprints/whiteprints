@@ -354,15 +354,18 @@ def _resolve_license_flag(namespace: Namespace) -> None:
         sys.exit(importlib.import_module("os").EX_OK)
 
 
-def _resolve_help_action(argument_parser: ArgumentParser) -> None:
+def _resolve_help_action(
+    namespace: Namespace, argument_parser: ArgumentParser
+) -> None:
     """Resolve the `--help` flag.
 
     Args:
         namespace: the program namespace.
         argument_parser: the program argument parser.
     """
-    argument_parser.print_help()
-    sys.exit(importlib.import_module("os").EX_OK)
+    if namespace.cmd is None:
+        argument_parser.print_help()
+        sys.exit(importlib.import_module("os").EX_OK)
 
 
 def resolve_flags(
@@ -377,6 +380,4 @@ def resolve_flags(
     """
     _resolve_platform_flag(namespace)
     _resolve_license_flag(namespace)
-
-    # At this point we should have exited. If not print help and exit.
-    _resolve_help_action(argument_parser)
+    _resolve_help_action(namespace, argument_parser)

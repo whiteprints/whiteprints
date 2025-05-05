@@ -22,7 +22,7 @@ ARG VIRTUAL_ENV=/opt/venv
 #   - These Python packages usually only provide binary wheels for GLIBC, so
 #   the packages will need to be recompiled fully within the container images,
 #   increasing build times.
-ARG UV_TAG=0.6.16-python3.13-alpine@sha256:1c0baf18db60cf0103013cc43806847ab4727c3c7cca1055dfd96c44743964e7
+ARG UV_TAG=0.7.2-python3.13-slim-bookworm@sha256:7c32c5bb4b162e17bfe537f1b0df16faa87b9b1ae12c4b8143f68da3fe537e90
 ARG UV_BIN="/usr/local/bin"
 
 FROM ghcr.io/astral-sh/uv:${UV_TAG} AS uv_image

@@ -187,11 +187,19 @@ class License(CompleterAction):
         license_paths = importlib.import_module(
             "whiteprints.metadata",
         ).extract_fields("License-File")
+        licenses_directory = (os := importlib.import_module("os")).path.join(
+            importlib.import_module(
+                "whiteprints.metadata"
+            ).locate_dist_info_directory(),
+            "licenses",
+        )
 
         # package with a single license
         if not args or isinstance(args, str):
-            license_path = next(iter(license_paths))
-            with open(license_path, encoding="utf-8") as license_file:
+            with open(
+                os.path.join(licenses_directory, next(iter(license_paths))),
+                encoding="utf-8",
+            ) as license_file:
                 text = license_file.read()
 
             robust_print(text)
@@ -199,10 +207,15 @@ class License(CompleterAction):
 
         # package with multiple licenses
         requested_license = args[0]
-        os = importlib.import_module("os")
         for license_path in license_paths:
             if requested_license in os.path.basename(license_path):
-                with open(license_path, encoding="utf-8") as license_file:
+                with open(
+                    os.path.join(
+                        licenses_directory,
+                        license_path,
+                    ),
+                    encoding="utf-8",
+                ) as license_file:
                     text = license_file.read()
 
                 robust_print(text)

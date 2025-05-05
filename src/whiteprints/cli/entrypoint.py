@@ -42,7 +42,7 @@ def _create_namespace(
         entrypoint_parser := importlib.import_module(
             "whiteprints.cli.entrypoint_parser",
         ).create_entrypoint_parser(
-            importlib.import_module("whiteprints.metadata").distribution_name()
+            importlib.import_module("whiteprints.metadata").DISTRIBUTION_NAME
         )
     ).add_subparsers(
         title=_("Subcommands"),

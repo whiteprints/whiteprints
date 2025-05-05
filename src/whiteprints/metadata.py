@@ -33,26 +33,19 @@ from typing import Final, Literal
 
 
 __all__: Final = [
-    "distribution_name",
+    "DISTRIBUTION_NAME",
     "extract_field",
     "extract_fields",
+    "locate_dist_info_directory",
 ]
 
 
-def distribution_name() -> str:
-    """Return the hard-coded distribution name.
-
-    This is the identifier used to locate the package metadata.
-
-    Returns:
-        The name of the distribution, e.g. "whiteprints".
-    """
-    return "whiteprints"
+DISTRIBUTION_NAME: Final = "whiteprints"
+"""The normalized distribution name (no space, no underscores, lowercase)."""
 
 
 def _is_dist_info(
     path: str,
-    distribution_name: str,
 ) -> bool:
     """Check if a directory is a dist-info.
 
@@ -68,13 +61,13 @@ def _is_dist_info(
     )
     return (
         os.path.isdir(path)
-        and path_name.startswith(distribution_name)
+        and path_name.startswith(DISTRIBUTION_NAME)
         and path_name.endswith("dist-info")
     )
 
 
 @cache
-def _locate_dist_info_directory(distribution_name: str) -> str:
+def locate_dist_info_directory() -> str:
     """Locate the .dist-info directory for a given package.
 
     This function scans `sys.path` for a directory matching the normalized
@@ -93,7 +86,6 @@ def _locate_dist_info_directory(distribution_name: str) -> str:
         for candidate in os.listdir(site)
         if _is_dist_info(
             candidate_path := os.path.join(site, candidate),
-            distribution_name.replace("-", "_").lower(),
         )
     )
 
@@ -138,7 +130,7 @@ def extract_fields(
     """
     with open(
         importlib.import_module("os").path.join(
-            _locate_dist_info_directory(distribution_name()),
+            locate_dist_info_directory(),
             "METADATA",
         ),
         encoding="utf-8",
