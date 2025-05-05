@@ -49,7 +49,7 @@ dynamic = [
     "version",
 ]
 dependencies = [
-    "typing-extensions==4.13.2; python_full_version<'3.12.0'",
+    "typing-extensions==4.13.2; python_full_version<'3.13.0'",
     "uv==0.7.2",
 ]
 optional-dependencies.autocompletion = [
