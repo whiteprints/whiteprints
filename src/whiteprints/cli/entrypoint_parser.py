@@ -11,7 +11,6 @@ from argparse import (
     HelpFormatter,
     Namespace,
 )
-from functools import partial
 from types import ModuleType
 from typing import (
     Final,
@@ -103,7 +102,7 @@ def _initialize_parser(
             robust_print(value_error)
             sys.exit(importlib.import_module("os").EX_USAGE)
 
-        formatter_class = partial(
+        formatter_class = importlib.import_module("functools").partial(
             formatter_class,
             width=(
                 str(width)
