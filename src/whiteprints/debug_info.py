@@ -217,7 +217,7 @@ def gather_debug_info(*, site_packages: bool = True) -> DebugInfo:
             name=(
                 distribution_name := importlib.import_module(
                     "whiteprints.metadata"
-                ).distribution_name()
+                ).DISTRIBUTION_NAME
             ),
             version=(
                 root_distribution := importlib.import_module(
