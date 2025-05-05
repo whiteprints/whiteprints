@@ -1708,7 +1708,7 @@ wheels = [
 name = "whiteprints"
 source = { editable = "." }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
     { name = "uv" },
 ]
 
@@ -1839,7 +1839,7 @@ requires-dist = [
     { name = "rich-argparse-plus", marker = "extra == 'color'", specifier = "==0.3.1.4" },
     { name = "shellingham", marker = "extra == 'qol'", specifier = "==1.5.4" },
     { name = "shellingham", marker = "extra == 'shell-detection'", specifier = "==1.5.4" },
-    { name = "typing-extensions", marker = "python_full_version < '3.12'", specifier = "==4.13.2" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'", specifier = "==4.13.2" },
     { name = "uv", specifier = "==0.7.2" },
 ]
 provides-extras = ["autocompletion", "color", "debug", "environment", "qol", "shell-detection"]
