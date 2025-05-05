@@ -172,10 +172,10 @@ class License(CompleterAction):
         Example:
             >>> from whiteprints.metadata import extract_fields
             >>>
-            >>> license_files = extract_fields("License-File")
-            >>> License._print_license_text(license_files.pop().stem)
+            >>> license_file = next(iter(extract_fields("License-File")))
+            >>> License._print_license_text(license_file)
             ...
-            >>> License._print_license_text([license_files.pop().stem])
+            >>> License._print_license_text([license_file])
             ...
             >>> License._print_license_text(None)
             ...
@@ -190,7 +190,7 @@ class License(CompleterAction):
 
         # package with a single license
         if not args or isinstance(args, str):
-            license_path = license_paths.pop()
+            license_path = next(iter(license_paths))
             with open(license_path, encoding="utf-8") as license_file:
                 text = license_file.read()
 
@@ -199,8 +199,9 @@ class License(CompleterAction):
 
         # package with multiple licenses
         requested_license = args[0]
+        os = importlib.import_module("os")
         for license_path in license_paths:
-            if requested_license in license_path.stem:
+            if requested_license in os.path.basename(license_path):
                 with open(license_path, encoding="utf-8") as license_file:
                     text = license_file.read()
 

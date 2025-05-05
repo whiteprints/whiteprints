@@ -20,29 +20,29 @@ class LazyGettext:
 
     If no locale directory is given, no localization is performed.
 
+    This class provides a callable `_` object that behaves like a standard
+    gettext translation function but defers loading translation files
+    until the first actual call.
+
     Example:
         >>> _ = LazyGettext()
         >>> _("No localization is performed")
         No localization is performed
-
-    This class provides a callable `_` object that behaves like a standard
-    gettext translation function but defers loading translation files
-    until the first actual call.
     """
 
     def __init__(
         self,
         *,
-        enable: bool = True,
+        disable: bool = False,
         fallback: bool = True,
     ) -> None:
         """Initializes the LazyGettext instance.
 
         Args:
-            enable: enable localization.
+            disable: disable localization.
             fallback: use a fallback if translation is not found.
         """
-        self.locale_directory = __file__ if enable else None
+        self.disable = disable
         self.fallback = fallback
 
     @cached_property
@@ -51,8 +51,16 @@ class LazyGettext:
 
         Returns:
             The gettext translation function.
+
+        Example:
+            >>> _ = LazyGettext(disable=True)
+            >>> _("test")
+            test
+            >>> _ = LazyGettext(disable=False)
+            >>> _("test")
+            ...
         """
-        if self.locale_directory is None:
+        if self.disable:
             return lambda x: x
 
         return (
@@ -61,7 +69,7 @@ class LazyGettext:
                 __name__,
                 (
                     (os := importlib.import_module("os")).path.join(
-                        os.path.dirname(self.locale_directory), "locale"
+                        os.path.dirname(__file__), "locale"
                     )
                 ),
                 fallback=self.fallback,
