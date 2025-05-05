@@ -170,9 +170,9 @@ class License(CompleterAction):
             args: the license name to print.
 
         Example:
-            >>> from whiteprints.metadata import find_license_files
+            >>> from whiteprints.metadata import extract_fields
             >>>
-            >>> license_files = find_license_files()
+            >>> license_files = extract_fields("License-File")
             >>> License._print_license_text(license_files.pop().stem)
             ...
             >>> License._print_license_text([license_files.pop().stem])
@@ -186,7 +186,7 @@ class License(CompleterAction):
         """
         license_paths = importlib.import_module(
             "whiteprints.metadata",
-        ).find_license_files()
+        ).extract_fields("License-File")
 
         # package with a single license
         if not args or isinstance(args, str):

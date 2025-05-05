@@ -17,14 +17,14 @@ def test_setup_logging(tmp_path: Path) -> None:
     log_config_path = tmp_path / "logs.json"
 
     # File does not exists so a new configuration is created
-    setup_logging(log_config_path)
+    setup_logging(str(log_config_path))
     generated_config = log_config_path.read_text(encoding="utf-8")
     assert json.loads(generated_config), (
         "logging configuration is not a valid json"
     )
 
     # Reload the created configuration for coverage
-    setup_logging(log_config_path)
+    setup_logging(str(log_config_path))
     assert log_config_path.read_text() == generated_config, (
         "logging configuration should not be modified when reloaded"
     )

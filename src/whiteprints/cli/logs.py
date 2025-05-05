@@ -53,13 +53,13 @@ def user_log_config() -> str | None:
     if (platformdirs := import_extra("platformdirs")) is None:
         return None
 
-    return (
+    return importlib.import_module("os").path.join(
         platformdirs.user_config_dir(
             importlib.import_module(
                 "whiteprints.metadata",
             ).distribution_name()
-        )
-        / "logs.json"
+        ),
+        "logs.json",
     )
 
 
@@ -128,7 +128,10 @@ def setup_logging(log_config_path: str | None = None) -> None:
     else:
         os = importlib.import_module("os")
         if not os.path.isfile(log_config_path):
-            os.makedirs(os.dirname(log_config_path), exist_ok=True)
+            os.makedirs(
+                os.path.dirname(log_config_path) or os.getcwd(),
+                exist_ok=True,
+            )
             _generate_configuration(log_config_path)
 
         os.makedirs(user_log_dir(), exist_ok=True)

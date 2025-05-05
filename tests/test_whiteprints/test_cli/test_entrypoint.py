@@ -12,7 +12,7 @@ from pytest import CaptureFixture, MonkeyPatch
 
 from whiteprints.cli.entrypoint import entrypoint
 from whiteprints.cli.entrypoint_parser import Completion
-from whiteprints.package_metadata import find_version
+from whiteprints.metadata import extract_field
 
 
 def test_help(capsys: CaptureFixture[str]) -> None:
@@ -78,7 +78,7 @@ def test_version(capsys: CaptureFixture[str]) -> None:
     assert ext.value.code == os.EX_OK, "Unexpected exit code."
 
     captured = capsys.readouterr()
-    assert captured.out.rstrip() == find_version(), (
+    assert captured.out.rstrip() == extract_field("Version"), (
         "Printed version does not match library version"
     )
 

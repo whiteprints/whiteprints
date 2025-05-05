@@ -35,7 +35,7 @@ from typing import Final, Literal
 __all__: Final = [
     "distribution_name",
     "extract_field",
-    "find_license_files",
+    "extract_fields",
 ]
 
 
@@ -169,16 +169,3 @@ def extract_field(
         The field value as a string, or None if zero matches.
     """
     return next(iter(extract_fields(field)), None)
-
-
-@cache
-def find_license_files() -> set[str]:
-    """Find declared license files in the distribution metadata.
-
-    This searches the METADATA file for "License-File" fields and falls back
-    to globbing for LICENSE* files if none are declared.
-
-    Returns:
-        A set of paths to license files found.
-    """
-    return extract_fields("License-File")

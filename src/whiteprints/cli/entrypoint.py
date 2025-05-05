@@ -88,11 +88,7 @@ def _setup_logging(namespace: Namespace) -> None:
     """
     importlib.import_module(
         "whiteprints.cli.logs",
-    ).setup_logging(
-        importlib.import_module("pathib").Path(namespace.log_config)
-        if namespace.log_config
-        else None,
-    )
+    ).setup_logging(namespace.log_config or None)
     logger = importlib.import_module("logging").getLogger(__name__)
     logger.debug(
         "program start",

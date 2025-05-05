@@ -174,7 +174,7 @@ def _add_licensing_info(parser: ArgumentParser) -> None:
                 )[0]
                 for license_path in importlib.import_module(
                     "whiteprints.metadata",
-                ).find_license_files()
+                ).extract_fields("License-File")
             ]
         ),
         action=License,
