@@ -8,7 +8,6 @@
 
 import importlib
 from argparse import Namespace
-from pathlib import Path
 from types import ModuleType
 from typing import Final
 
@@ -90,7 +89,9 @@ def _setup_logging(namespace: Namespace) -> None:
     importlib.import_module(
         "whiteprints.cli.logs",
     ).setup_logging(
-        Path(namespace.log_config) if namespace.log_config else None,
+        importlib.import_module("pathib").Path(namespace.log_config)
+        if namespace.log_config
+        else None,
     )
     logger = importlib.import_module("logging").getLogger(__name__)
     logger.debug(

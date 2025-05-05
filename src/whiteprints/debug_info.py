@@ -32,7 +32,6 @@ import sys
 from functools import cache
 from importlib.metadata import Distribution
 from importlib.util import find_spec
-from pathlib import Path
 from typing import Final, TypedDict
 
 
@@ -117,7 +116,7 @@ def _find_origin(package_name: str | None) -> str | None:
     ):
         return None
 
-    return str(Path(spec.origin).parent)
+    return str(importlib.import_module("pathlib").Path(spec.origin).parent)
 
 
 @cache
@@ -197,7 +196,11 @@ def gather_debug_info(*, site_packages: bool = True) -> DebugInfo:
         platform=PlatformInfo(
             name=(platform := importlib.import_module("platform")).uname(),
             python=PythonInfo(
-                executable=str(Path(sys.executable)),
+                executable=str(
+                    (pathlib := importlib.import_module("pathlib")).Path(
+                        sys.executable
+                    )
+                ),
                 version=platform.python_version(),
                 implementation=platform.python_implementation(),
                 build=platform.python_build(),
@@ -206,7 +209,9 @@ def gather_debug_info(*, site_packages: bool = True) -> DebugInfo:
             environment=EnvironmentInfo(
                 VIRTUAL_ENV=os.environ.get("VIRTUAL_ENV"),
                 base_exec_prefix=sys.base_exec_prefix,
-                pythonpath=list(map(str, map(Path, sys.path))),
+                pythonpath=list(
+                    map(str, [pathlib.Path(path) for path in sys.path])
+                ),
             ),
         ),
         package=PackageInfo(

@@ -4,8 +4,8 @@
 
 """The 'init' subcommand."""
 
+import importlib
 from argparse import ArgumentParser
-from pathlib import Path
 from typing import Final, cast
 
 from whiteprints import _, import_extra
@@ -98,7 +98,7 @@ def setup_init_parser(parser: ArgumentParser) -> None:
         "CompleterAction",
         parser.add_argument(
             "project_directory",
-            default=str(Path.cwd()),
+            default=str(importlib.import_module("pathlib").Path.cwd()),
             nargs="?",
             help=_("Directory in which to initialize the Python project."),
             metavar="PROJECT_DIRECTORY",

@@ -7,7 +7,6 @@
 import importlib
 from collections.abc import Callable
 from functools import cache, cached_property
-from pathlib import Path
 from types import ModuleType
 from typing import Final
 
@@ -33,18 +32,17 @@ class LazyGettext:
 
     def __init__(
         self,
-        locale_directory: Path | None = None,
         *,
+        enable: bool = True,
         fallback: bool = True,
     ) -> None:
         """Initializes the LazyGettext instance.
 
         Args:
-            locale_directory: Path to the directory containing locale files.
-                Set to None to disable translation.
+            enable: enable localization.
             fallback: use a fallback if translation is not found.
         """
-        self.locale_directory = locale_directory
+        self.locale_directory = __file__ if enable else None
         self.fallback = fallback
 
     @cached_property
@@ -61,7 +59,11 @@ class LazyGettext:
             importlib.import_module("gettext")
             .translation(
                 __name__,
-                self.locale_directory,
+                (
+                    (os := importlib.import_module("os")).path.join(
+                        os.path.basename(self.locale_directory), "locale"
+                    )
+                ),
                 fallback=self.fallback,
             )
             .gettext
@@ -98,6 +100,7 @@ def has_extra(module_name: str) -> bool:
     return import_extra(module_name) is not None
 
 
+@cache
 def _setup_package(
     *,
     claw: ModuleType | None = None,
@@ -123,5 +126,5 @@ _setup_package(
     dotenv=import_extra("dotenv"),
 )
 
-_: Final = LazyGettext(Path(__file__).parent / "locale")
+_: Final = LazyGettext()
 """A Gettext translation."""

@@ -13,7 +13,6 @@ from argparse import (
     Namespace,
 )
 from functools import partial
-from pathlib import Path
 from types import ModuleType
 from typing import (
     Final,
@@ -335,7 +334,11 @@ def _resolve_license_flag(namespace: Namespace) -> None:
                         " individual source code file"
                         " for detailed licensing information."
                     ).format(),
-                    "source_code_location": str(Path(__file__).parent.parent),
+                    "source_code_location": str(
+                        importlib.import_module("pathlib")
+                        .Path(__file__)
+                        .parent.parent
+                    ),
                     "REUSE": "https://reuse.software/",
                 },
                 indent=None,
