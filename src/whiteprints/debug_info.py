@@ -27,11 +27,9 @@ legacy packaging). Hence we use the slower but more robust importlib.metadata
 """
 
 import importlib
-import os
 import sys
 from functools import cache
 from importlib.metadata import Distribution
-from importlib.util import find_spec
 from typing import Final, TypedDict
 
 
@@ -111,12 +109,17 @@ def _find_origin(package_name: str | None) -> str | None:
     """
     if (
         package_name is None
-        or (spec := find_spec(package_name)) is None
+        or (
+            spec := importlib.import_module("importlib.util").find_spec(
+                package_name
+            )
+        )
+        is None
         or spec.origin is None
     ):
         return None
 
-    return str(importlib.import_module("pathlib").Path(spec.origin).parent)
+    return str(importlib.import_module("os").path.dirname(spec.origin))
 
 
 @cache
@@ -196,22 +199,18 @@ def gather_debug_info(*, site_packages: bool = True) -> DebugInfo:
         platform=PlatformInfo(
             name=(platform := importlib.import_module("platform")).uname(),
             python=PythonInfo(
-                executable=str(
-                    (pathlib := importlib.import_module("pathlib")).Path(
-                        sys.executable
-                    )
-                ),
+                executable=sys.executable,
                 version=platform.python_version(),
                 implementation=platform.python_implementation(),
                 build=platform.python_build(),
                 compiler=platform.python_compiler(),
             ),
             environment=EnvironmentInfo(
-                VIRTUAL_ENV=os.environ.get("VIRTUAL_ENV"),
-                base_exec_prefix=sys.base_exec_prefix,
-                pythonpath=list(
-                    map(str, [pathlib.Path(path) for path in sys.path])
+                VIRTUAL_ENV=importlib.import_module("os").environ.get(
+                    "VIRTUAL_ENV"
                 ),
+                base_exec_prefix=sys.base_exec_prefix,
+                pythonpath=sys.path,
             ),
         ),
         package=PackageInfo(
