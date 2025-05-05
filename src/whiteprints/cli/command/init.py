@@ -5,7 +5,6 @@
 """Initialize a project."""
 
 import importlib
-import os
 import sys
 from argparse import Namespace
 from collections.abc import Iterable
@@ -237,4 +236,4 @@ def init(namespace: Namespace) -> None:
             "Exception caught while running Copier",
             stack_info=True,
         )
-        sys.exit(os.EX_SOFTWARE)
+        sys.exit(importlib.import_module("os").EX_SOFTWARE)

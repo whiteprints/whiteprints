@@ -61,7 +61,7 @@ class LazyGettext:
                 __name__,
                 (
                     (os := importlib.import_module("os")).path.join(
-                        os.path.basename(self.locale_directory), "locale"
+                        os.path.dirname(self.locale_directory), "locale"
                     )
                 ),
                 fallback=self.fallback,

@@ -98,7 +98,7 @@ def setup_init_parser(parser: ArgumentParser) -> None:
         "CompleterAction",
         parser.add_argument(
             "project_directory",
-            default=str(importlib.import_module("pathlib").Path.cwd()),
+            default=importlib.import_module("os").getcwd(),
             nargs="?",
             help=_("Directory in which to initialize the Python project."),
             metavar="PROJECT_DIRECTORY",

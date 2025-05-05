@@ -5,7 +5,6 @@
 """The entrypoint arguments parser."""
 
 import importlib
-import os
 import sys
 from argparse import (
     ArgumentParser,
@@ -52,7 +51,10 @@ class ArgumentParserExUsage(ArgumentParser):
             message: The error message.
         """
         self.print_usage(sys.stderr)
-        self.exit(os.EX_USAGE, _("{}: error: {}\n").format(self.prog, message))
+        self.exit(
+            importlib.import_module("os").EX_USAGE,
+            _("{}: error: {}\n").format(self.prog, message),
+        )
 
 
 def _nargs_completion_script() -> Literal["?", 1]:
@@ -99,14 +101,14 @@ def _initialize_parser(
             formatter_class.choose_theme(theme)
         except ValueError as value_error:
             robust_print(value_error)
-            sys.exit(os.EX_USAGE)
+            sys.exit(importlib.import_module("os").EX_USAGE)
 
         formatter_class = partial(
             formatter_class,
             width=(
                 str(width)
                 if (
-                    width := os.environ.get(
+                    width := importlib.import_module("os").environ.get(
                         f"{app_name_env_prefix}_HELP_WIDTH"
                     )
                 )
@@ -168,7 +170,9 @@ def _add_licensing_info(parser: ArgumentParser) -> None:
         "--license-text",
         nargs=_nargs_license_text(
             licenses := [
-                license_path.stem
+                (os := importlib.import_module("os")).path.splitext(
+                    os.path.basename(license_path)
+                )[0]
                 for license_path in importlib.import_module(
                     "whiteprints.metadata",
                 ).find_license_files()
@@ -227,16 +231,18 @@ def _add_configuration_parsers(
                 ).format(
                     ""
                     if (
-                        logs_conf_default := os.environ.get(
-                            logs_conf_env := (
-                                f"{app_name_env_prefix}_DEFAULT_LOGS_CONF"
-                            ),
-                            (
-                                importlib.import_module(
-                                    "whiteprints.cli.logs"
-                                ).user_log_config()
-                                or ""
-                            ),
+                        logs_conf_default := (
+                            importlib.import_module("os").environ.get(
+                                logs_conf_env := (
+                                    f"{app_name_env_prefix}_DEFAULT_LOGS_CONF"
+                                ),
+                                (
+                                    importlib.import_module(
+                                        "whiteprints.cli.logs"
+                                    ).user_log_config()
+                                    or ""
+                                ),
+                            )
                         )
                     )
                     else _(" or none"),
@@ -270,7 +276,9 @@ def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
     parser = _initialize_parser(
         prog,
         app_name_env_prefix := prog.upper(),
-        os.environ.get(theme_env := f"{app_name_env_prefix}_THEME", "default"),
+        importlib.import_module("os").environ.get(
+            theme_env := f"{app_name_env_prefix}_THEME", "default"
+        ),
         (
             _(
                 "You may change the CLI color theme with the environment"
@@ -308,7 +316,7 @@ def _resolve_platform_flag(namespace: Namespace) -> None:
             ).gather_debug_info(site_packages=(namespace.platform > 1)),
             indent=None,
         )
-        sys.exit(os.EX_OK)
+        sys.exit(importlib.import_module("os").EX_OK)
 
 
 def _resolve_license_flag(namespace: Namespace) -> None:
@@ -335,16 +343,16 @@ def _resolve_license_flag(namespace: Namespace) -> None:
                         " for detailed licensing information."
                     ).format(),
                     "source_code_location": str(
-                        importlib.import_module("pathlib")
-                        .Path(__file__)
-                        .parent.parent
+                        (os := importlib.import_module("os")).path.dirname(
+                            os.path.dirname(__file__)
+                        )
                     ),
                     "REUSE": "https://reuse.software/",
                 },
                 indent=None,
             )
 
-        sys.exit(os.EX_OK)
+        sys.exit(importlib.import_module("os").EX_OK)
 
 
 def _resolve_help_action(
@@ -358,7 +366,7 @@ def _resolve_help_action(
     """
     if namespace.cmd is None:
         argument_parser.print_help()
-        sys.exit(os.EX_OK)
+        sys.exit(importlib.import_module("os").EX_OK)
 
 
 def resolve_flags(

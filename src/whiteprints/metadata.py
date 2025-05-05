@@ -27,9 +27,8 @@ This module prioritizes startup time and metadata locality over generality or
 fallback mechanisms.
 """
 
-import site
+import importlib
 from functools import cache
-from pathlib import Path
 from typing import Final, Literal
 
 
@@ -52,7 +51,7 @@ def distribution_name() -> str:
 
 
 def _is_dist_info(
-    path: Path,
+    path: str,
     distribution_name: str,
 ) -> bool:
     """Check if a directory is a dist-info.
@@ -64,16 +63,18 @@ def _is_dist_info(
     Returns:
         True if the given path is a dist-info, False otherwise.
     """
-    path_name = path.name.lower()
+    path_name = (
+        (os := importlib.import_module("os")).path.basename(path).lower()
+    )
     return (
-        path.is_dir()
+        os.path.isdir(path)
         and path_name.startswith(distribution_name)
         and path_name.endswith("dist-info")
     )
 
 
 @cache
-def _locate_dist_info_directory(distribution_name: str) -> Path | None:
+def _locate_dist_info_directory(distribution_name: str) -> str | None:
     """Locate the .dist-info directory for a given package.
 
     This function scans `sys.path` for a directory matching the normalized
@@ -85,13 +86,15 @@ def _locate_dist_info_directory(distribution_name: str) -> Path | None:
     Returns:
         The path to the .dist-info directory if found, otherwise None.
     """
+    os = importlib.import_module("os")
     return next(
         (
-            candidate
-            for site in map(Path, site.getsitepackages())
-            for candidate in site.iterdir()
+            candidate_path
+            for site in importlib.import_module("site").getsitepackages()
+            for candidate in os.listdir(site)
             if _is_dist_info(
-                candidate, distribution_name.replace("-", "_").lower()
+                candidate_path := os.path.join(site, candidate),
+                distribution_name.replace("-", "_").lower(),
             )
         ),
         None,
@@ -139,7 +142,16 @@ def extract_fields(
     if not (dist_dir := _locate_dist_info_directory(distribution_name())):
         return set()
 
-    return _extract_metadata_fields((dist_dir / "METADATA").read_text(), field)
+    with open(
+        importlib.import_module("os").path.join(dist_dir, "METADATA"),
+        encoding="utf-8",
+    ) as metadata_file:
+        text = metadata_file.read()
+
+    return _extract_metadata_fields(
+        text,
+        field,
+    )
 
 
 @cache
@@ -160,7 +172,7 @@ def extract_field(
 
 
 @cache
-def find_license_files() -> set[Path]:
+def find_license_files() -> set[str]:
     """Find declared license files in the distribution metadata.
 
     This searches the METADATA file for "License-File" fields and falls back
@@ -169,4 +181,4 @@ def find_license_files() -> set[Path]:
     Returns:
         A set of paths to license files found.
     """
-    return {Path(file) for file in extract_fields("License-File")}
+    return extract_fields("License-File")

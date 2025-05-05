@@ -5,7 +5,6 @@
 """Defines CLI actions."""
 
 import importlib
-import os
 import sys
 from argparse import (
     Action,
@@ -106,7 +105,7 @@ class Completion(CompleterAction):
             )
             .strip()
         )
-        sys.exit(os.EX_OK)
+        sys.exit(importlib.import_module("os").EX_OK)
 
 
 class Copyright(CompleterAction):
@@ -132,7 +131,7 @@ class Copyright(CompleterAction):
                 " <whiteprints@pm.me>."
             )
         )
-        sys.exit(os.EX_OK)
+        sys.exit(importlib.import_module("os").EX_OK)
 
 
 class Version(CompleterAction):
@@ -157,7 +156,7 @@ class Version(CompleterAction):
                 "whiteprints.metadata",
             ).extract_field("Version")
         )
-        sys.exit(os.EX_OK)
+        sys.exit(importlib.import_module("os").EX_OK)
 
 
 class License(CompleterAction):
@@ -185,20 +184,27 @@ class License(CompleterAction):
             >>> License._print_license_text([""])
             ...
         """
-        license_files = importlib.import_module(
+        license_paths = importlib.import_module(
             "whiteprints.metadata",
         ).find_license_files()
 
         # package with a single license
         if not args or isinstance(args, str):
-            robust_print(license_files.pop().read_text(encoding="utf-8"))
+            license_path = license_paths.pop()
+            with open(license_path, encoding="utf-8") as license_file:
+                text = license_file.read()
+
+            robust_print(text)
             return
 
         # package with multiple licenses
         requested_license = args[0]
-        for license_path in license_files:
+        for license_path in license_paths:
             if requested_license in license_path.stem:
-                robust_print(license_path.read_text(encoding="utf-8"))
+                with open(license_path, encoding="utf-8") as license_file:
+                    text = license_file.read()
+
+                robust_print(text)
                 return
 
     @override
@@ -224,4 +230,4 @@ class License(CompleterAction):
             args: the arguments passed to the parser
         """
         self._print_license_text(args[0])
-        sys.exit(os.EX_OK)
+        sys.exit(importlib.import_module("os").EX_OK)
