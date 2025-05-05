@@ -21,7 +21,7 @@ The collected data includes:
 This is useful for debugging issues related to dependency resolution,
 environment configuration across different systems.
 
-Note: we cannot do the .dist-info hypothesis as in package_metadata.py since we
+Note: we cannot do the .dist-info hypothesis as in metadata.py since we
 do not know how the dependencies were installed (they could use deprecated or
 legacy packaging). Hence we use the slower but more robust importlib.metadata
 """
@@ -187,19 +187,9 @@ def gather_debug_info(*, site_packages: bool = True) -> DebugInfo:
     Returns:
         DebugInfo: useful debugging information.
     """
-    logs = importlib.import_module(
-        "whiteprints.cli.logs",
-    )
-    log_config = logs.user_log_config()
-    platform = importlib.import_module("platform")
-
-    distribution_name = importlib.import_module(
-        "whiteprints.package_metadata"
-    ).distribution_name()
-
     return DebugInfo(
         platform=PlatformInfo(
-            name=platform.uname(),
+            name=(platform := importlib.import_module("platform")).uname(),
             python=PythonInfo(
                 executable=str(Path(sys.executable)),
                 version=platform.python_version(),
@@ -214,7 +204,11 @@ def gather_debug_info(*, site_packages: bool = True) -> DebugInfo:
             ),
         ),
         package=PackageInfo(
-            name=distribution_name,
+            name=(
+                distribution_name := importlib.import_module(
+                    "whiteprints.metadata"
+                ).distribution_name()
+            ),
             version=(
                 root_distribution := importlib.import_module(
                     "importlib.metadata"
@@ -228,9 +222,17 @@ def gather_debug_info(*, site_packages: bool = True) -> DebugInfo:
             _list_site_packages(root_distribution) if site_packages else None
         ),
         logs=LogsInfo(
-            USER_LOG_DIR=str(logs.user_log_dir()),
+            USER_LOG_DIR=str(
+                (
+                    logs := importlib.import_module(
+                        "whiteprints.cli.logs",
+                    )
+                ).user_log_dir()
+            ),
             default_configuration=(
-                None if log_config is None else str(log_config)
+                None
+                if (log_config := logs.user_log_config()) is None
+                else str(log_config)
             ),
         ),
     )

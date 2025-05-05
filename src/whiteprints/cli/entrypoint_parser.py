@@ -171,7 +171,7 @@ def _add_licensing_info(parser: ArgumentParser) -> None:
             licenses := [
                 license_path.stem
                 for license_path in importlib.import_module(
-                    "whiteprints.package_metadata",
+                    "whiteprints.metadata",
                 ).find_license_files()
             ]
         ),
@@ -320,7 +320,7 @@ def _resolve_license_flag(namespace: Namespace) -> None:
     """
     if isinstance(namespace.license, int):
         license_expression = importlib.import_module(
-            "whiteprints.package_metadata",
+            "whiteprints.metadata",
         ).extract_field("License-Expression")
         if namespace.license == 1:
             robust_print(license_expression)

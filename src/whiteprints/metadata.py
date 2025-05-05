@@ -35,7 +35,6 @@ from typing import Final, Literal
 
 __all__: Final = [
     "distribution_name",
-    "entry_point_name",
     "extract_field",
     "find_license_files",
 ]
@@ -65,7 +64,12 @@ def _is_dist_info(
     Returns:
         True if the given path is a dist-info, False otherwise.
     """
-    return path.is_dir() and path.name.lower().startswith(distribution_name)
+    path_name = path.name.lower()
+    return (
+        path.is_dir()
+        and path_name.startswith(distribution_name)
+        and path_name.endswith("dist-info")
+    )
 
 
 @cache
@@ -85,7 +89,7 @@ def _locate_dist_info_directory(distribution_name: str) -> Path | None:
         (
             candidate
             for site in map(Path, site.getsitepackages())
-            for candidate in site.glob("*.dist-info")
+            for candidate in site.iterdir()
             if _is_dist_info(
                 candidate, distribution_name.replace("-", "_").lower()
             )
@@ -166,104 +170,3 @@ def find_license_files() -> set[Path]:
         A set of paths to license files found.
     """
     return {Path(file) for file in extract_fields("License-File")}
-
-
-def _read_entry_points(dist_dir: Path) -> list[str]:
-    """Read the entry_points.txt file lines.
-
-    Args:
-        dist_dir: Path to the .dist-info directory.
-
-    Returns:
-        A list of lines from entry_points.txt or an empty list if missing.
-    """
-    entry_file = dist_dir / "entry_points.txt"
-    if entry_file.is_file():
-        return entry_file.read_text().splitlines()
-
-    return []
-
-
-def _find_section_start_index(
-    lines: list[str],
-) -> int | None:
-    """Find the line index of the [console_scripts] section.
-
-    Args:
-        lines: Lines from entry_points.txt.
-
-    Returns:
-        The section start index
-    """
-    return next(
-        (
-            i + 1
-            for i, line in enumerate(lines)
-            if line.strip() == "[console_scripts]"
-        ),
-        None,
-    )
-
-
-def _extract_console_scripts_section(lines: list[str]) -> set[str]:
-    """Extract only the [console_scripts] section.
-
-    This slices the entry points data after the section header, stopping
-    at the start of a new section or EOF.
-
-    Args:
-        lines: Lines from entry_points.txt.
-
-    Returns:
-        A list of lines belonging to [console_scripts].
-    """
-    if (section_start := _find_section_start_index(lines)) is None:
-        return set()
-
-    return {
-        line
-        for line in lines[section_start:]
-        if not line.strip().startswith("[")  # Stop at new section
-    }
-
-
-def _match_entry_point(lines: set[str], target: str) -> str | None:
-    """Match a module:function target against entry point declarations.
-
-    Args:
-        lines: Lines from the [console_scripts] section.
-        target: The string 'module:function' to match.
-
-    Returns:
-        The entry point name if found, otherwise None.
-    """
-    for line in lines:
-        if "=" in line:
-            name_part, value_part = map(str.strip, line.split("=", 1))
-            if value_part == target:
-                return name_part
-
-    return None
-
-
-@cache
-def entry_point_name(module_name: str, entrypoint_function: str) -> str | None:
-    """Get the name of the console script for a given module:function.
-
-    This scans the [console_scripts] section of entry_points.txt.
-
-    Args:
-        module_name: The Python module defining the entry point.
-        entrypoint_function: The function used as the entry point.
-
-    Returns:
-        The name of the script entry point if found, otherwise None.
-    """
-    if (dist_dir := _locate_dist_info_directory(distribution_name())) is None:
-        return None
-
-    lines = _read_entry_points(dist_dir)
-    console_scripts = _extract_console_scripts_section(lines)
-    return _match_entry_point(
-        console_scripts, f"{module_name}:{entrypoint_function}"
-    )

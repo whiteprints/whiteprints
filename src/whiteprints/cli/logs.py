@@ -34,8 +34,8 @@ def user_log_dir() -> Path:
 
     return platformdirs.user_log_path(
         importlib.import_module(
-            "whiteprints.cli.entrypoint",
-        ).prog_name()
+            "whiteprints.metadata",
+        ).distribution_name()
     )
 
 
@@ -57,8 +57,8 @@ def user_log_config() -> Path | None:
     return (
         platformdirs.user_config_path(
             importlib.import_module(
-                "whiteprints.cli.entrypoint",
-            ).prog_name()
+                "whiteprints.metadata",
+            ).distribution_name()
         )
         / "logs.json"
     )

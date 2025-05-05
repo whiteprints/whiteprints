@@ -107,10 +107,15 @@ def setup_init_parser(parser: ArgumentParser) -> None:
     if (argcomplete := import_extra("argcomplete")) is not None:
         project_directory_arg.completer = argcomplete.DirectoriesCompleter()
 
-    project_directory_arg = parser.add_argument(
-        "copier_args",
-        default=[],
-        nargs="*",
-        help=_("Additional arguments forwarded to each Copier invocations."),
-        metavar="COPIER_ARGS",
+    project_directory_arg = cast(
+        "CompleterAction",
+        parser.add_argument(
+            "copier_args",
+            default=[],
+            nargs="*",
+            help=_(
+                "Additional arguments forwarded to each Copier invocations."
+            ),
+            metavar="COPIER_ARGS",
+        ),
     )

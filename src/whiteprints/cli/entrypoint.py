@@ -7,9 +7,7 @@
 """Command Line Interface app entrypoint."""
 
 import importlib
-import sys
 from argparse import Namespace
-from functools import cache
 from pathlib import Path
 from types import ModuleType
 from typing import Final
@@ -17,7 +15,7 @@ from typing import Final
 from whiteprints import _, import_extra
 
 
-__all__: Final = ["entrypoint", "prog_name"]
+__all__: Final = ["entrypoint"]
 """Public module attributes."""
 
 
@@ -26,23 +24,6 @@ __all__: Final = ["entrypoint", "prog_name"]
     _.locale_directory,
 )
 _gettext.textdomain("argparse")
-
-
-@cache
-def prog_name() -> str:
-    """Determine the program name from the entrypoint metadata.
-
-    Returns:
-        The program name.
-    """
-    if (
-        entrypoint_name := importlib.import_module(
-            "whiteprints.package_metadata"
-        ).entry_point_name(__name__, "entrypoint")
-    ) is None:
-        return Path(sys.argv[0]).stem
-
-    return entrypoint_name
 
 
 def _create_namespace(
@@ -61,7 +42,9 @@ def _create_namespace(
     subparsers = (
         entrypoint_parser := importlib.import_module(
             "whiteprints.cli.entrypoint_parser",
-        ).create_entrypoint_parser(prog_name())
+        ).create_entrypoint_parser(
+            importlib.import_module("whiteprints.metadata").distribution_name()
+        )
     ).add_subparsers(
         title=_("Subcommands"),
         dest="cmd",

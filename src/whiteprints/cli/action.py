@@ -154,7 +154,7 @@ class Version(CompleterAction):
         """
         robust_print(
             importlib.import_module(
-                "whiteprints.package_metadata",
+                "whiteprints.metadata",
             ).extract_field("Version")
         )
         sys.exit(os.EX_OK)
@@ -171,7 +171,7 @@ class License(CompleterAction):
             args: the license name to print.
 
         Example:
-            >>> from whiteprints.package_metadata import find_license_files
+            >>> from whiteprints.metadata import find_license_files
             >>>
             >>> license_files = find_license_files()
             >>> License._print_license_text(license_files.pop().stem)
@@ -186,11 +186,11 @@ class License(CompleterAction):
             ...
         """
         license_files = importlib.import_module(
-            "whiteprints.package_metadata",
+            "whiteprints.metadata",
         ).find_license_files()
 
         # package with a single license
-        if args is None or isinstance(args, str):
+        if not args or isinstance(args, str):
             robust_print(license_files.pop().read_text(encoding="utf-8"))
             return
 

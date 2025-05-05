@@ -79,10 +79,10 @@ def import_extra(module_name: str) -> ModuleType | None:
     Returns:
         None if the module is not found, otherwise returns the module.
     """
-    with importlib.import_module("contextlib").suppress(ModuleNotFoundError):
+    try:
         return importlib.import_module(module_name)
-
-    return None
+    except ModuleNotFoundError:
+        return None
 
 
 def has_extra(module_name: str) -> bool:

@@ -17,12 +17,6 @@ from whiteprints.cli import robust_print
 from whiteprints.libuv.copier import Copier
 
 
-if sys.version_info >= (3, 11):
-    from typing import Required
-else:
-    from typing_extensions import Required
-
-
 __all__: Final = ["init"]
 
 
@@ -42,21 +36,14 @@ class InitKwargs(TypedDict):
     github_all: bool
 
 
-class _FeatureRepository(TypedDict):
-    """Feature dictionnary interface."""
-
-    pypi: Required[str]
-    codecov: Required[str]
-    readthedocs: Required[str]
-    protect_repository: Required[str]
-
-
-FEATURE_REPOSITORY = _FeatureRepository(
-    pypi="gh:whiteprints/template-github-publish-pypi.git",
-    codecov="gh:whiteprints/template-github-codecov.git",
-    readthedocs="gh:whiteprints/template-github-readthedocs.git",
-    protect_repository="gh:whiteprints/template-github-protect-repository.git",
-)
+FEATURE_REPOSITORY: Final = {
+    "pypi": "gh:whiteprints/template-github-publish-pypi.git",
+    "codecov": "gh:whiteprints/template-github-codecov.git",
+    "readthedocs": "gh:whiteprints/template-github-readthedocs.git",
+    "protect_repository": (
+        "gh:whiteprints/template-github-protect-repository.git"
+    ),
+}
 """A mapping from a feature name to its template repository."""
 
 
@@ -70,7 +57,7 @@ def _should_add(feature: str, cli_kwargs: InitKwargs) -> bool:
     Returns:
         True if the feature should be added, False otherwise.
     """
-    return cli_kwargs.get(feature, False) or cli_kwargs["github_all"]
+    return bool(cli_kwargs.get(feature, cli_kwargs["github_all"]))
 
 
 def add_github_functionalities(
@@ -92,10 +79,7 @@ def add_github_functionalities(
         if _should_add(feature, cli_kwargs=init_kwargs):  # pragma: no cover
             copier.copy(
                 [
-                    # There seems to be a bug in pyright as of 2024/10/19
-                    # repository is guaranteed to be a string, as shown
-                    # in the TypedDict _FeatureRepository...
-                    repository,  # type: ignore[reportPropertyTypeMismatch]
+                    repository,
                     project_directory,
                     *copier_args,
                 ],
