@@ -47,7 +47,6 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "nuitka>=2.7",
     "typing-extensions==4.13.2; python_full_version<'3.12.0'",
     "uv==0.7.1",
 ]
