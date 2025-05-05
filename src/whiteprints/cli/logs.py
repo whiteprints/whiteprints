@@ -6,7 +6,6 @@
 
 import importlib
 from functools import cache
-from pathlib import Path
 from typing import Final
 
 from whiteprints import import_extra
@@ -16,7 +15,7 @@ __all__: Final = ["setup_logging", "user_log_config", "user_log_dir"]
 
 
 @cache
-def user_log_dir() -> Path:
+def user_log_dir() -> str:
     """The default user log directory Path.
 
     The default path is given by `platformdirs.user_log_path`.
@@ -24,15 +23,15 @@ def user_log_dir() -> Path:
 
     Example:
         >>> user_log_dir()
-        PosixPath(...)
+        ...
 
     Returns:
         The path to the log directory.
     """
     if (platformdirs := import_extra("platformdirs")) is None:
-        return Path.cwd()
+        return importlib.import_module("os").getcwd()
 
-    return platformdirs.user_log_path(
+    return platformdirs.user_log_dir(
         importlib.import_module(
             "whiteprints.metadata",
         ).distribution_name()
@@ -40,7 +39,7 @@ def user_log_dir() -> Path:
 
 
 @cache
-def user_log_config() -> Path | None:
+def user_log_config() -> str | None:
     """The default user logging configuration file Path.
 
     If platformdirs is not installed, returns None.
@@ -55,7 +54,7 @@ def user_log_config() -> Path | None:
         return None
 
     return (
-        platformdirs.user_config_path(
+        platformdirs.user_config_dir(
             importlib.import_module(
                 "whiteprints.metadata",
             ).distribution_name()
@@ -64,7 +63,7 @@ def user_log_config() -> Path | None:
     )
 
 
-def _generate_configuration(log_config_path: Path) -> None:
+def _generate_configuration(log_config_path: str) -> None:
     """Generate a default logging configuration file.
 
     The special keyword $USER_LOG_DIR will be replaced by the path returned by
@@ -73,7 +72,7 @@ def _generate_configuration(log_config_path: Path) -> None:
     Args:
         log_config_path: path to the logging configuration file.
     """
-    with log_config_path.open("w", encoding="utf-8") as user_log_config_fh:
+    with open(log_config_path, "w", encoding="utf-8") as user_log_config_fh:
         default_logs_config = {
             "version": 1,
             "disable_existing_loggers": True,
@@ -113,7 +112,7 @@ def _generate_configuration(log_config_path: Path) -> None:
         )
 
 
-def setup_logging(log_config_path: Path | None = None) -> None:
+def setup_logging(log_config_path: str | None = None) -> None:
     """Setup logging.
 
     It loads the configuration file specified in the arguments. If the file
@@ -127,12 +126,15 @@ def setup_logging(log_config_path: Path | None = None) -> None:
     if log_config_path is None:
         logging.basicConfig(level=logging.CRITICAL)
     else:
-        if not log_config_path.is_file():
-            log_config_path.parent.mkdir(parents=True, exist_ok=True)
+        os = importlib.import_module("os")
+        if not os.path.isfile(log_config_path):
+            os.makedirs(os.dirname(log_config_path), exist_ok=True)
             _generate_configuration(log_config_path)
 
-        user_log_dir().mkdir(parents=True, exist_ok=True)
-        raw_config = log_config_path.read_text(encoding="utf-8")
+        os.makedirs(user_log_dir(), exist_ok=True)
+        with open(log_config_path, encoding="utf-8") as log_config_file:
+            raw_config = log_config_file.read()
+
         importlib.import_module("logging.config").dictConfig(
             config=importlib.import_module("json").loads(
                 importlib.import_module("string")

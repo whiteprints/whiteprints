@@ -10,7 +10,6 @@ We use Python subprocesses.
 import importlib
 from collections.abc import Iterable
 from functools import cached_property
-from pathlib import Path
 from typing import Final
 
 
@@ -21,17 +20,17 @@ class UVX:
     """Manage the uv program."""
 
     @cached_property
-    def bin(self) -> Path:
+    def bin(self) -> str:
         """The uv binary path.
 
         Example:
             >>> UVX().bin
-            PosixPath(...)
+            ...
 
         Returns:
             a path to the uv binary.
         """
-        return Path(importlib.import_module("uv").find_uv_bin())
+        return importlib.import_module("uv").find_uv_bin()
 
     def run(self, command: Iterable[str]) -> None:
         """Run `uv tool run`.

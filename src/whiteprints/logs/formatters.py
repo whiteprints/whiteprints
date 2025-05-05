@@ -8,7 +8,6 @@ import json
 import sys
 import traceback
 from logging import Formatter, LogRecord
-from pathlib import Path
 from typing import (
     Any,
     ClassVar,
@@ -153,7 +152,7 @@ class JSONFormatter(Formatter):
                         "function": record.funcName,
                     },
                     "physical": {
-                        "path": str(Path(record.pathname)),
+                        "path": record.pathname,
                         "line": record.lineno,
                     },
                 },
