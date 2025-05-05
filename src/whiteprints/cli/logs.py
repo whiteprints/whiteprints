@@ -34,7 +34,7 @@ def user_log_dir() -> str:
     return platformdirs.user_log_dir(
         importlib.import_module(
             "whiteprints.metadata",
-        ).distribution_name()
+        ).DISTRIBUTION_NAME
     )
 
 
@@ -57,7 +57,7 @@ def user_log_config() -> str | None:
         platformdirs.user_config_dir(
             importlib.import_module(
                 "whiteprints.metadata",
-            ).distribution_name()
+            ).DISTRIBUTION_NAME
         ),
         "logs.json",
     )
