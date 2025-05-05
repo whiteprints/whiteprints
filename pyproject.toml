@@ -13,7 +13,6 @@ requires = [
 [project]
 name = "whiteprints"
 description = "A Copier-based cookiecutter for creating Python projects managed by uv."
-readme = "README.md"
 keywords = [
     "Python",
 ]
