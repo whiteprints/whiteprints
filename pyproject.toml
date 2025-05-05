@@ -12,7 +12,6 @@ requires = [
 
 [project]
 name = "whiteprints"
-version = "0.0.0"
 description = "A Copier-based cookiecutter for creating Python projects managed by uv."
 readme = "README.md"
 keywords = [
@@ -45,6 +44,10 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
     "Typing :: Typed",
+]
+dynamic = [
+    "readme",
+    "version",
 ]
 dependencies = [
     "typing-extensions==4.13.2; python_full_version<'3.12.0'",
