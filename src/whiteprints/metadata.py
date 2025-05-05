@@ -74,7 +74,7 @@ def _is_dist_info(
 
 
 @cache
-def _locate_dist_info_directory(distribution_name: str) -> str | None:
+def _locate_dist_info_directory(distribution_name: str) -> str:
     """Locate the .dist-info directory for a given package.
 
     This function scans `sys.path` for a directory matching the normalized
@@ -88,16 +88,13 @@ def _locate_dist_info_directory(distribution_name: str) -> str | None:
     """
     os = importlib.import_module("os")
     return next(
-        (
-            candidate_path
-            for site in importlib.import_module("site").getsitepackages()
-            for candidate in os.listdir(site)
-            if _is_dist_info(
-                candidate_path := os.path.join(site, candidate),
-                distribution_name.replace("-", "_").lower(),
-            )
-        ),
-        None,
+        candidate_path
+        for site in importlib.import_module("site").getsitepackages()
+        for candidate in os.listdir(site)
+        if _is_dist_info(
+            candidate_path := os.path.join(site, candidate),
+            distribution_name.replace("-", "_").lower(),
+        )
     )
 
 
@@ -139,11 +136,11 @@ def extract_fields(
     Returns:
         A list of values found in the METADATA file.
     """
-    if not (dist_dir := _locate_dist_info_directory(distribution_name())):
-        return set()
-
     with open(
-        importlib.import_module("os").path.join(dist_dir, "METADATA"),
+        importlib.import_module("os").path.join(
+            _locate_dist_info_directory(distribution_name()),
+            "METADATA",
+        ),
         encoding="utf-8",
     ) as metadata_file:
         text = metadata_file.read()
