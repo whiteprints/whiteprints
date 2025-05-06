@@ -32,20 +32,21 @@ class UVX:
         """
         return importlib.import_module("uv").find_uv_bin()
 
-    def run(self, command: Iterable[str]) -> None:
+    def run(self, command: Iterable[str], *, debug: bool = False) -> None:
         """Run `uv tool run`.
 
         Note:
             `uv tool run` is equivalent to `uvx`
 
+        Args:
+            command: The `uv tool run` command to execute.
+            debug: run in debug mode. If debug is false, stderr is suppressed.
+
         Example:
             >>> UVX().run(["uv", "--help"])
             ...
-
-        Args:
-            command: The `uv tool run` command to execute.
         """
-        importlib.import_module("subprocess").run(  # nosec
+        (subprocess := importlib.import_module("subprocess")).run(  # nosec
             [
                 self.bin,
                 "tool",
@@ -55,6 +56,7 @@ class UVX:
                 "--no-progress",
                 *command,
             ],
+            stderr=None if debug else subprocess.DEVNULL,
             shell=False,
             check=True,
         )
