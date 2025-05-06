@@ -9,7 +9,7 @@ import sys
 from argparse import Namespace
 from collections.abc import Iterable
 from subprocess import CalledProcessError  # nosec
-from typing import Final, TypedDict
+from typing import Final, Literal, TypedDict, get_args
 
 from whiteprints import _, has_extra
 from whiteprints.cli import robust_print
@@ -22,8 +22,25 @@ __all__: Final = ["init"]
 WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.6.0"
 """The whiteprints-template-context version pin."""
 
+_Feature = Literal["pypi", "codecov", "readthedocs", "protect_repository"]
+"""Feature list."""
 
-class InitKwargs(TypedDict):
+_FEATURE_REPOSITORY: Final[dict[_Feature, str]] = dict(
+    zip(
+        get_args(_Feature),
+        (
+            "gh:whiteprints/template-github-publish-pypi.git",
+            "gh:whiteprints/template-github-codecov.git",
+            "gh:whiteprints/template-github-readthedocs.git",
+            "gh:whiteprints/template-github-protect-repository.git",
+        ),
+        strict=False,
+    )
+)
+"""A mapping from a feature name to its template repository."""
+
+
+class _InitKwargs(TypedDict):
     """The 'init' command line arguments."""
 
     command_line: bool
@@ -35,18 +52,7 @@ class InitKwargs(TypedDict):
     github_all: bool
 
 
-FEATURE_REPOSITORY: Final = {
-    "pypi": "gh:whiteprints/template-github-publish-pypi.git",
-    "codecov": "gh:whiteprints/template-github-codecov.git",
-    "readthedocs": "gh:whiteprints/template-github-readthedocs.git",
-    "protect_repository": (
-        "gh:whiteprints/template-github-protect-repository.git"
-    ),
-}
-"""A mapping from a feature name to its template repository."""
-
-
-def _should_add(feature: str, cli_kwargs: InitKwargs) -> bool:
+def _should_add(feature: _Feature, cli_kwargs: _InitKwargs) -> bool:
     """Whether a GitHub feature should be added.
 
     Args:
@@ -56,7 +62,7 @@ def _should_add(feature: str, cli_kwargs: InitKwargs) -> bool:
     Returns:
         True if the feature should be added, False otherwise.
     """
-    return bool(cli_kwargs.get(feature, cli_kwargs["github_all"]))
+    return cli_kwargs.get(feature, cli_kwargs["github_all"])
 
 
 def add_github_functionalities(
@@ -64,7 +70,7 @@ def add_github_functionalities(
     *,
     copier_args: Iterable[str],
     project_directory: str,
-    init_kwargs: InitKwargs,
+    init_kwargs: _InitKwargs,
 ) -> None:
     """Update the project to add GitHub functionalities.
 
@@ -74,7 +80,7 @@ def add_github_functionalities(
         project_directory: directory where the new project will be created.
         init_kwargs: the command line flags.
     """
-    for feature, repository in FEATURE_REPOSITORY.items():
+    for feature, repository in _FEATURE_REPOSITORY.items():
         if _should_add(feature, cli_kwargs=init_kwargs):  # pragma: no cover
             copier.copy(
                 [
@@ -90,7 +96,7 @@ def add_github_functionalities(
             )
 
 
-def _require_github(init_kwargs: InitKwargs) -> bool:
+def _require_github(init_kwargs: _InitKwargs) -> bool:
     """Check if the project requires a GitHub configuration.
 
     Args:
@@ -112,7 +118,7 @@ def add_github(
     *,
     copier_args: Iterable[str],
     project_directory: str,
-    init_kwargs: InitKwargs,
+    init_kwargs: _InitKwargs,
 ) -> None:
     """Update the project to add GitHub functionalities.
 
@@ -153,7 +159,7 @@ def create_project(
     *,
     copier_args: Iterable[str],
     project_directory: str,
-    init_kwargs: InitKwargs,
+    init_kwargs: _InitKwargs,
 ) -> None:
     """Initialize a python project.
 
