@@ -106,7 +106,7 @@ def _should_add(feature: _Feature, cli_kwargs: _InitKwargs) -> bool:
     return cli_kwargs.get("github_all") or cli_kwargs[feature]
 
 
-def add_github_functionalities(
+def _add_github_functionalities(
     copier: Copier,
     *,
     copier_args: Iterable[str],
@@ -154,7 +154,7 @@ def _require_github(init_kwargs: _InitKwargs) -> bool:
     )
 
 
-def add_github(
+def _add_github(
     copier: Copier,
     *,
     copier_args: Iterable[str],
@@ -187,7 +187,7 @@ def add_github(
             trust=True,
         )
 
-    add_github_functionalities(
+    _add_github_functionalities(
         copier,
         copier_args=copier_args,
         project_directory=project_directory,
@@ -195,7 +195,7 @@ def add_github(
     )
 
 
-def create_project(
+def _create_project(
     copier: Copier,
     *,
     copier_args: Iterable[str],
@@ -236,7 +236,7 @@ def create_project(
             trust=True,
         )
 
-    add_github(
+    _add_github(
         copier,
         copier_args=copier_args,
         project_directory=project_directory,
@@ -254,7 +254,7 @@ def init(namespace: Namespace) -> None:
     project_directory_str = str(namespace.project_directory)
 
     try:
-        create_project(
+        _create_project(
             copier,
             copier_args=namespace.copier_args,
             project_directory=project_directory_str,
