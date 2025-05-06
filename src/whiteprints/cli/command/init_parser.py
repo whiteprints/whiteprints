@@ -112,7 +112,7 @@ def setup_init_parser(parser: ArgumentParser) -> None:
         parser.add_argument(
             "copier_args",
             default=[],
-            nargs="*",
+            nargs=importlib.import_module("argparse").REMAINDER,
             help=_(
                 "Additional arguments forwarded to each Copier invocations."
             ),

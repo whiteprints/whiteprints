@@ -5,6 +5,7 @@
 """Test the CLI init subcommand."""
 
 import os
+from pathlib import Path
 
 import pytest
 from pytest import CaptureFixture
@@ -21,3 +22,16 @@ def test_help(capsys: CaptureFixture[str]) -> None:
 
     captured = capsys.readouterr()
     assert captured.out, "Could not print init subcommand help message"
+
+
+def test_init_fail_on_empty_args(
+    capsys: CaptureFixture[str], tmp_path: Path
+) -> None:
+    """Test that the init subcommand fails when given empty data."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["init", str(tmp_path), "--data"])
+
+    assert ext.value.code == os.EX_SOFTWARE, "Unexpected exit code."
+
+    captured = capsys.readouterr()
+    assert captured.err, "Could not print init subcommand help message"
