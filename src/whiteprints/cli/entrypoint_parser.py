@@ -130,6 +130,11 @@ def _initialize_parser(
 
 
 def _add_program_info(parser: ArgumentParser) -> None:
+    """Add flags to show program information.
+
+    Args:
+        parser: the program argument parser.
+    """
     (
         program_info := parser.add_argument_group(_("Program Info"))
     ).add_argument(
@@ -155,6 +160,11 @@ def _add_program_info(parser: ArgumentParser) -> None:
 
 
 def _add_licensing_info(parser: ArgumentParser) -> None:
+    """Add flags to show program licenses.
+
+    Args:
+        parser: the program argument parser.
+    """
     (licensing := parser.add_argument_group(_("Licensing Info"))).add_argument(
         "-l",
         "--license",
@@ -184,6 +194,11 @@ def _add_licensing_info(parser: ArgumentParser) -> None:
 
 
 def _add_debug_info(parser: ArgumentParser) -> None:
+    """Add flags to show debug information.
+
+    Args:
+        parser: the program argument parser.
+    """
     parser.add_argument_group(_("Debug Info")).add_argument(
         "-p",
         "--platform",
@@ -196,6 +211,11 @@ def _add_debug_info(parser: ArgumentParser) -> None:
 
 
 def _add_autocompletion(parser: ArgumentParser) -> None:
+    """Add flags to generate autocompletion.
+
+    Args:
+        parser: the program argument parser.
+    """
     if has_extra("argcomplete"):
         parser.add_argument_group(_("Completion")).add_argument(
             "-a",
@@ -212,6 +232,14 @@ def _add_configuration_parsers(
     app_name_env_prefix: str,
     argcomplete: ModuleType | None,
 ) -> None:
+    """Add flags to change the program behaviour (configuration).
+
+    Args:
+        parser: the program argument parser.
+        app_name_env_prefix: the environment variable prefix name for the
+            program.
+        argcomplete: an argcomplete module.
+    """
     logs_arg = cast(
         "CompleterAction",
         parser.add_argument_group(_("Configuration")).add_argument(

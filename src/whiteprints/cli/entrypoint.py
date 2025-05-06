@@ -18,11 +18,11 @@ __all__: Final = ["entrypoint"]
 """Public module attributes."""
 
 
-(_gettext := importlib.import_module("gettext")).bindtextdomain(
+(_GETTEXT := importlib.import_module("gettext")).bindtextdomain(
     "argparse",
     _.locale_directory,
 )
-_gettext.textdomain("argparse")
+_GETTEXT.textdomain("argparse")
 
 
 def _create_namespace(

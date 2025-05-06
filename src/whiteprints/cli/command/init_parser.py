@@ -18,15 +18,15 @@ __all__: Final = ["setup_init_parser"]
 def setup_init_parser(parser: ArgumentParser) -> None:
     """Add a subparser to initialize a Python project.
 
+    Args:
+        subparser: the subparser to attach to
+        parser: the main parser use to forward the `formatter_class`.
+
     Example:
         >>> main_parser = ArgumentParser()
         >>> subparsers = main_parser.add_subparsers()
         >>> setup_init_parser(subparsers.add_parser("init", add_help=False))
         None
-
-    Args:
-        subparser: the subparser to attach to
-        parser: the main parser use to forward the `formatter_class`.
     """
     parser.add_argument(
         "-h",
