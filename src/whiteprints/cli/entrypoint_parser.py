@@ -238,7 +238,7 @@ def _add_configuration_parsers(
         parser: the program argument parser.
         app_name_env_prefix: the environment variable prefix name for the
             program.
-        argcomplete: an argcomplete module.
+        argcomplete: an optional argcomplete module.
     """
     logs_arg = cast(
         "CompleterAction",

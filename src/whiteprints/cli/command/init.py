@@ -250,7 +250,7 @@ def init(namespace: Namespace) -> None:
     Args:
         namespace: the arguments namespace.
     """
-    copier = Copier()
+    copier = importlib.import_module("whiteprints.libuv.copier").Copier()
     project_directory_str = str(namespace.project_directory)
 
     try:

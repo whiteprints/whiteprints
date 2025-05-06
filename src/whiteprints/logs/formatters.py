@@ -94,6 +94,8 @@ class JSONFormatter(Formatter):
         """Format a record.
 
         Example:
+            >>> import sys
+            >>>
             >>> JSONFormatter().format(
             >>>     LogRecord(
             >>>         "dummy",
