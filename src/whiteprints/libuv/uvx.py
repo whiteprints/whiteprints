@@ -45,6 +45,8 @@ class UVX:
         Example:
             >>> UVX().run(["uv", "--help"])
             ...
+            >>> UVX().run(["uv", "--help"], debug=True)
+            ...
         """
         (subprocess := importlib.import_module("subprocess")).run(  # nosec
             [
