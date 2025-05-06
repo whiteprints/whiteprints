@@ -14,6 +14,6 @@ class WhiteprintsError(Exception):
     """A base exception for the project.
 
     Example:
-        >>> class NewError(ValueError, WhiteprintsError):
+        >>> class NewError(WhiteprintsError):
         >>>     ...
     """
