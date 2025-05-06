@@ -61,8 +61,49 @@ def _should_add(feature: _Feature, cli_kwargs: _InitKwargs) -> bool:
 
     Returns:
         True if the feature should be added, False otherwise.
+
+    Example:
+        >>> _should_add(
+        >>>     "pypi",
+        >>>     _InitKwargs(
+        >>>         command_line=False,
+        >>>         github=False,
+        >>>         pypi=False,
+        >>>         codecov=False,
+        >>>         readthedocs=False,
+        >>>         protect_repository=False,
+        >>>         github_all=True,
+        >>>     ),
+        >>> )
+        True
+        >>> _should_add(
+        >>>     "pypi",
+        >>>     _InitKwargs(
+        >>>         command_line=False,
+        >>>         github=False,
+        >>>         pypi=True,
+        >>>         codecov=False,
+        >>>         readthedocs=False,
+        >>>         protect_repository=False,
+        >>>         github_all=False,
+        >>>     ),
+        >>> )
+        True
+        >>> _should_add(
+        >>>     "pypi",
+        >>>     _InitKwargs(
+        >>>         command_line=False,
+        >>>         github=False,
+        >>>         pypi=False,
+        >>>         codecov=False,
+        >>>         readthedocs=False,
+        >>>         protect_repository=False,
+        >>>         github_all=False,
+        >>>     ),
+        >>> )
+        False
     """
-    return cli_kwargs.get(feature, cli_kwargs["github_all"])
+    return cli_kwargs.get("github_all") or cli_kwargs[feature]
 
 
 def add_github_functionalities(
