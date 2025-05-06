@@ -43,7 +43,7 @@ def test_init_dummy(capsys: CaptureFixture[str], tmp_path: Path) -> None:
         entrypoint([
             "init",
             str(tmp_path),
-            "--force",
+            "--defaults",
             "--data",
             "project_name=My Awesome Project",
             "--data",
@@ -56,6 +56,8 @@ def test_init_dummy(capsys: CaptureFixture[str], tmp_path: Path) -> None:
             "code_license_id=MIT-0 OR Apache-2.0",
             "--data",
             "resources_license_id=CC0-1.0",
+            "--data",
+            "target_python_version=py313",
         ])
 
     assert ext.value.code == os.EX_OK, "Unexpected exit code."
