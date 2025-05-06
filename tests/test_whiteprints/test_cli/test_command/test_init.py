@@ -20,4 +20,4 @@ def test_help(capsys: CaptureFixture[str]) -> None:
     assert ext.value.code == os.EX_OK, "Unexpected exit code."
 
     captured = capsys.readouterr()
-    assert captured.out, "Could not print application help message"
+    assert captured.out, "Could not print init subcommand help message"
