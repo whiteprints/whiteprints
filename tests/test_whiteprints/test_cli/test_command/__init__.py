@@ -2,4 +2,4 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""Test the CLI commands."""
+"""Test the CLI init subcommand."""
