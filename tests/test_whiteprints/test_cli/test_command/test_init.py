@@ -21,7 +21,7 @@ def test_help(capsys: CaptureFixture[str]) -> None:
     assert ext.value.code == os.EX_OK, "Unexpected exit code."
 
     captured = capsys.readouterr()
-    assert captured.out, "Could not print init subcommand help message"
+    assert captured.out, "Could not print init subcommand help message."
 
 
 def test_init_fail_on_empty_args(
@@ -34,4 +34,30 @@ def test_init_fail_on_empty_args(
     assert ext.value.code == os.EX_SOFTWARE, "Unexpected exit code."
 
     captured = capsys.readouterr()
-    assert captured.err, "Could not print init subcommand help message"
+    assert captured.err, "Could not print init subcommand help message."
+
+
+def test_init_dummy(capsys: CaptureFixture[str], tmp_path: Path) -> None:
+    """Test that the init subcommand fails when given empty data."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint([
+            "init",
+            str(tmp_path),
+            "--force",
+            "--dataproject_name=My Awesome Project",
+            "--data",
+            "author=Whiteprints",
+            "--data",
+            "organisation=Whiteprints",
+            "--data",
+            "author_email=whiteprints@whiteprints.com",
+            "--data",
+            "code_license_id=MIT-0 OR Apache-2.0",
+            "--data",
+            "resources_license_id=CC0-1.0",
+        ])
+
+    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+
+    captured = capsys.readouterr()
+    assert captured.out, "Project generation failed."
