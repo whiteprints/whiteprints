@@ -119,6 +119,7 @@ def build_copy_ops(
         >>> from argparse import Namespace
         >>>
         >>> ns = Namespace(
+        ...     command_line=False,
         ...     github=True,
         ...     github_all=False,
         ...     pypi=False,
@@ -130,6 +131,20 @@ def build_copy_ops(
         >>> ops = build_github_ops('proj', ['--flag'], ns, ['ctx'])
         >>> [o.repo for o in ops]
         ['gh:whiteprints/template-github.git']
+        >>>
+        >>> ns = Namespace(
+        ...     command_line=True,
+        ...     github=False,
+        ...     github_all=False,
+        ...     pypi=False,
+        ...     codecov=False,
+        ...     readthedocs=False,
+        ...     protect_repository=False
+        ... )
+        >>>
+        >>> ops = build_github_ops('proj', ['--flag'], ns, ['ctx'])
+        >>> [o.repo for o in ops]
+        ['gh:whiteprints/template-rich-click.git']
     """
     ops: list[CopyOp] = []
     context = [

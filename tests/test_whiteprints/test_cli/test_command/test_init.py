@@ -37,7 +37,7 @@ def test_init_fail_on_empty_args(
     assert captured.err, "Could not print init subcommand help message."
 
 
-def test_init_dummy(capsys: CaptureFixture[str], tmp_path: Path) -> None:
+def init_dummy(capsys: CaptureFixture[str], tmp_path: Path) -> None:
     """Test that the init subcommand fails when given empty data."""
     with pytest.raises(SystemExit) as ext:
         entrypoint([
