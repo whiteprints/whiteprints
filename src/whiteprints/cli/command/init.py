@@ -2,32 +2,29 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""Initialize a project."""
+"""Initialize a project using pure logic for testable copy operations."""
 
 import importlib
+import logging
+import os
 import sys
 from argparse import Namespace
 from collections.abc import Iterable
+from dataclasses import dataclass
 from subprocess import CalledProcessError  # nosec
-from typing import Final, Literal, TypedDict, get_args
+from typing import Final
 
 from whiteprints import _, has_extra
 from whiteprints.cli import robust_print
-from whiteprints.libuv.copier import Copier
-
-
-__all__: Final = ["init"]
 
 
 WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.6.0"
 """The whiteprints-template-context version pin."""
 
-_Feature = Literal["pypi", "codecov", "readthedocs", "protect_repository"]
-"""Feature list."""
-
-_FEATURE_REPOSITORY: Final[dict[_Feature, str]] = dict(
+# Define the repository mapping from feature names to copier templates
+_GITHUB_EXTRAS: Final[dict[str, str]] = dict(
     zip(
-        get_args(_Feature),
+        ["pypi", "codecov", "readthedocs", "protect_repository"],
         (
             "gh:whiteprints/template-github-publish-pypi.git",
             "gh:whiteprints/template-github-codecov.git",
@@ -37,237 +34,146 @@ _FEATURE_REPOSITORY: Final[dict[_Feature, str]] = dict(
         strict=False,
     )
 )
-"""A mapping from a feature name to its template repository."""
 
 
-class _InitKwargs(TypedDict):
-    """The 'init' command line arguments."""
+@dataclass(frozen=True)
+class CopyOp:
+    """Descriptor for a copier operation, pure and testable."""
 
-    command_line: bool
-    github: bool
-    pypi: bool
-    codecov: bool
-    readthedocs: bool
-    protect_repository: bool
-    github_all: bool
+    repo: str
+    dest: str
+    args: Iterable[str]
+    context: Iterable[str]
+    trust: bool
 
 
-def _should_add(feature: _Feature, cli_kwargs: _InitKwargs) -> bool:
-    """Whether a GitHub feature should be added.
+def build_github_ops(
+    project_directory: str,
+    copier_args: Iterable[str],
+    init_kwargs: dict[str, bool],
+    context: Iterable[str],
+) -> list[CopyOp]:
+    """Build copy operations for GitHub core and feature extras.
 
     Args:
-        feature: the feature to add.
-        cli_kwargs: the command-line key-value arguments.
+        project_directory: target directory
+        copier_args: extra args for copier
+        init_kwargs: flags for github, github_all, extras
+        context: the shared context list
 
     Returns:
-        True if the feature should be added, False otherwise.
-
-    Example:
-        >>> _should_add(
-        >>>     "pypi",
-        >>>     _InitKwargs(
-        >>>         command_line=False,
-        >>>         github=False,
-        >>>         pypi=False,
-        >>>         codecov=False,
-        >>>         readthedocs=False,
-        >>>         protect_repository=False,
-        >>>         github_all=True,
-        >>>     ),
-        >>> )
-        True
-        >>> _should_add(
-        >>>     "pypi",
-        >>>     _InitKwargs(
-        >>>         command_line=False,
-        >>>         github=False,
-        >>>         pypi=True,
-        >>>         codecov=False,
-        >>>         readthedocs=False,
-        >>>         protect_repository=False,
-        >>>         github_all=False,
-        >>>     ),
-        >>> )
-        True
-        >>> _should_add(
-        >>>     "pypi",
-        >>>     _InitKwargs(
-        >>>         command_line=False,
-        >>>         github=False,
-        >>>         pypi=False,
-        >>>         codecov=False,
-        >>>         readthedocs=False,
-        >>>         protect_repository=False,
-        >>>         github_all=False,
-        >>>     ),
-        >>> )
-        False
+        CopyOp list for GitHub actions
     """
-    return cli_kwargs.get("github_all") or cli_kwargs[feature]
+    ops: list[CopyOp] = []
 
-
-def _add_github_functionalities(
-    copier: Copier,
-    *,
-    copier_args: Iterable[str],
-    project_directory: str,
-    init_kwargs: _InitKwargs,
-) -> None:
-    """Update the project to add GitHub functionalities.
-
-    Args:
-        copier: a copier manager.
-        copier_args: additional arguments forwarded to copier.
-        project_directory: directory where the new project will be created.
-        init_kwargs: the command line flags.
-    """
-    for feature, repository in _FEATURE_REPOSITORY.items():
-        if _should_add(feature, cli_kwargs=init_kwargs):  # pragma: no cover
-            copier.copy(
-                [
-                    repository,
-                    project_directory,
-                    *copier_args,
-                ],
-                context=[
-                    "whiteprints-template-context=="
-                    + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
-                ],
+    # Determine if any GitHub integration is needed
+    github_core = (
+        init_kwargs.get("github", False)
+        or init_kwargs.get("github_all", False)
+        or any(init_kwargs.get(f, False) for f in _GITHUB_EXTRAS)
+    )
+    if github_core:
+        ops.append(
+            CopyOp(
+                repo="gh:whiteprints/template-github.git",
+                dest=project_directory,
+                args=copier_args,
+                context=context,
                 trust=True,
             )
+        )
+
+    # Add each extra feature template if requested or global flag
+    for feature, repo in _GITHUB_EXTRAS.items():
+        if init_kwargs.get("github_all") or init_kwargs.get(feature):
+            ops.append(
+                CopyOp(
+                    repo=repo,
+                    dest=project_directory,
+                    args=copier_args,
+                    context=context,
+                    trust=True,
+                )
+            )
+    return ops
 
 
-def _require_github(init_kwargs: _InitKwargs) -> bool:
-    """Check if the project requires a GitHub configuration.
+def build_copy_ops(
+    project_directory: str,
+    copier_args: Iterable[str],
+    init_kwargs: dict[str, bool],
+) -> list[CopyOp]:
+    """Build a list of CopyOp instances based on feature flags.
 
     Args:
-        init_kwargs: the command line flags.
+        project_directory: target directory for templates
+        copier_args: extra arguments to forward to copier
+        init_kwargs: boolean flags for each feature
 
     Returns:
-        True if the project requires a GitHub configuration, False otherwise.
+        a list of CopyOp objects describing the copy operations to perform.
     """
-    return (
-        init_kwargs["pypi"]
-        or init_kwargs["codecov"]
-        or init_kwargs["readthedocs"]
-        or init_kwargs["protect_repository"]
-    )
+    ops: list[CopyOp] = []
+    context = [
+        f"whiteprints-template-context=={WHITEPRINTS_TEMPLATE_CONTEXT_VERSION}"
+    ]
 
-
-def _add_github(
-    copier: Copier,
-    *,
-    copier_args: Iterable[str],
-    project_directory: str,
-    init_kwargs: _InitKwargs,
-) -> None:
-    """Update the project to add GitHub functionalities.
-
-    Args:
-        copier: a copier manager.
-        copier_args: additional arguments forwarded to copier.
-        project_directory: directory where the new project will be created.
-        init_kwargs: the command line flags.
-    """
-    if (  # pragma: no cover
-        init_kwargs["github"]
-        or init_kwargs["github_all"]
-        or _require_github(init_kwargs)
-    ):
-        copier.copy(
-            [
-                "gh:whiteprints/template-github.git",
-                project_directory,
-                *copier_args,
-            ],
-            context=[
-                "whiteprints-template-context=="
-                + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
-            ],
+    # Base Python template
+    ops.append(
+        CopyOp(
+            repo="gh:whiteprints/template-python.git",
+            dest=project_directory,
+            args=copier_args,
+            context=context,
             trust=True,
         )
-
-    _add_github_functionalities(
-        copier,
-        copier_args=copier_args,
-        project_directory=project_directory,
-        init_kwargs=init_kwargs,
     )
 
-
-def _create_project(
-    copier: Copier,
-    *,
-    copier_args: Iterable[str],
-    project_directory: str,
-    init_kwargs: _InitKwargs,
-) -> None:
-    """Initialize a python project.
-
-    Args:
-        copier: a copier manager.
-        copier_args: additional arguments forwarded to copier.
-        project_directory: directory where the new project will be created.
-        init_kwargs: the command line flags.
-    """
-    copier.copy(
-        [
-            "gh:whiteprints/template-python.git",
-            project_directory,
-            *copier_args,
-        ],
-        context=[
-            "whiteprints-template-context=="
-            + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
-        ],
-        trust=True,
-    )
-    if init_kwargs["command_line"]:  # pragma: no cover
-        copier.copy(
-            [
-                "gh:whiteprints/template-rich-click.git",
-                project_directory,
-                *copier_args,
-            ],
-            context=[
-                "whiteprints-template-context=="
-                + WHITEPRINTS_TEMPLATE_CONTEXT_VERSION
-            ],
-            trust=True,
+    # Optional CLI support
+    if init_kwargs.get("command_line"):
+        ops.append(
+            CopyOp(
+                repo="gh:whiteprints/template-rich-click.git",
+                dest=project_directory,
+                args=copier_args,
+                context=context,
+                trust=True,
+            )
         )
 
-    _add_github(
-        copier,
-        copier_args=copier_args,
-        project_directory=project_directory,
-        init_kwargs=init_kwargs,
+    ops.extend(
+        build_github_ops(project_directory, copier_args, init_kwargs, context)
     )
+    return ops
 
 
 def init(namespace: Namespace) -> None:
-    """Initialize a python project.
-
-    Args:
-        namespace: the arguments namespace.
-    """
+    """Initialize a python project by executing all copy operations."""
     copier = importlib.import_module("whiteprints.libuv.copier").Copier()
-    project_directory_str = str(namespace.project_directory)
+    project_directory = str(namespace.project_directory)
+
+    # Gather boolean flags into a dict for build_copy_ops
+    init_kwargs = {
+        "command_line": bool(namespace.command_line),
+        "github": bool(namespace.github),
+        "pypi": bool(namespace.pypi),
+        "codecov": bool(namespace.codecov),
+        "readthedocs": bool(namespace.readthedocs),
+        "protect_repository": bool(namespace.protect_repository),
+        "github_all": bool(namespace.github_all),
+    }
 
     try:
-        _create_project(
-            copier,
-            copier_args=namespace.copier_args,
-            project_directory=project_directory_str,
-            init_kwargs={
-                "command_line": namespace.command_line,
-                "github": namespace.github,
-                "pypi": namespace.pypi,
-                "codecov": namespace.codecov,
-                "readthedocs": namespace.readthedocs,
-                "protect_repository": namespace.protect_repository,
-                "github_all": namespace.github_all,
-            },
-        )
+        for op in build_copy_ops(
+            project_directory,
+            namespace.copier_args,
+            init_kwargs,
+        ):
+            copier.copy(
+                [op.repo, op.dest, *op.args],
+                context=op.context,
+                trust=op.trust,
+            )
     except CalledProcessError:
         error_message = _("Project creation failed")
         robust_print(
@@ -278,9 +184,9 @@ def init(namespace: Namespace) -> None:
             ),
             file=sys.stderr,
         )
-        logger = importlib.import_module("logging").getLogger(__name__)
+        logger = logging.getLogger(__name__)
         logger.exception(
             "Exception caught while running Copier",
             stack_info=True,
         )
-        sys.exit(importlib.import_module("os").EX_SOFTWARE)
+        sys.exit(os.EX_SOFTWARE)

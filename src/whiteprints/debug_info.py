@@ -30,60 +30,66 @@ import importlib
 import sys
 from functools import cache
 from importlib.metadata import Distribution
-from typing import Final, NamedTuple
+from typing import Final, TypedDict
 
 
 __all__: Final = ["DebugInfo", "gather_debug_info"]
 
 
-class PackageInfo(NamedTuple):
+if sys.version_info >= (3, 13):
+    from typing import ReadOnly
+else:
+    from typing_extensions import ReadOnly
+
+
+class PackageInfo(TypedDict):
     """Holds current package information."""
 
-    name: tuple[str, str, str, str, str]
-    version: str
-    origin: str | None
+    name: ReadOnly[tuple[str, str, str, str, str]]
+    version: ReadOnly[str]
+    origin: ReadOnly[str | None]
 
 
-class LogsInfo(NamedTuple):
+class LogsInfo(TypedDict):
     """Holds the logging configuration."""
 
-    USER_LOG_DIR: str
-    default_configuration: str | None
+    USER_LOG_DIR: ReadOnly[str]
+    default_configuration: ReadOnly[str | None]
 
 
-class PythonInfo(NamedTuple):
+class PythonInfo(TypedDict):
     """Holds the Python interpreter information."""
 
-    executable: str
-    version: list[str | int]
-    implementation: str
-    build: str
-    compiler: str
+    executable: ReadOnly[str]
+    version: ReadOnly[list[str | int]]
+    implementation: ReadOnly[str]
+    build: ReadOnly[str]
+    compiler: ReadOnly[str]
 
 
-class EnvironmentInfo(NamedTuple):
+class EnvironmentInfo(TypedDict):
     """Holds the environment information."""
 
-    VIRTUAL_ENV: str | None
-    base_exec_prefix: str
-    pythonpath: list[str]
+    VIRTUAL_ENV: ReadOnly[str | None]
+    base_exec_prefix: ReadOnly[str]
+    pythonpath: ReadOnly[list[str]]
 
 
-class PlatformInfo(NamedTuple):
+class PlatformInfo(TypedDict):
     """Holds the platform configuration."""
 
-    name: str
-    python: PythonInfo
-    environment: EnvironmentInfo
+    name: ReadOnly[str]
+    python: ReadOnly[PythonInfo]
+    environment: ReadOnly[EnvironmentInfo]
 
 
-class DebugInfo(NamedTuple):
+class DebugInfo(TypedDict):
     """Holds runtime debug information."""
 
-    platform: PlatformInfo
-    package: PackageInfo
-    site_packages: list[PackageInfo] | None
-    logs: LogsInfo | None
+    platform: ReadOnly[PlatformInfo]
+    package: ReadOnly[PackageInfo]
+    site_packages: ReadOnly[list[PackageInfo] | None]
+    logs: ReadOnly[LogsInfo | None]
 
 
 def _find_origin(package_name: str | None) -> str | None:
