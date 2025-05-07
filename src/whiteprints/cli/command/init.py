@@ -36,9 +36,9 @@ _GITHUB_EXTRAS: Final[dict[str, str]] = dict(
 )
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class CopyOp:
-    """Descriptor for a copier operation, pure and testable."""
+    """Descriptor for a copier operation."""
 
     repo: str
     dest: str
@@ -50,7 +50,7 @@ class CopyOp:
 def build_github_ops(
     project_directory: str,
     copier_args: Iterable[str],
-    init_kwargs: dict[str, bool],
+    namespace: Namespace,
     context: Iterable[str],
 ) -> list[CopyOp]:
     """Build copy operations for GitHub core and feature extras.
@@ -58,19 +58,21 @@ def build_github_ops(
     Args:
         project_directory: target directory
         copier_args: extra args for copier
-        init_kwargs: flags for github, github_all, extras
+        namespace: flags for github, github_all, extras.
         context: the shared context list
 
     Returns:
         CopyOp list for GitHub actions
+
+
     """
     ops: list[CopyOp] = []
 
     # Determine if any GitHub integration is needed
     github_core = (
-        init_kwargs.get("github", False)
-        or init_kwargs.get("github_all", False)
-        or any(init_kwargs.get(f, False) for f in _GITHUB_EXTRAS)
+        bool(namespace.github)
+        or bool(namespace.github_all)
+        or any(bool(getattr(namespace, f)) for f in _GITHUB_EXTRAS)
     )
     if github_core:
         ops.append(
@@ -85,7 +87,7 @@ def build_github_ops(
 
     # Add each extra feature template if requested or global flag
     for feature, repo in _GITHUB_EXTRAS.items():
-        if init_kwargs.get("github_all") or init_kwargs.get(feature):
+        if bool(namespace.github_all) or bool(getattr(namespace, feature)):
             ops.append(
                 CopyOp(
                     repo=repo,
@@ -101,17 +103,33 @@ def build_github_ops(
 def build_copy_ops(
     project_directory: str,
     copier_args: Iterable[str],
-    init_kwargs: dict[str, bool],
+    namespace: Namespace,
 ) -> list[CopyOp]:
     """Build a list of CopyOp instances based on feature flags.
 
     Args:
         project_directory: target directory for templates
         copier_args: extra arguments to forward to copier
-        init_kwargs: boolean flags for each feature
+        namespace: boolean flags for each feature
 
     Returns:
         a list of CopyOp objects describing the copy operations to perform.
+
+    Example:
+        >>> from argparse import Namespace
+        >>>
+        >>> ns = Namespace(
+        ...     github=True,
+        ...     github_all=False,
+        ...     pypi=False,
+        ...     codecov=False,
+        ...     readthedocs=False,
+        ...     protect_repository=False
+        ... )
+        >>>
+        >>> ops = build_github_ops('proj', ['--flag'], ns, ['ctx'])
+        >>> [o.repo for o in ops]
+        ['gh:whiteprints/template-github.git']
     """
     ops: list[CopyOp] = []
     context = [
@@ -130,7 +148,7 @@ def build_copy_ops(
     )
 
     # Optional CLI support
-    if init_kwargs.get("command_line"):
+    if bool(namespace.command_line):
         ops.append(
             CopyOp(
                 repo="gh:whiteprints/template-rich-click.git",
@@ -141,8 +159,9 @@ def build_copy_ops(
             )
         )
 
+    # Optional GitHub and GitHub extras support
     ops.extend(
-        build_github_ops(project_directory, copier_args, init_kwargs, context)
+        build_github_ops(project_directory, copier_args, namespace, context)
     )
     return ops
 
@@ -152,22 +171,11 @@ def init(namespace: Namespace) -> None:
     copier = importlib.import_module("whiteprints.libuv.copier").Copier()
     project_directory = str(namespace.project_directory)
 
-    # Gather boolean flags into a dict for build_copy_ops
-    init_kwargs = {
-        "command_line": bool(namespace.command_line),
-        "github": bool(namespace.github),
-        "pypi": bool(namespace.pypi),
-        "codecov": bool(namespace.codecov),
-        "readthedocs": bool(namespace.readthedocs),
-        "protect_repository": bool(namespace.protect_repository),
-        "github_all": bool(namespace.github_all),
-    }
-
     try:
         for op in build_copy_ops(
             project_directory,
             namespace.copier_args,
-            init_kwargs,
+            namespace,
         ):
             copier.copy(
                 [op.repo, op.dest, *op.args],
