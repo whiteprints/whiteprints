@@ -21,19 +21,15 @@ from whiteprints.cli import robust_print
 WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.6.0"
 """The whiteprints-template-context version pin."""
 
-# Define the repository mapping from feature names to copier templates
-_GITHUB_EXTRAS: Final[dict[str, str]] = dict(
-    zip(
-        ["pypi", "codecov", "readthedocs", "protect_repository"],
-        (
-            "gh:whiteprints/template-github-publish-pypi.git",
-            "gh:whiteprints/template-github-codecov.git",
-            "gh:whiteprints/template-github-readthedocs.git",
-            "gh:whiteprints/template-github-protect-repository.git",
-        ),
-        strict=False,
-    )
-)
+_GITHUB_EXTRAS: Final = {
+    "pypi": "gh:whiteprints/template-github-publish-pypi.git",
+    "codecov": "gh:whiteprints/template-github-codecov.git",
+    "readthedocs": "gh:whiteprints/template-github-readthedocs.git",
+    "protect_repository": (
+        "gh:whiteprints/template-github-protect-repository.git"
+    ),
+}
+"""Define the repository mapping from feature names to copier templates."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -65,6 +61,21 @@ def build_github_ops(
         CopyOp list for GitHub actions
 
 
+    Example:
+        >>> from argparse import Namespace
+        >>>
+        >>> ns = Namespace(
+        ...     github=True,
+        ...     github_all=False,
+        ...     pypi=False,
+        ...     codecov=False,
+        ...     readthedocs=False,
+        ...     protect_repository=False
+        ... )
+        >>>
+        >>> ops = build_github_ops('proj', [], ns, ['ctx'])
+        >>> [o.repo for o in ops]
+        ['gh:whiteprints/template-github.git']
     """
     ops: list[CopyOp] = []
 
@@ -119,20 +130,6 @@ def build_copy_ops(
         >>> from argparse import Namespace
         >>>
         >>> ns = Namespace(
-        ...     command_line=False,
-        ...     github=True,
-        ...     github_all=False,
-        ...     pypi=False,
-        ...     codecov=False,
-        ...     readthedocs=False,
-        ...     protect_repository=False
-        ... )
-        >>>
-        >>> ops = build_github_ops('proj', ['--flag'], ns, ['ctx'])
-        >>> [o.repo for o in ops]
-        ['gh:whiteprints/template-github.git']
-        >>>
-        >>> ns = Namespace(
         ...     command_line=True,
         ...     github=False,
         ...     github_all=False,
@@ -142,9 +139,9 @@ def build_copy_ops(
         ...     protect_repository=False
         ... )
         >>>
-        >>> ops = build_github_ops('proj', ['--flag'], ns, ['ctx'])
+        >>> ops = build_copy_ops('proj', [], ns)
         >>> [o.repo for o in ops]
-        ['gh:whiteprints/template-rich-click.git']
+        [..., 'gh:whiteprints/template-rich-click.git']
     """
     ops: list[CopyOp] = []
     context = [
