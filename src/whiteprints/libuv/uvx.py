@@ -32,7 +32,7 @@ class UVX:
         """
         return importlib.import_module("uv").find_uv_bin()
 
-    def run(self, command: Iterable[str], *, debug: bool = True) -> None:
+    def run(self, command: Iterable[str], *, debug: bool = False) -> None:
         """Run `uv tool run`.
 
         Note:
