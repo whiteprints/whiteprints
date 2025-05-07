@@ -76,7 +76,6 @@ def _nargs_license_text(licenses: list[str]) -> Literal[0, 1]:
 
 def _initialize_parser(
     prog: str,
-    app_name_env_prefix: str,
     theme: str | None,
     epilog: str | None,
     rich_argparse_plus: ModuleType | None,
@@ -101,19 +100,6 @@ def _initialize_parser(
         except ValueError as value_error:
             robust_print(value_error)
             sys.exit(importlib.import_module("os").EX_USAGE)
-
-        formatter_class = importlib.import_module("functools").partial(
-            formatter_class,
-            width=(
-                str(width)
-                if (
-                    width := importlib.import_module("os").environ.get(
-                        f"{app_name_env_prefix}_HELP_WIDTH"
-                    )
-                )
-                else None
-            ),
-        )
     else:
         formatter_class = HelpFormatter
 
@@ -300,9 +286,9 @@ def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
     Returns:
         the program namespace.
     """
+    app_name_env_prefix = prog.upper()
     parser = _initialize_parser(
         prog,
-        app_name_env_prefix := prog.upper(),
         importlib.import_module("os").environ.get(
             theme_env := f"{app_name_env_prefix}_THEME", "default"
         ),
