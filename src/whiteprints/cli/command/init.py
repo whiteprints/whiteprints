@@ -6,7 +6,6 @@
 
 import importlib
 import logging
-import sys
 from argparse import Namespace
 from collections.abc import Iterable
 from dataclasses import dataclass
@@ -201,7 +200,7 @@ def init(namespace: Namespace) -> None:
                 if has_extra("rich")
                 else error_message
             ),
-            file=sys.stderr,
+            file=importlib.import_module("sys").stderr,
         )
         logger = logging.getLogger(__name__)
         logger.exception(
