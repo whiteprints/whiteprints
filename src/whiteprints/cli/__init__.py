@@ -142,14 +142,6 @@ class PosixExitCode(IntEnum):
     """Power failure (SIGPWR)."""
     EXIT_SIG_SYS = 159
     """Bad system call (SIGSYS)."""
-    SCRIPT_TERMINATED_BY_SIGINT = 130
-    """Script terminated by Control-C (SIGINT)."""
-    SCRIPT_TERMINATED_BY_SIGKILL = 137
-    """Script terminated by SIGKILL."""
-    SEGMENTATION_FAULT = 139
-    """Segmentation fault (SIGSEGV)."""
-    SCRIPT_TERMINATED_BY_SIGTERM = 143
-    """Script terminated by SIGTERM."""
     EXIT_STATUS_OUT_OF_RANGE = 255
     """Exit status out of range (greater than 255)."""
 
