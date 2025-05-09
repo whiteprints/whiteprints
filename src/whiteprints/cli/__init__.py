@@ -243,7 +243,7 @@ def _exit_gracefully_action(signalnum: int, frame: FrameType) -> NoReturn:
             "stack": importlib.import_module("traceback").format_stack(frame),
         },
     )
-    PosixExitCode(signalnum).exit()
+    PosixExitCode(128 + signalnum).exit()
 
 
 def _exit_gracefully_on_sigint() -> None:
