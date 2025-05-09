@@ -85,10 +85,71 @@ class PosixExitCode(IntEnum):
     INVALID_EXIT_ARGUMENT = 128
     """Invalid argument to exit."""
 
-    # Signal-based exit codes (auto-generated)
-    for signal in importlib.import_module("signal").Signals:
-        locals()[f"EXIT_SIG_{signal.name}"] = 128 + signal.value
+    # Signal-based exit codes
+    EXIT_SIG_HUP = 129
+    """Hangup detected on controlling terminal (SIGHUP)."""
+    EXIT_SIG_INT = 130
+    """Interrupt from keyboard (SIGINT)."""
+    EXIT_SIG_QUIT = 131
+    """Quit from keyboard (SIGQUIT)."""
+    EXIT_SIG_ILL = 132
+    """Illegal instruction (SIGILL)."""
+    EXIT_SIG_TRAP = 133
+    """Trace/breakpoint trap (SIGTRAP)."""
+    EXIT_SIG_ABRT = 134
+    """Abort signal from abort(3) (SIGABRT)."""
+    EXIT_SIG_BUS = 135
+    """Bus error (SIGBUS)."""
+    EXIT_SIG_FPE = 136
+    """Floating point exception (SIGFPE)."""
+    EXIT_SIG_KILL = 137
+    """Kill signal (SIGKILL)."""
+    EXIT_SIG_USR1 = 138
+    """User-defined signal 1 (SIGUSR1)."""
+    EXIT_SIG_SEGV = 139
+    """Segmentation fault (SIGSEGV)."""
+    EXIT_SIG_USR2 = 140
+    """User-defined signal 2 (SIGUSR2)."""
+    EXIT_SIG_PIPE = 141
+    """Broken pipe (SIGPIPE)."""
+    EXIT_SIG_ALRM = 142
+    """Timer signal (SIGALRM)."""
+    EXIT_SIG_TERM = 143
+    """Termination signal (SIGTERM)."""
+    EXIT_SIG_STKFLT = 144
+    """Stack fault (SIGSTKFLT)."""
+    EXIT_SIG_CHLD = 145
+    """Child stopped or terminated (SIGCHLD)."""
+    EXIT_SIG_CONT = 146
+    """Continue if stopped (SIGCONT)."""
+    EXIT_SIG_STOP = 147
+    """Stop process (SIGSTOP)."""
+    EXIT_SIG_TSTP = 148
+    """Stop typed at terminal (SIGTSTP)."""
+    EXIT_SIG_TTIN = 149
+    """Terminal input for background process (SIGTTIN)."""
+    EXIT_SIG_TTOU = 150
+    """Terminal output for background process (SIGTTOU)."""
+    EXIT_SIG_URG = 151
+    """Urgent condition on socket (SIGURG)."""
+    EXIT_SIG_XCPU = 152
+    """CPU time limit exceeded (SIGXCPU)."""
+    EXIT_SIG_XFSZ = 153
+    """File size limit exceeded (SIGXFSZ)."""
+    EXIT_SIG_VTALRM = 154
+    """Virtual alarm clock (SIGVTALRM)."""
+    EXIT_SIG_PROF = 155
+    """Profiling timer expired (SIGPROF)."""
+    EXIT_SIG_WINCH = 156
+    """Window resize signal (SIGWINCH)."""
+    EXIT_SIG_POLL = 157
+    """Pollable event (SIGIO)."""
+    EXIT_SIG_PWR = 158
+    """Power failure (SIGPWR)."""
+    EXIT_SIG_SYS = 159
+    """Bad system call (SIGSYS)."""
 
+    # Invalid exit status
     EXIT_STATUS_OUT_OF_RANGE = 255
     """Exit status out of range (greater than 255)."""
 
@@ -102,6 +163,13 @@ class PosixExitCode(IntEnum):
 
     @classmethod
     def from_signal(cls, python_signal_number: int) -> Self:
+        """Create a posix exit code from a signal number.
+
+        The posix exit code is obtained by adding 128 to the signal number.
+
+        Returns:
+            A PosixExitCode corresponding to the given Python signal.
+        """
         return cls(128 + python_signal_number)
 
 
