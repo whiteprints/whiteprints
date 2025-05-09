@@ -9,7 +9,6 @@ We use Python subprocesses.
 
 import importlib
 from collections.abc import Iterable
-from functools import cached_property
 from typing import Final
 
 
@@ -19,20 +18,11 @@ __all__: Final = ["UVX"]
 class UVX:
     """Manage the uv program."""
 
-    @cached_property
-    def bin(self) -> str:
-        """The uv binary path.
+    def __init__(self) -> None:
+        """Create an UVX instance."""
+        self.bin = importlib.import_module("uv").find_uv_bin()
 
-        Example:
-            >>> UVX().bin
-            ...
-
-        Returns:
-            a path to the uv binary.
-        """
-        return importlib.import_module("uv").find_uv_bin()
-
-    def run(self, command: Iterable[str], *, debug: bool = False) -> None:
+    def run(self, command: Iterable[str]) -> None:
         """Run `uv tool run`.
 
         Note:
@@ -58,7 +48,8 @@ class UVX:
                 "--no-progress",
                 *command,
             ],
-            stderr=None if debug else subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
             shell=False,
             check=True,
+            text=True,
         )

@@ -153,13 +153,13 @@ class PosixExitCode(IntEnum):
     EXIT_STATUS_OUT_OF_RANGE = 255
     """Exit status out of range (greater than 255)."""
 
-    def exit(self) -> NoReturn:
+    def exit(self, source: Exception | None = None) -> NoReturn:
         """Exit with a given posix exit code.
 
         Raises:
             SystemExit: exit the programe with the enum exit code.
         """
-        raise SystemExit(self.value)
+        raise SystemExit(self.value) from source
 
     @classmethod
     def from_signal(cls, python_signal_number: int) -> Self:

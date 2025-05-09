@@ -208,7 +208,7 @@ def init(namespace: Namespace) -> None:
                 context=op.context,
                 trust=op.trust,
             )
-    except CalledProcessError:
+    except CalledProcessError as called_process_error:
         error_message = _("Project creation failed")
         robust_print(
             (
@@ -220,7 +220,12 @@ def init(namespace: Namespace) -> None:
         )
         logger = logging.getLogger(__name__)
         logger.exception(
-            "Exception caught while running Copier",
+            "CalledProcessError caught while running Copier",
             stack_info=True,
+            extra={
+                "command": called_process_error.cmd,
+                "return_code": called_process_error.returncode,
+                "stderr": called_process_error.stderr.strip(),
+            },
         )
-        PosixExitCode.INTERNAL_SOFTWARE_ERROR.exit()
+        PosixExitCode.INTERNAL_SOFTWARE_ERROR.exit(called_process_error)
