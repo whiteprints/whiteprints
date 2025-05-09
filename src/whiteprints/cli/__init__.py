@@ -8,6 +8,7 @@ import gettext
 import importlib
 import sys
 from collections.abc import Callable
+from enum import IntEnum, unique
 from types import FrameType
 from typing import Final, NoReturn
 
@@ -19,6 +20,142 @@ __all__: Final = ["robust_print", "robust_print_json"]
 
 
 robust_print = print if (rich := import_extra("rich")) is None else rich.print
+
+
+@unique
+class PosixExitCode(IntEnum):
+    """POSIX, Linux, and signal-based exit status codes.
+
+    Includes:
+        - Shell-reserved statuses (0-2, 126-255)
+        - BSD/GNU `sysexits.h` codes (64-78)
+        - Signal-based terminations (128+SIGNAL)
+    """
+
+    SUCCESS = 0
+    """Successful termination."""
+    GENERAL_ERROR = 1
+    """Catchall for general errors."""
+    MISUSE_OF_SHELL_BUILTINS = 2
+    """Misuse of shell builtins."""
+    INVALID_ARGUMENT = 3
+    """Miscellaneous invalid argument."""
+    INPUT_OUTPUT_ERROR = 5
+    """Input/output error (alternate)."""
+    NO_SUCH_DEVICE_OR_ADDRESS = 6
+    """No such device or address."""
+    COMMAND_LINE_USAGE_ERROR = 64
+    """Command line usage error (sysexits.h EX_USAGE)."""
+    DATA_FORMAT_ERROR = 65
+    """Data format error (sysexits.h EX_DATAERR)."""
+    CANNOT_OPEN_INPUT = 66
+    """Cannot open input (sysexits.h EX_NOINPUT)."""
+    ADDRESSEE_UNKNOWN = 67
+    """Addressee unknown (sysexits.h EX_NOUSER)."""
+    HOST_NAME_UNKNOWN = 68
+    """Host name unknown (sysexits.h EX_NOHOST)."""
+    SERVICE_UNAVAILABLE = 69
+    """Service unavailable (sysexits.h EX_UNAVAILABLE)."""
+    INTERNAL_SOFTWARE_ERROR = 70
+    """Internal software error (sysexits.h EX_SOFTWARE)."""
+    SYSTEM_ERROR = 71
+    """System error (sysexits.h EX_OSERR)."""
+    CRITICAL_OS_FILE_MISSING = 72
+    """Critical OS file missing (sysexits.h EX_OSFILE)."""
+    CANNOT_CREATE = 73
+    """Cannot create output file (sysexits.h EX_CANTCREAT)."""
+    IO_ERROR = 74
+    """Input/output error (sysexits.h EX_IOERR)."""
+    TEMPORARY_FAILURE = 75
+    """Temporary failure (sysexits.h EX_TEMPFAIL)."""
+    REMOTE_PROTOCOL_ERROR = 76
+    """Remote protocol error (sysexits.h EX_PROTOCOL)."""
+    PERMISSION_DENIED = 77
+    """Permission denied (sysexits.h EX_NOPERM)."""
+    CONFIGURATION_ERROR = 78
+    """Configuration error (sysexits.h EX_CONFIG)."""
+    COMMAND_CANNOT_EXECUTE = 126
+    """Command invoked cannot execute."""
+    COMMAND_NOT_FOUND = 127
+    """“command not found."""
+    INVALID_EXIT_ARGUMENT = 128
+    """Invalid argument to exit."""
+    EXIT_SIG_HUP = 129
+    """Hangup detected on controlling terminal (SIGHUP)."""
+    EXIT_SIG_INT = 130
+    """Interrupt from keyboard (SIGINT)."""
+    EXIT_SIG_QUIT = 131
+    """Quit from keyboard (SIGQUIT)."""
+    EXIT_SIG_ILL = 132
+    """Illegal instruction (SIGILL)."""
+    EXIT_SIG_TRAP = 133
+    """Trace/breakpoint trap (SIGTRAP)."""
+    EXIT_SIG_ABRT = 134
+    """Abort signal from abort(3) (SIGABRT)."""
+    EXIT_SIG_BUS = 135
+    """Bus error (SIGBUS)."""
+    EXIT_SIG_FPE = 136
+    """Floating point exception (SIGFPE)."""
+    EXIT_SIG_KILL = 137
+    """Kill signal (SIGKILL)."""
+    EXIT_SIG_USR1 = 138
+    """User-defined signal 1 (SIGUSR1)."""
+    EXIT_SIG_SEGV = 139
+    """Segmentation fault (SIGSEGV)."""
+    EXIT_SIG_USR2 = 140
+    """User-defined signal 2 (SIGUSR2)."""
+    EXIT_SIG_PIPE = 141
+    """Broken pipe (SIGPIPE)."""
+    EXIT_SIG_ALRM = 142
+    """Timer signal (SIGALRM)."""
+    EXIT_SIG_TERM = 143
+    """Termination signal (SIGTERM)."""
+    EXIT_SIG_STKFLT = 144
+    """Stack fault (SIGSTKFLT)."""
+    EXIT_SIG_CHLD = 145
+    """Child stopped or terminated (SIGCHLD)."""
+    EXIT_SIG_CONT = 146
+    """Continue if stopped (SIGCONT)."""
+    EXIT_SIG_STOP = 147
+    """Stop process (SIGSTOP)."""
+    EXIT_SIG_TSTP = 148
+    """Stop typed at terminal (SIGTSTP)."""
+    EXIT_SIG_TTIN = 149
+    """Terminal input for background process (SIGTTIN)."""
+    EXIT_SIG_TTOU = 150
+    """Terminal output for background process (SIGTTOU)."""
+    EXIT_SIG_URG = 151
+    """Urgent condition on socket (SIGURG)."""
+    EXIT_SIG_XCPU = 152
+    """CPU time limit exceeded (SIGXCPU)."""
+    EXIT_SIG_XFSZ = 153
+    """File size limit exceeded (SIGXFSZ)."""
+    EXIT_SIG_VTALRM = 154
+    """Virtual alarm clock (SIGVTALRM)."""
+    EXIT_SIG_PROF = 155
+    """Profiling timer expired (SIGPROF)."""
+    EXIT_SIG_WINCH = 156
+    """Window resize signal (SIGWINCH)."""
+    EXIT_SIG_POLL = 157
+    """Pollable event (SIGIO)."""
+    EXIT_SIG_PWR = 158
+    """Power failure (SIGPWR)."""
+    EXIT_SIG_SYS = 159
+    """Bad system call (SIGSYS)."""
+    SCRIPT_TERMINATED_BY_SIGINT = 130
+    """Script terminated by Control-C (SIGINT)."""
+    SCRIPT_TERMINATED_BY_SIGKILL = 137
+    """Script terminated by SIGKILL."""
+    SEGMENTATION_FAULT = 139
+    """Segmentation fault (SIGSEGV)."""
+    SCRIPT_TERMINATED_BY_SIGTERM = 143
+    """Script terminated by SIGTERM."""
+    EXIT_STATUS_OUT_OF_RANGE = 255
+    """Exit status out of range (greater than 255)."""
+
+    def exit(self) -> NoReturn:
+        """Exit with a given posix exit code."""
+        sys.exit(self.value)
 
 
 def robust_print_json(  # noqa: PLR0913
@@ -111,7 +248,7 @@ def _exit_gracefully_action(signalnum: int, frame: FrameType) -> NoReturn:
             "stack": importlib.import_module("traceback").format_stack(frame),
         },
     )
-    sys.exit(signalnum)
+    PosixExitCode(signalnum).exit()
 
 
 def _exit_gracefully_on_sigint() -> None:

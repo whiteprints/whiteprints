@@ -6,7 +6,6 @@
 
 import importlib
 import logging
-import os
 import sys
 from argparse import Namespace
 from collections.abc import Iterable
@@ -15,7 +14,7 @@ from subprocess import CalledProcessError  # nosec
 from typing import Final
 
 from whiteprints import _, has_extra
-from whiteprints.cli import robust_print
+from whiteprints.cli import PosixExitCode, robust_print
 
 
 WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.6.0"
@@ -209,4 +208,4 @@ def init(namespace: Namespace) -> None:
             "Exception caught while running Copier",
             stack_info=True,
         )
-        sys.exit(os.EX_SOFTWARE)
+        PosixExitCode.INTERNAL_SOFTWARE_ERROR.exit()

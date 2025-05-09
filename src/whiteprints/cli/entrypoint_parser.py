@@ -20,7 +20,7 @@ from typing import (
 )
 
 from whiteprints import _, has_extra, import_extra
-from whiteprints.cli import robust_print, robust_print_json
+from whiteprints.cli import PosixExitCode, robust_print, robust_print_json
 from whiteprints.cli.action import (
     CompleterAction,
     Completion,
@@ -99,7 +99,7 @@ def _initialize_parser(
             formatter_class.choose_theme(theme)
         except ValueError as value_error:
             robust_print(value_error)
-            sys.exit(importlib.import_module("os").EX_USAGE)
+            PosixExitCode.COMMAND_LINE_USAGE_ERROR.exit()
     else:
         formatter_class = HelpFormatter
 
@@ -329,7 +329,7 @@ def _resolve_platform_flag(namespace: Namespace) -> None:
             ).gather_debug_info(site_packages=(namespace.platform > 1)),
             indent=None,
         )
-        sys.exit(importlib.import_module("os").EX_OK)
+        PosixExitCode.SUCCESS.exit()
 
 
 def _resolve_license_flag(namespace: Namespace) -> None:
@@ -365,7 +365,7 @@ def _resolve_license_flag(namespace: Namespace) -> None:
                 indent=None,
             )
 
-        sys.exit(importlib.import_module("os").EX_OK)
+        PosixExitCode.SUCCESS.exit()
 
 
 def _resolve_help_action(
@@ -379,7 +379,7 @@ def _resolve_help_action(
     """
     if namespace.cmd is None:
         argument_parser.print_help()
-        sys.exit(importlib.import_module("os").EX_OK)
+        PosixExitCode.SUCCESS.exit()
 
 
 def resolve_flags(

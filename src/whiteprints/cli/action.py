@@ -20,7 +20,7 @@ from typing import (
 )
 
 from whiteprints import _
-from whiteprints.cli import robust_print
+from whiteprints.cli import PosixExitCode, robust_print
 
 
 if sys.version_info >= (3, 12):
@@ -105,7 +105,7 @@ class Completion(CompleterAction):
             )
             .strip()
         )
-        sys.exit(importlib.import_module("os").EX_OK)
+        PosixExitCode.SUCCESS.exit()
 
 
 class Copyright(CompleterAction):
@@ -131,7 +131,7 @@ class Copyright(CompleterAction):
                 " <whiteprints@pm.me>."
             )
         )
-        sys.exit(importlib.import_module("os").EX_OK)
+        PosixExitCode.SUCCESS.exit()
 
 
 class Version(CompleterAction):
@@ -156,7 +156,7 @@ class Version(CompleterAction):
                 "whiteprints.metadata",
             ).extract_field("Version")
         )
-        sys.exit(importlib.import_module("os").EX_OK)
+        PosixExitCode.SUCCESS.exit()
 
 
 class License(CompleterAction):
@@ -244,4 +244,4 @@ class License(CompleterAction):
             args: the arguments passed to the parser
         """
         self._print_license_text(args[0])
-        sys.exit(importlib.import_module("os").EX_OK)
+        PosixExitCode.SUCCESS.exit()
