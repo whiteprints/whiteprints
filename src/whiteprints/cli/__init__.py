@@ -9,7 +9,7 @@ import importlib
 from collections.abc import Callable
 from enum import IntEnum, unique
 from types import FrameType
-from typing import Final, NoReturn
+from typing import Final, NoReturn, Self
 
 from whiteprints import _, has_extra, import_extra
 
@@ -31,6 +31,7 @@ class PosixExitCode(IntEnum):
         - Signal-based terminations (128+SIGNAL)
     """
 
+    # Shell-reserved statuses
     SUCCESS = 0
     """Successful termination."""
     GENERAL_ERROR = 1
@@ -43,6 +44,8 @@ class PosixExitCode(IntEnum):
     """Input/output error (alternate)."""
     NO_SUCH_DEVICE_OR_ADDRESS = 6
     """No such device or address."""
+
+    # BSD/GNU "sysexits.h" codes
     COMMAND_LINE_USAGE_ERROR = 64
     """Command line usage error (sysexits.h EX_USAGE)."""
     DATA_FORMAT_ERROR = 65
@@ -73,74 +76,19 @@ class PosixExitCode(IntEnum):
     """Permission denied (sysexits.h EX_NOPERM)."""
     CONFIGURATION_ERROR = 78
     """Configuration error (sysexits.h EX_CONFIG)."""
+
+    # Commands and invalid exit argument
     COMMAND_CANNOT_EXECUTE = 126
     """Command invoked cannot execute."""
     COMMAND_NOT_FOUND = 127
-    """“command not found."""
+    """Command not found."""
     INVALID_EXIT_ARGUMENT = 128
     """Invalid argument to exit."""
-    EXIT_SIG_HUP = 129
-    """Hangup detected on controlling terminal (SIGHUP)."""
-    EXIT_SIG_INT = 130
-    """Interrupt from keyboard (SIGINT)."""
-    EXIT_SIG_QUIT = 131
-    """Quit from keyboard (SIGQUIT)."""
-    EXIT_SIG_ILL = 132
-    """Illegal instruction (SIGILL)."""
-    EXIT_SIG_TRAP = 133
-    """Trace/breakpoint trap (SIGTRAP)."""
-    EXIT_SIG_ABRT = 134
-    """Abort signal from abort(3) (SIGABRT)."""
-    EXIT_SIG_BUS = 135
-    """Bus error (SIGBUS)."""
-    EXIT_SIG_FPE = 136
-    """Floating point exception (SIGFPE)."""
-    EXIT_SIG_KILL = 137
-    """Kill signal (SIGKILL)."""
-    EXIT_SIG_USR1 = 138
-    """User-defined signal 1 (SIGUSR1)."""
-    EXIT_SIG_SEGV = 139
-    """Segmentation fault (SIGSEGV)."""
-    EXIT_SIG_USR2 = 140
-    """User-defined signal 2 (SIGUSR2)."""
-    EXIT_SIG_PIPE = 141
-    """Broken pipe (SIGPIPE)."""
-    EXIT_SIG_ALRM = 142
-    """Timer signal (SIGALRM)."""
-    EXIT_SIG_TERM = 143
-    """Termination signal (SIGTERM)."""
-    EXIT_SIG_STKFLT = 144
-    """Stack fault (SIGSTKFLT)."""
-    EXIT_SIG_CHLD = 145
-    """Child stopped or terminated (SIGCHLD)."""
-    EXIT_SIG_CONT = 146
-    """Continue if stopped (SIGCONT)."""
-    EXIT_SIG_STOP = 147
-    """Stop process (SIGSTOP)."""
-    EXIT_SIG_TSTP = 148
-    """Stop typed at terminal (SIGTSTP)."""
-    EXIT_SIG_TTIN = 149
-    """Terminal input for background process (SIGTTIN)."""
-    EXIT_SIG_TTOU = 150
-    """Terminal output for background process (SIGTTOU)."""
-    EXIT_SIG_URG = 151
-    """Urgent condition on socket (SIGURG)."""
-    EXIT_SIG_XCPU = 152
-    """CPU time limit exceeded (SIGXCPU)."""
-    EXIT_SIG_XFSZ = 153
-    """File size limit exceeded (SIGXFSZ)."""
-    EXIT_SIG_VTALRM = 154
-    """Virtual alarm clock (SIGVTALRM)."""
-    EXIT_SIG_PROF = 155
-    """Profiling timer expired (SIGPROF)."""
-    EXIT_SIG_WINCH = 156
-    """Window resize signal (SIGWINCH)."""
-    EXIT_SIG_POLL = 157
-    """Pollable event (SIGIO)."""
-    EXIT_SIG_PWR = 158
-    """Power failure (SIGPWR)."""
-    EXIT_SIG_SYS = 159
-    """Bad system call (SIGSYS)."""
+
+    # Signal-based exit codes (auto-generated)
+    for signal in importlib.import_module("signal").Signals:
+        locals()[f"EXIT_SIG_{signal.name}"] = 128 + signal.value
+
     EXIT_STATUS_OUT_OF_RANGE = 255
     """Exit status out of range (greater than 255)."""
 
@@ -151,6 +99,10 @@ class PosixExitCode(IntEnum):
             SystemExit: exit the programe with the enum exit code.
         """
         raise SystemExit(self.value)
+
+    @classmethod
+    def from_signal(cls, python_signal_number: int) -> Self:
+        return cls(128 + python_signal_number)
 
 
 def robust_print_json(  # noqa: PLR0913
@@ -243,7 +195,7 @@ def _exit_gracefully_action(signalnum: int, frame: FrameType) -> NoReturn:
             "stack": importlib.import_module("traceback").format_stack(frame),
         },
     )
-    PosixExitCode(128 + signalnum).exit()
+    PosixExitCode.from_signal(signalnum).exit()
 
 
 def _exit_gracefully_on_sigint() -> None:
