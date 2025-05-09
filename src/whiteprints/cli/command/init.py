@@ -31,7 +31,7 @@ _GITHUB_EXTRAS: Final = {
 
 
 @dataclass(frozen=True, slots=True)
-class CopyOp:
+class _CopierOperation:
     """Descriptor for a copier operation."""
 
     repo: str
@@ -41,12 +41,28 @@ class CopyOp:
     trust: bool
 
 
-def build_github_ops(
+def _requires_github_integration(namespace: Namespace) -> bool:
+    """Check if the namespace call for GitHub integration.
+
+    Args:
+        namespace: flags for github, github_all, extras.
+
+    Returns:
+        True if the namespace call for GitHub integration, False otherwise.
+    """
+    return (
+        bool(namespace.github)
+        or bool(namespace.github_all)
+        or any(bool(getattr(namespace, f)) for f in _GITHUB_EXTRAS)
+    )
+
+
+def _build_github_operation(
     project_directory: str,
     copier_args: Iterable[str],
     namespace: Namespace,
     context: Iterable[str],
-) -> list[CopyOp]:
+) -> list[_CopierOperation]:
     """Build copy operations for GitHub core and feature extras.
 
     Args:
@@ -56,7 +72,7 @@ def build_github_ops(
         context: the shared context list
 
     Returns:
-        CopyOp list for GitHub actions
+        _CopierOperation list for GitHub actions
 
 
     Example:
@@ -71,21 +87,15 @@ def build_github_ops(
         ...     protect_repository=False
         ... )
         >>>
-        >>> ops = build_github_ops('proj', [], ns, ['ctx'])
+        >>> ops = _build_github_operation('proj', [], ns, ['ctx'])
         >>> [o.repo for o in ops]
         ['gh:whiteprints/template-github.git']
     """
-    ops: list[CopyOp] = []
+    ops: list[_CopierOperation] = []
 
-    # Determine if any GitHub integration is needed
-    github_core = (
-        bool(namespace.github)
-        or bool(namespace.github_all)
-        or any(bool(getattr(namespace, f)) for f in _GITHUB_EXTRAS)
-    )
-    if github_core:
+    if _requires_github_integration(namespace):
         ops.append(
-            CopyOp(
+            _CopierOperation(
                 repo="gh:whiteprints/template-github.git",
                 dest=project_directory,
                 args=copier_args,
@@ -98,7 +108,7 @@ def build_github_ops(
     for feature, repo in _GITHUB_EXTRAS.items():
         if bool(namespace.github_all) or bool(getattr(namespace, feature)):
             ops.append(
-                CopyOp(
+                _CopierOperation(
                     repo=repo,
                     dest=project_directory,
                     args=copier_args,
@@ -109,12 +119,12 @@ def build_github_ops(
     return ops
 
 
-def build_copy_ops(
+def _build_copier_operation(
     project_directory: str,
     copier_args: Iterable[str],
     namespace: Namespace,
-) -> list[CopyOp]:
-    """Build a list of CopyOp instances based on feature flags.
+) -> list[_CopierOperation]:
+    """Build a list of _CopierOperation instances based on feature flags.
 
     Args:
         project_directory: target directory for templates
@@ -122,7 +132,8 @@ def build_copy_ops(
         namespace: boolean flags for each feature
 
     Returns:
-        a list of CopyOp objects describing the copy operations to perform.
+        a list of _CopierOperation objects describing the copy operations to
+        perform.
 
     Example:
         >>> from argparse import Namespace
@@ -137,18 +148,18 @@ def build_copy_ops(
         ...     protect_repository=False
         ... )
         >>>
-        >>> ops = build_copy_ops('proj', [], ns)
+        >>> ops = _build_copier_operation('proj', [], ns)
         >>> [o.repo for o in ops]
         [..., 'gh:whiteprints/template-rich-click.git']
     """
-    ops: list[CopyOp] = []
+    ops: list[_CopierOperation] = []
     context = [
         f"whiteprints-template-context=={WHITEPRINTS_TEMPLATE_CONTEXT_VERSION}"
     ]
 
     # Base Python template
     ops.append(
-        CopyOp(
+        _CopierOperation(
             repo="gh:whiteprints/template-python.git",
             dest=project_directory,
             args=copier_args,
@@ -160,7 +171,7 @@ def build_copy_ops(
     # Optional CLI support
     if bool(namespace.command_line):
         ops.append(
-            CopyOp(
+            _CopierOperation(
                 repo="gh:whiteprints/template-rich-click.git",
                 dest=project_directory,
                 args=copier_args,
@@ -171,7 +182,12 @@ def build_copy_ops(
 
     # Optional GitHub and GitHub extras support
     ops.extend(
-        build_github_ops(project_directory, copier_args, namespace, context)
+        _build_github_operation(
+            project_directory,
+            copier_args,
+            namespace,
+            context,
+        )
     )
     return ops
 
@@ -182,7 +198,7 @@ def init(namespace: Namespace) -> None:
     project_directory = str(namespace.project_directory)
 
     try:
-        for op in build_copy_ops(
+        for op in _build_copier_operation(
             project_directory,
             namespace.copier_args,
             namespace,
