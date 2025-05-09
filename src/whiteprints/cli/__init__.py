@@ -6,7 +6,6 @@
 
 import gettext
 import importlib
-import sys
 from collections.abc import Callable
 from enum import IntEnum, unique
 from types import FrameType
@@ -146,8 +145,12 @@ class PosixExitCode(IntEnum):
     """Exit status out of range (greater than 255)."""
 
     def exit(self) -> NoReturn:
-        """Exit with a given posix exit code."""
-        sys.exit(self.value)
+        """Exit with a given posix exit code.
+
+        Raises:
+            SystemExit: exit the programe with the enum exit code.
+        """
+        raise SystemExit(self.value)
 
 
 def robust_print_json(  # noqa: PLR0913
@@ -195,7 +198,7 @@ def robust_print_json(  # noqa: PLR0913
     if (rich := import_extra("rich")) is None:
         importlib.import_module("json").dump(
             data,
-            sys.stdout,
+            importlib.import_module("sys").stdout,
             indent=indent,
             skipkeys=skip_keys,
             ensure_ascii=ensure_ascii,
@@ -204,7 +207,7 @@ def robust_print_json(  # noqa: PLR0913
             sort_keys=sort_keys,
             default=default,
         )
-        sys.stdout.write("\n")
+        importlib.import_module("sys").stdout.write("\n")
     else:
         rich.print_json(
             data=data,
@@ -229,7 +232,7 @@ def _exit_gracefully_action(signalnum: int, frame: FrameType) -> NoReturn:
     error_message = _("Execution stopped by user")
     robust_print(
         f"[red]{error_message}[/]" if has_extra("rich") else error_message,
-        file=sys.stderr,
+        file=importlib.import_module("sys").stderr,
     )
 
     logger = importlib.import_module("logging").getLogger(__name__)
