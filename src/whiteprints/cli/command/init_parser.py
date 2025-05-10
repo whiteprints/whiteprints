@@ -13,6 +13,7 @@ from whiteprints.cli.action import CompleterAction
 
 
 __all__: Final = ["setup_init_parser"]
+"""Public module attributes."""
 
 
 def setup_init_parser(parser: ArgumentParser) -> None:

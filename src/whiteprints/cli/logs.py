@@ -12,6 +12,7 @@ from whiteprints import import_extra
 
 
 __all__: Final = ["setup_logging", "user_log_config", "user_log_dir"]
+"""Public module attributes."""
 
 
 @cache

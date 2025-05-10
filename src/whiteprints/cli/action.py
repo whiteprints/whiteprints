@@ -36,6 +36,7 @@ __all__: Final = [
     "License",
     "Version",
 ]
+"""Public module attributes."""
 
 
 class CompleterAction(Action):
@@ -90,9 +91,9 @@ class Completion(CompleterAction):
         """Generate the autocompletion code.
 
         Args:
-            parser: the argument parser
-            namespace: the arguments namespace
-            args: the arguments passed to the parser
+            parser: the argument parser.
+            namespace: the arguments namespace.
+            args: the arguments passed to the parser.
         """
         # Bandit has a false positive. Here shell is a string not a
         # boolean. More importantly it is not related to a subprocess
@@ -121,9 +122,9 @@ class Copyright(CompleterAction):
         """Print the code copyright information.
 
         Args:
-            parser: the argument parser
-            namespace: the arguments namespace
-            args: the arguments passed to the parser
+            parser: the argument parser.
+            namespace: the arguments namespace.
+            args: the arguments passed to the parser.
         """
         robust_print(
             _(
@@ -147,9 +148,9 @@ class Version(CompleterAction):
         """Print the code copyright information.
 
         Args:
-            parser: the argument parser
-            namespace: the arguments namespace
-            args: the arguments passed to the parser
+            parser: the argument parser.
+            namespace: the arguments namespace.
+            args: the arguments passed to the parser.
         """
         robust_print(
             importlib.import_module(
@@ -239,9 +240,9 @@ class License(CompleterAction):
         present in the package.
 
         Args:
-            parser: the argument parser
-            namespace: the arguments namespace
-            args: the arguments passed to the parser
+            parser: the argument parser.
+            namespace: the arguments namespace.
+            args: the arguments passed to the parser.
         """
         self._print_license_text(args[0])
         PosixExitCode.SUCCESS.exit()

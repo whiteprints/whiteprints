@@ -15,6 +15,10 @@ from whiteprints import _, has_extra
 from whiteprints.cli import PosixExitCode, robust_print
 
 
+__all__: Final = ["init"]
+"""Public module attributes."""
+
+
 WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.6.0"
 """The whiteprints-template-context version pin."""
 

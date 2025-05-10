@@ -16,6 +16,7 @@ from whiteprints.libuv.uvx import UVX
 
 
 __all__: Final = ["Copier"]
+"""Public module attributes."""
 
 
 class Copier:

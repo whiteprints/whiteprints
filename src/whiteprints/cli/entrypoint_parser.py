@@ -37,6 +37,7 @@ else:
 
 
 __all__: Final = ["create_entrypoint_parser"]
+"""Public module attributes."""
 
 
 class ArgumentParserExUsage(ArgumentParser):

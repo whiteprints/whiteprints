@@ -19,9 +19,9 @@ for installed Python distributions. These metadata directories are required for
 all compliant wheel installs.
 
 Caveats:
-- Packages installed via `setup.py develop` (i.e., legacy `.egg-info`) are
-  unsupported.
-- Broken or non-standard environments may yield incomplete results.
+    - Packages installed via `setup.py develop` (i.e., legacy `.egg-info`) are
+      unsupported.
+    - Broken or non-standard environments may yield incomplete results.
 
 This module prioritizes startup time and metadata locality over generality or
 fallback mechanisms.
@@ -38,6 +38,7 @@ __all__: Final = [
     "extract_fields",
     "locate_dist_info_directory",
 ]
+"""Public module attributes."""
 
 
 DISTRIBUTION_NAME: Final = "whiteprints"

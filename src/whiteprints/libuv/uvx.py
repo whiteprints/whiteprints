@@ -13,6 +13,7 @@ from typing import Final
 
 
 __all__: Final = ["UVX"]
+"""Public module attributes."""
 
 
 class UVX:

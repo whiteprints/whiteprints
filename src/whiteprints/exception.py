@@ -8,6 +8,7 @@ from typing import Final
 
 
 __all__: Final = ["WhiteprintsError"]
+"""Public module attributes."""
 
 
 class WhiteprintsError(Exception):

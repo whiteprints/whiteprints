@@ -28,7 +28,6 @@ extensions = [
     "sphinxarg.ext",
     "sphinx_copybutton",
     "sphinx.ext.autosummary",
-    "sphinx.ext.viewcode",
     "autoapi.extension",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",

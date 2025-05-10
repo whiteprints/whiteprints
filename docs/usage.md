@@ -12,7 +12,6 @@ SPDX-License-Identifier: CC-BY-NC-SA-4.0
    :module: whiteprints.cli.entrypoint_parser
    :func: create_entrypoint_parser
    :prog: whiteprints
-   :path: init
 ```
 
 ```{toctree}

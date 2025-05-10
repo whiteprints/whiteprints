@@ -34,6 +34,7 @@ from typing import Final, TypedDict
 
 
 __all__: Final = ["DebugInfo", "gather_debug_info"]
+"""Public module attributes."""
 
 
 if sys.version_info >= (3, 13):
