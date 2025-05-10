@@ -162,6 +162,8 @@ required-version = ">=0.7.3"
 cache-keys = [
     { git = { commit = true, tags = true } },
     { file = "src/**/*.py" },
+    { file = "src/**/*.po" },
+    { file = "src/**/*.pot" },
     { file = "pyproject.toml" },
     { file = "uv.toml.py" },
     { file = "hatch.toml" },

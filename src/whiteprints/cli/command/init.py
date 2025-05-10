@@ -8,9 +8,8 @@ import importlib
 import logging
 from argparse import Namespace
 from collections.abc import Iterable
-from dataclasses import dataclass
 from subprocess import CalledProcessError  # nosec
-from typing import Final
+from typing import Final, NamedTuple
 
 from whiteprints import _, has_extra
 from whiteprints.cli import PosixExitCode, robust_print
@@ -30,8 +29,7 @@ _GITHUB_EXTRAS: Final = {
 """Define the repository mapping from feature names to copier templates."""
 
 
-@dataclass(frozen=True, slots=True)
-class _CopierOperation:
+class _CopierOperation(NamedTuple):
     """Descriptor for a copier operation."""
 
     repo: str
