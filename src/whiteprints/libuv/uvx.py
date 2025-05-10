@@ -17,7 +17,11 @@ __all__: Final = ["UVX"]
 
 
 class UVX:
-    """Manage the uv program."""
+    """Manage the uv program.
+
+    Attributes:
+        bin: path to the UV binary.
+    """
 
     def __init__(self) -> None:
         """Create an UVX instance."""
