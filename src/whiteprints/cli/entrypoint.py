@@ -41,9 +41,7 @@ def _create_namespace(
     subparsers = (
         entrypoint_parser := importlib.import_module(
             "whiteprints.cli.entrypoint_parser",
-        ).create_entrypoint_parser(
-            importlib.import_module("whiteprints.metadata").DISTRIBUTION_NAME
-        )
+        ).create_entrypoint_parser()
     ).add_subparsers(
         title=_("Subcommands"),
         dest="cmd",

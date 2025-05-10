@@ -270,23 +270,24 @@ def _add_configuration_parsers(
         logs_arg.completer = argcomplete.FilesCompleter(allowednames=".json")
 
 
-def create_entrypoint_parser(prog: str) -> ArgumentParserExUsage:
+def create_entrypoint_parser() -> ArgumentParserExUsage:
     """Parse command line arguments.
 
     The ouput of this function is cached. No new instances are created on
     subsequent calls.
 
     Example:
-        >>> isinstance(create_entrypoint_parser("prog"), ArgumentParser)
+        >>> isinstance(create_entrypoint_parser(), ArgumentParser)
         True
-
-    Args:
-        prog: the program name.
 
     Returns:
         the program namespace.
     """
-    app_name_env_prefix = prog.upper()
+    app_name_env_prefix = (
+        prog := importlib.import_module(
+            "whiteprints.metadata"
+        ).DISTRIBUTION_NAME
+    ).upper()
     parser = _initialize_parser(
         prog,
         importlib.import_module("os").environ.get(
