@@ -62,15 +62,15 @@ class Completion(CompleterAction):
         Args:
             args: the arguments forwarded to the action.
 
+        Returns:
+            The current shell name.
+
         Example:
             >>> Completion._autodetect_shell("bash")
             bash
             >>> Completion._autodetect_shell(["bash"])
             bash
             >>> assert isinstance(Completion._autodetect_shell(None), str)
-
-        Returns:
-            The current shell name.
         """
         if args is None:
             return importlib.import_module("shellingham").detect_shell()[0]
