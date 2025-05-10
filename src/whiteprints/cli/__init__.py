@@ -6,16 +6,23 @@
 
 import gettext
 import importlib
+import sys
 from collections.abc import Callable
 from enum import IntEnum, unique
 from types import FrameType
-from typing import Final, NoReturn, Self
+from typing import Final, NoReturn
 
 from whiteprints import _, has_extra, import_extra
 
 
 __all__: Final = ["robust_print", "robust_print_json"]
 """Public module attributes."""
+
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 robust_print = print if (rich := import_extra("rich")) is None else rich.print
