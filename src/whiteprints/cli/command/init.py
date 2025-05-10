@@ -196,7 +196,6 @@ def _build_copier_operation(
 
 def init(namespace: Namespace) -> None:
     """Initialize a python project by executing all copy operations."""
-    copier = importlib.import_module("whiteprints.libuv.copier").Copier()
     project_directory = str(namespace.project_directory)
 
     try:
@@ -205,7 +204,7 @@ def init(namespace: Namespace) -> None:
             namespace.copier_args,
             namespace,
         ):
-            copier.copy(
+            importlib.import_module("whiteprints.libuv.copier").copy(
                 [op.repo, op.dest, *op.args],
                 context=op.context,
                 trust=op.trust,
