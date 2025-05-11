@@ -53,14 +53,49 @@ pip install git+ssh://git@github.com/whiteprints/whiteprints
 
 The same recommendations made for PyPI installation apply.
 
+# ✨ Installing optional features
+
+By default, the CLI is installed without any optional dependencies. This keeps
+the installation minimal and avoids pulling in unnecessary packages.
+
+However, you can enable additional features by installing *extras*, which
+provide support for:
+
+- Colored terminal output
+- Shell autocompletion
+- Automatic loading of `.env` files
+
+To install the CLI with extras, use the following syntax:
+
+```
+uv tool install whiteprints[qol,color]
+```
+
+In the example above:
+
+- `color` enables ANSI-colored output in help messages and errors.
+- `qol` (Quality of Life) enables shell autocompletion and `.env` file
+  autoloading , and smart handling of config and cache directories based on
+  your operating system.
+
+> **Note:** Installing extras will increase the number of dependencies and may
+> slightly affect CLI startup performance. Only enable the extras you actually
+> need.
+
 [GitHub]: https://github.com
 [git]: https://git-scm.com/
-
-For additional information on source installation see [PyPA]'s guide:
-[installing Packages](https://packaging.python.org/en/latest/tutorials/installing-packages).
 
 [PyPA]: https://www.pypa.io/en/latest/
 [pip]: https://pip.pypa.io/en/stable
 [package]: https://pypi.org/project/whiteprints
 [uv]: https://docs.astral.sh/uv/
 [pipx]: https://pipx.pypa.io/stable/
+
+# 📚 Further Reading
+
+For additional information on source installation see [PyPA]'s guide:
+[installing Packages](https://packaging.python.org/en/latest/tutorials/installing-packages).
+
+For more details on how Python extras work, see the official guide:
+[Installing Extras – Python Packaging User Guide](https://packaging.python.org/en/latest/tutorials/installing-packages/#installing-extras)
+
