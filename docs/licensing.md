@@ -24,7 +24,7 @@ explanations on licenses, expressions and exceptions.
 
 The [Python] code distributed is a subset of the complete codebase.
 
-:::{attention}
+:::{note}
 :name: Whiteprints's documentation License
 The documentation of this project is distributed under license [CC-BY-NC-SA-4.0](../LICENSES/CC-BY-NC-SA-4.0.txt).
 :::
