@@ -767,7 +767,6 @@ sphinx-autobuild *args:
         sphinx-autobuild \
             --jobs=auto \
             --keep-going \
-            --open-browser \
         docs \
         $(just tmp-path sphinx-autobuild)/docs_build \
         {{ args }} \
@@ -775,8 +774,8 @@ sphinx-autobuild *args:
 
 # Serve the documentation on a given port. If port=0 a random available port is set.
 [group("documentation")]
-serve-documentation port="0":
-    @just sphinx-autobuild "--port={{ port }}"
+serve-documentation port="0" *args:
+    @just sphinx-autobuild --port={{ port }} {{ args }}
 
 # Run `pybabel`
 [private]
