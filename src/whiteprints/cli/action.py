@@ -43,6 +43,12 @@ class CompleterAction(Action):
     """An action that can use a completer (argcomplete)."""
 
     completer: Callable[..., Any]
+    """An additional completer added to the Action.
+
+    This is here to help type checkers. Indeed argcomplete dynamically injects
+    a completer attribute which his not present int the argparse.Action. As a
+    results linters complains when assinging a completer to an Action.
+    """
 
 
 class Completion(CompleterAction):

@@ -4,12 +4,12 @@
 
 """Test the CLI init subcommand."""
 
-import os
 from pathlib import Path
 
 import pytest
 from pytest import CaptureFixture
 
+from whiteprints.cli import PosixExitCode
 from whiteprints.cli.entrypoint import entrypoint
 
 
@@ -18,7 +18,7 @@ def test_help(capsys: CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as ext:
         entrypoint(["init", "--help"])
 
-    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
     captured = capsys.readouterr()
     assert captured.out, "Could not print init subcommand help message."
@@ -31,7 +31,9 @@ def test_init_fail_on_empty_args(
     with pytest.raises(SystemExit) as ext:
         entrypoint(["init", str(tmp_path), "--data"])
 
-    assert ext.value.code == os.EX_SOFTWARE, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.INTERNAL_SOFTWARE_ERROR, (
+        "Unexpected exit code."
+    )
 
     captured = capsys.readouterr()
     assert captured.err, "Could not print init subcommand help message."
@@ -60,7 +62,7 @@ def init_dummy(capsys: CaptureFixture[str], tmp_path: Path) -> None:
             "target_python_version=py313",
         ])
 
-    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
     captured = capsys.readouterr()
     assert captured.out, "Project generation failed."

@@ -7,14 +7,14 @@
 """Command Line Interface app entrypoint."""
 
 import importlib
-from argparse import Namespace
+from argparse import ArgumentParser, Namespace
 from types import ModuleType
 from typing import Final
 
 from whiteprints import _, import_extra
 
 
-__all__: Final = ["entrypoint"]
+__all__: Final = ["create_parser", "entrypoint"]
 """Public module attributes."""
 
 
@@ -25,18 +25,11 @@ __all__: Final = ["entrypoint"]
 _GETTEXT.textdomain("argparse")
 
 
-def _create_namespace(
-    args: list[str] | None,
-    argcomplete: ModuleType | None,
-) -> Namespace:
-    """Create a namespace from the arguments.
-
-    Args:
-        args: the command line arguments.
-        argcomplete: an optional argcomplete module.
+def create_parser() -> ArgumentParser:
+    """Create the CLI parser.
 
     Returns:
-        The namespace corresponding to the arguments passed.
+        The CLI parser.
     """
     subparsers = (
         entrypoint_parser := importlib.import_module(
@@ -63,15 +56,30 @@ def _create_namespace(
             ),
         )
     )
+    return entrypoint_parser
+
+
+def _create_namespace(
+    args: list[str] | None,
+    argcomplete: ModuleType | None,
+) -> Namespace:
+    """Create a namespace from the arguments.
+
+    Args:
+        args: the command line arguments.
+        argcomplete: an optional argcomplete module.
+
+    Returns:
+        The namespace corresponding to the arguments passed.
+    """
+    parser = create_parser()
 
     if argcomplete is not None:
-        argcomplete.autocomplete(entrypoint_parser)
+        argcomplete.autocomplete(parser)
 
     importlib.import_module(
         "whiteprints.cli.entrypoint_parser",
-    ).resolve_flags(
-        entrypoint_parser, namespace := entrypoint_parser.parse_args(args)
-    )
+    ).resolve_flags(parser, namespace := parser.parse_args(args))
 
     return namespace
 

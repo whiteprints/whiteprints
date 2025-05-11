@@ -38,9 +38,7 @@ def uvx(command: Iterable[str]) -> None:
         debug: run in debug mode. If debug is false, stderr is suppressed.
 
     Example:
-        >>> UVX().run(["uv", "--help"])
-        ...
-        >>> UVX().run(["uv", "--help"], debug=True)
+        >>> uvx(["uv", "--help"])
         ...
     """
     (subprocess := importlib.import_module("subprocess")).run(  # nosec

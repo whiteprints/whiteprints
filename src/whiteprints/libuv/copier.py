@@ -27,7 +27,7 @@ def copy(
     """Run a copier command.
 
     Example:
-        >>> Copier().copy(["--help"])
+        >>> copy(["--help"])
         ...
 
     Args:

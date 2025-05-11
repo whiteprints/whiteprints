@@ -738,6 +738,7 @@ check-supply-chain python resolution="lowest": (venv ("check-supply-chain-" + re
 [private]
 sphinx-build *args:
     @just uvr " \
+        --all-extras \
         --group=build-documentation \
         sphinx-build \
             --jobs=auto \
@@ -761,6 +762,7 @@ check-documentation-links dest="docs_build":
 [private]
 sphinx-autobuild *args:
     @just uvr " \
+            --all-extras \
             --group=serve-documentation \
         sphinx-autobuild \
             --jobs=auto \

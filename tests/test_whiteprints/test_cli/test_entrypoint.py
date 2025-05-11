@@ -5,11 +5,11 @@
 """Test the CLI entrypoint."""
 
 import json
-import os
 
 import pytest
 from pytest import CaptureFixture, MonkeyPatch
 
+from whiteprints.cli import PosixExitCode
 from whiteprints.cli.entrypoint import entrypoint
 from whiteprints.cli.entrypoint_parser import Completion
 from whiteprints.metadata import extract_field
@@ -20,7 +20,7 @@ def test_help(capsys: CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--help"])
 
-    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
     captured = capsys.readouterr()
     assert captured.out, "Could not print application help message"
@@ -31,14 +31,14 @@ def test_no_args_is_help(capsys: CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as ext:
         entrypoint([])
 
-    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
     captured_1 = capsys.readouterr()
 
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--help"])
 
-    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
     captured_2 = capsys.readouterr()
     assert captured_1.out == captured_2.out, "no args output should match help"
@@ -53,7 +53,9 @@ def test_help_wrong_theme(
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--help"])
 
-    assert ext.value.code == os.EX_USAGE, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.COMMAND_LINE_USAGE_ERROR, (
+        "Unexpected exit code."
+    )
 
     captured = capsys.readouterr()
     assert captured.out, "Application should fail on invalid theme selection"
@@ -64,7 +66,9 @@ def test_wrong_usage(capsys: CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--this-flag-does-not-exists"])
 
-    assert ext.value.code == os.EX_USAGE, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.COMMAND_LINE_USAGE_ERROR, (
+        "Unexpected exit code."
+    )
 
     captured = capsys.readouterr()
     assert "error" in captured.err, "Could not print application help message"
@@ -75,7 +79,7 @@ def test_version(capsys: CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--version"])
 
-    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
     captured = capsys.readouterr()
     assert captured.out.rstrip() == extract_field("Version"), (
@@ -89,7 +93,7 @@ def test_platform(capsys: CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--platform"])
 
-    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
     captured = capsys.readouterr()
     assert json.loads(captured.out), (
@@ -103,7 +107,7 @@ def test_platform_full(capsys: CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--platform", "--platform"])
 
-    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
     captured = capsys.readouterr()
     assert json.loads(captured.out), (
@@ -116,7 +120,7 @@ def test_copyright(capsys: CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--copyright"])
 
-    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
     captured = capsys.readouterr()
     assert captured.out, "Could not print application copyright message"
@@ -127,7 +131,7 @@ def test_license_simple(capsys: CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--license"])
 
-    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
     captured = capsys.readouterr()
     assert captured.out, "Could not print application license informations"
@@ -138,7 +142,7 @@ def test_license_full(capsys: CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--license", "--license"])
 
-    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
     captured = capsys.readouterr()
     assert json.loads(captured.out), (
@@ -151,7 +155,7 @@ def test_license_valid(capsys: CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--license-text"])
 
-    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
     captured = capsys.readouterr()
     assert captured.out, "There should be a license text displayed"
@@ -165,7 +169,9 @@ def test_shell_autocompletion_fail_when_no_extras(
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--autocompletion-script"])
 
-    assert ext.value.code == os.EX_USAGE, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.COMMAND_LINE_USAGE_ERROR, (
+        "Unexpected exit code."
+    )
 
     captured = capsys.readouterr()
     assert "error" in captured.err.lower(), (
@@ -181,7 +187,7 @@ def test_shell_autocompletion(
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--autocompletion-script", Completion.SUPPORTED_SHELLS[0]])
 
-    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
     captured = capsys.readouterr()
     assert captured.out, "There should be a shell autocompletion displayed"
@@ -194,7 +200,7 @@ def test_shell_autocompletion_auto(
     with pytest.raises(SystemExit) as ext:
         entrypoint(["--autocompletion-script"])
 
-    assert ext.value.code == os.EX_OK, "Unexpected exit code."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
     captured = capsys.readouterr()
     assert captured.out, "There should be a shell autocompletion displayed"

@@ -17,7 +17,7 @@ project_copyright = (
     '2024 The "Whiteprints" contributors <whiteprints@pm.me> - {}'
 )
 project_copyright = project_copyright.format(
-    "Distributed under license CC-BY-NC-SA-4.0"
+    "Documentation distributed under license CC-BY-NC-SA-4.0"
 )
 release = metadata.version("whiteprints")
 version = ".".join(release.split(".")[:3])
@@ -31,6 +31,7 @@ extensions = [
     "autoapi.extension",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
 ]
 autoapi_type = "python"
 autoapi_dirs = ["../src"]
@@ -38,7 +39,6 @@ autoapi_template_dir = "_autoapi_templates"
 autoapi_options = [
     "members",
     "undoc-members",
-    "inherited-members",
     "special-members",
     "show-inheritance",
     "show-module-summary",
