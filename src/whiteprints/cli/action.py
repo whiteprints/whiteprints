@@ -63,45 +63,67 @@ class Completion(CompleterAction):
     )
 
     @staticmethod
-    def _autodetect_shell(args: str | Sequence[str] | None) -> str:
+    def _abort_shell_detection() -> NoReturn:
+        """Abort shell detection."""
+        error_message = (
+            "Failed to auto-detect your shell. "
+            "Run `whiteprints --autocompletion-script <shell_name>` instead."
+        )
+        robust_print(
+            f"[red]{error_message}[/]" if has_extra("rich") else error_message,
+            file=importlib.import_module("sys").stderr,
+        )
+        PosixExitCode.INTERNAL_SOFTWARE_ERROR.exit()
+
+    @classmethod
+    def _autodetect_shell(
+        cls,
+        args: str | Sequence[str] | None,
+        shell_detection_function: Callable[[], tuple[str, str]],
+    ) -> str:
         """Try to autotect the shell if not given.
 
         Args:
             args: the arguments forwarded to the action.
+            shell_detection_function: a callable that takes no args and return
+                a tuple containing the shell name and the command to invoke it.
+                E.g. `(sh, /bin/sh)`.
 
         Returns:
             The current shell name.
 
         Example:
-            >>> Completion._autodetect_shell("bash")
+            >>> from shellingham import detect_shell, ShellDetectionFailure
+            >>>
+            >>>
+            >>> Completion._autodetect_shell("bash", detect_shell)
             bash
-            >>> Completion._autodetect_shell(["bash"])
+            >>> Completion._autodetect_shell(["bash"], detect_shell)
             bash
-            >>> assert isinstance(Completion._autodetect_shell(None), str)
+            >>> assert isinstance(
+            ...     Completion._autodetect_shell(None, detect_shell), str
+            ... )
+            True
+            >>>
+            >>> try:
+            ...     Completion._autodetect_shell(
+            ...         None, lambda: raise ShellDetectionFailure
+            ...     )
+            ... except SystemExit as system_exit:
+            ...     assert system_exit.code == (
+            ...         PosixExitCode.INTERNAL_SOFTWARE_ERROR
+            ...     ), "Wrong exit code."
+            >>> ...
+
         """
-        if args is None:
-            shellingham = importlib.import_module("shellingham")
-            try:
-                return shellingham.detect_shell()[0]
-            except shellingham.ShellDetectionFailure:
-                error_message = (
-                    "Failed to autotect shell. You can still get"
-                    " the autocompletion script if you know your shell"
-                    " name by runing `whiteprints --autocompletion-script"
-                    " <shell_name>`."
-                )
-                robust_print(
-                    f"[red]{error_message}[/]"
-                    if has_extra("rich")
-                    else error_message,
-                    file=importlib.import_module("sys").stderr,
-                )
-                PosixExitCode.INTERNAL_SOFTWARE_ERROR.exit()
+        if args:
+            return args if isinstance(args, str) else args[0]
 
-        if isinstance(args, str):
-            return args
-
-        return args[0]
+        shellingham = importlib.import_module("shellingham")
+        try:
+            return shell_detection_function()[0]
+        except shellingham.ShellDetectionFailure:
+            cls._abort_shell_detection()
 
     @override
     def __call__(
@@ -124,7 +146,10 @@ class Completion(CompleterAction):
             importlib.import_module("argcomplete.shell_integration")
             .shellcode(
                 [parser.prog],
-                shell=self._autodetect_shell(args[0]),  # nosec
+                shell=self._autodetect_shell(  # nosec
+                    args[0],
+                    importlib.import_module("shellingham").detect_shell,
+                ),
             )
             .strip()
         )
