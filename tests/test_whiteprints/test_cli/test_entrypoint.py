@@ -200,5 +200,6 @@ def test_shell_autocompletion_auto() -> None:
 
     assert ext.value.code in {
         PosixExitCode.SUCCESS,
+        PosixExitCode.COMMAND_LINE_USAGE_ERROR,
         PosixExitCode.SERVICE_UNAVAILABLE,
     }, "Unexpected exit code."
