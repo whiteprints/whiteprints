@@ -76,11 +76,11 @@ class Completion(CompleterAction):
         PosixExitCode.SERVICE_UNAVAILABLE.exit()
 
     @classmethod
-    def _autodetect_shell(
+    def autodetect_shell(
         cls,
         args: str | Sequence[str] | None,
-        shell_detection_function: Callable[[], tuple[str, str]],
-    ) -> str:
+        shell_detection_function: Callable[[], tuple[str, str] | None],
+    ) -> str | None:
         """Try to autotect the shell if not given.
 
         Args:
@@ -96,34 +96,22 @@ class Completion(CompleterAction):
             >>> def _always_sh() -> tuple[str, str]:
             ...     return ("sh", "/bin/sh")
             >>>
-            >>> Completion._autodetect_shell(None, _always_sh)
+            >>> Completion.autodetect_shell(None, _always_sh)
             sh
-            >>> Completion._autodetect_shell("sh", _always_sh)
+            >>> Completion.autodetect_shell("sh", _always_sh)
             sh
-            >>> Completion._autodetect_shell(["sh"], _always_sh)
+            >>> Completion.autodetect_shell(["sh"], _always_sh)
             sh
-            >>>
-            >>> def _always_invalid_shell() -> tuple[str, str]:
-            ...     raise OSError
-            >>>
-            >>> try:
-            ...     Completion._autodetect_shell(
-            ...         None, _always_invalid_shell
-            ...     )
-            ... except SystemExit:
-            ...     print("Shell detection failed")
-            Shell detection failed
         """
         if args:
             return args if isinstance(args, str) else args[0]
 
         try:
-            return shell_detection_function()[0]
-        except (
-            OSError,
-            importlib.import_module("shellingham").ShellDetectionFailure,
-        ):
+            shell = shell_detection_function()
+        except importlib.import_module("shellingham").ShellDetectionFailure:
             cls._abort_shell_detection()
+
+        return shell[0] if shell else shell
 
     @override
     def __call__(
@@ -146,7 +134,7 @@ class Completion(CompleterAction):
             importlib.import_module("argcomplete.shell_integration")
             .shellcode(
                 [parser.prog],
-                shell=self._autodetect_shell(  # nosec
+                shell=self.autodetect_shell(  # nosec
                     args[0],
                     importlib.import_module("shellingham").detect_shell,
                 ),
