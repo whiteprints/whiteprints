@@ -267,6 +267,7 @@ install-distribution receipt python dist resolution="highest" link_mode="" group
         touch "$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt" || \
         just requirements-dev " \
             {{ if group == '' { '' } else { '--only-group=' + group } }} \
+            --all-extras \
             --output-file=\"$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt\" \
             --python=\"$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
         "
