@@ -31,7 +31,7 @@ def test_init_fail_on_empty_args(
     with pytest.raises(SystemExit) as ext:
         entrypoint(["init", str(tmp_path), "--data"])
 
-    assert ext.value.code == PosixExitCode.INTERNAL_SOFTWARE_ERROR, (
+    assert ext.value.code == PosixExitCode.GENERAL_ERROR, (
         "Unexpected exit code."
     )
 
