@@ -117,10 +117,12 @@ class Completion(CompleterAction):
         if args:
             return args if isinstance(args, str) else args[0]
 
-        shellingham = importlib.import_module("shellingham")
         try:
             return shell_detection_function()[0]
-        except (OSError, shellingham.ShellDetectionFailure):
+        except (
+            OSError,
+            importlib.import_module("shellingham").ShellDetectionFailure,
+        ):
             cls._abort_shell_detection()
 
     @override
