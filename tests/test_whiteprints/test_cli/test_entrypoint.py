@@ -44,7 +44,6 @@ def test_no_args_is_help(capsys: CaptureFixture[str]) -> None:
     assert captured_1.out == captured_2.out, "no args output should match help"
 
 
-@pytest.mark.only_extras
 def test_help_wrong_theme(
     capsys: CaptureFixture[str],
     monkeypatch: MonkeyPatch,
