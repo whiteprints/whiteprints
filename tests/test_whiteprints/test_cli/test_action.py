@@ -4,8 +4,6 @@
 
 """Test the CLI actions."""
 
-import importlib
-
 import pytest
 
 from whiteprints.cli import PosixExitCode
@@ -17,8 +15,9 @@ def test_completion_action_shell_detection_failed() -> None:
     with pytest.raises(SystemExit) as ext:
         Completion.autodetect_shell(
             None,
-            lambda: (_none for _none in ()).throw(
-                importlib.import_module("shellingham").ShellDetectionFailure
+            lambda: exec(
+                "raise"
+                ' importlib.import_module("shellingham").ShellDetectionFailure'
             ),
         )
 
