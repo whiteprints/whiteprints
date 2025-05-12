@@ -105,9 +105,12 @@ class Completion(CompleterAction):
             ... )
             True
             >>>
+            >>> def _always_invalid_shell() -> tuple[str, str]:
+            ...     raise ShellDetectionFailure
+            >>>
             >>> try:
             ...     Completion._autodetect_shell(
-            ...         None, lambda: raise ShellDetectionFailure
+            ...         None, _always_invalid_shell
             ...     )
             ... except SystemExit as system_exit:
             ...     assert system_exit.code == (
