@@ -357,7 +357,7 @@ test-repository python *args: (venv "test-repository" python)
             --group=tests \
             --python=\"$(just venv-path test-repository {{ python }})\" \
         pytest \
-            -m='no_extras or extras_and_no_extras' \
+            -m='no_extras or extras_and_no_extras and not only_extras' \
             --numprocesses='auto' \
             --html=\"$(just tests-results-path test-repository {{ python }})/test_report.extras.{{ arch() }}.{{ os() }}.html\" \
             --junitxml=\"$(just tests-results-path test-repository {{ python }})/junit-extras-{{ arch() }}-{{ os() }}.xml\" \
