@@ -229,4 +229,4 @@ def init(namespace: Namespace) -> None:
                 "stderr": called_process_error.stderr.strip(),
             },
         )
-        PosixExitCode.INTERNAL_SOFTWARE_ERROR.exit(called_process_error)
+        PosixExitCode.GENERAL_ERROR.exit(called_process_error)
