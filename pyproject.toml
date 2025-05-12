@@ -41,7 +41,6 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
     "Typing :: Typed",
 ]
 dynamic = [
@@ -155,7 +154,7 @@ localization = [
 column_width = 79
 indent = 4
 keep_full_version = true
-max_supported_python = "3.14"
+max_supported_python = "3.13"
 
 [tool.uv]
 required-version = ">=0.7.3"
