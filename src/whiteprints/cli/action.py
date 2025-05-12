@@ -113,14 +113,14 @@ class Completion(CompleterAction):
             ... except SystemExit:
             ...     print("Shell detection failed")
             Shell detection failed
-
         """
         if args:
             return args if isinstance(args, str) else args[0]
 
+        shellingham = importlib.import_module("shellingham")
         try:
             return shell_detection_function()[0]
-        except OSError:
+        except (OSError, shellingham.ShellDetectionFailure):
             cls._abort_shell_detection()
 
     @override
