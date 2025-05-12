@@ -73,7 +73,7 @@ class Completion(CompleterAction):
             f"[red]{error_message}[/]" if has_extra("rich") else error_message,
             file=importlib.import_module("sys").stderr,
         )
-        PosixExitCode.INTERNAL_SOFTWARE_ERROR.exit()
+        PosixExitCode.SERVICE_UNAVAILABLE.exit()
 
     @classmethod
     def _autodetect_shell(
@@ -93,22 +93,18 @@ class Completion(CompleterAction):
             The current shell name.
 
         Example:
-            >>> from shellingham import detect_shell, ShellDetectionFailure
-            >>>
-            >>>
-            >>> Completion._autodetect_shell("bash", detect_shell)
-            bash
-            >>> Completion._autodetect_shell(["bash"], detect_shell)
-            bash
-            >>>
             >>> def _always_sh() -> tuple[str, str]:
             ...     return ("sh", "/bin/sh")
             >>>
             >>> Completion._autodetect_shell(None, _always_sh)
             sh
+            >>> Completion._autodetect_shell("sh", _always_sh)
+            sh
+            >>> Completion._autodetect_shell(["sh"], _always_sh)
+            sh
             >>>
             >>> def _always_invalid_shell() -> tuple[str, str]:
-            ...     raise ShellDetectionFailure
+            ...     raise OSError
             >>>
             >>> try:
             ...     Completion._autodetect_shell(
@@ -122,10 +118,9 @@ class Completion(CompleterAction):
         if args:
             return args if isinstance(args, str) else args[0]
 
-        shellingham = importlib.import_module("shellingham")
         try:
             return shell_detection_function()[0]
-        except shellingham.ShellDetectionFailure:
+        except OSError:
             cls._abort_shell_detection()
 
     @override
