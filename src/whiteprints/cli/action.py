@@ -19,7 +19,7 @@ from typing import (
     NoReturn,
 )
 
-from whiteprints import _
+from whiteprints import _, has_extra
 from whiteprints.cli import PosixExitCode, robust_print
 
 
@@ -80,7 +80,23 @@ class Completion(CompleterAction):
             >>> assert isinstance(Completion._autodetect_shell(None), str)
         """
         if args is None:
-            return importlib.import_module("shellingham").detect_shell()[0]
+            shellingham = importlib.import_module("shellingham")
+            try:
+                return shellingham.detect_shell()[0]
+            except shellingham.ShellDetectionFailure:
+                error_message = (
+                    "Failed to autotect shell. You can still get"
+                    " the autocompletion script if you know your shell"
+                    " name by runing `whiteprints --autocompletion-script"
+                    " <shell_name>`."
+                )
+                robust_print(
+                    f"[red]{error_message}[/]"
+                    if has_extra("rich")
+                    else error_message,
+                    file=importlib.import_module("sys").stderr,
+                )
+                PosixExitCode.INTERNAL_SOFTWARE_ERROR.exit()
 
         if isinstance(args, str):
             return args
