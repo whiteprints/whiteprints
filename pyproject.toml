@@ -65,6 +65,9 @@ optional-dependencies.environment = [
     "platformdirs==4.3.8",
     "python-dotenv==1.1.0",
 ]
+optional-dependencies.profile = [
+    "functiontrace==0.4.0",
+]
 optional-dependencies.qol = [
     "whiteprints[autocompletion]",
     "whiteprints[environment]",
@@ -82,6 +85,8 @@ urls.integration = "https://github.com/whiteprints/whiteprints/actions"
 urls.issues = "https://github.com/whiteprints/whiteprints/issues"
 urls.pypi = "https://pypi.org/project/whiteprints"
 urls.repository = "https://github.com/whiteprints/whiteprints"
+scripts.functiontrace = "functiontrace:main"
+
 scripts.whiteprints = "whiteprints.cli.entrypoint:entrypoint"
 
 [dependency-groups]
