@@ -39,7 +39,7 @@ def test_init_fail_on_empty_args(
     assert captured.err, "Could not print init subcommand help message."
 
 
-def init_dummy(capsys: CaptureFixture[str], tmp_path: Path) -> None:
+def test_init_dummy(capsys: CaptureFixture[str], tmp_path: Path) -> None:
     """Test that the init subcommand fails when given empty data."""
     with pytest.raises(SystemExit) as ext:
         entrypoint([
@@ -47,17 +47,17 @@ def init_dummy(capsys: CaptureFixture[str], tmp_path: Path) -> None:
             str(tmp_path),
             "--defaults",
             "--data",
-            "project_name=My Awesome Project",
+            "project_name='My Awesome Project'",
             "--data",
             "author=Whiteprints",
-            "--data",
-            "organisation=Whiteprints",
-            "--data",
-            "author_email=whiteprints@whiteprints.com",
             "--data",
             "code_license_id=MIT-0 OR Apache-2.0",
             "--data",
             "resources_license_id=CC0-1.0",
+            "--data",
+            "organisation=Whiteprints",
+            "--data",
+            "author_email=whiteprints@whiteprints.com",
             "--data",
             "target_python_version=py313",
         ])

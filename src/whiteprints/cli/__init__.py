@@ -264,7 +264,6 @@ def _exit_gracefully_action(signalnum: int, frame: FrameType) -> NoReturn:
     error_message = _("Execution stopped by user")
     robust_print(
         f"[red]{error_message}[/]" if has_extra("rich") else error_message,
-        file=importlib.import_module("sys").stderr,
     )
 
     logger = importlib.import_module("logging").getLogger(__name__)

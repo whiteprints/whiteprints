@@ -217,7 +217,6 @@ def init(namespace: Namespace) -> None:
                 if has_extra("rich")
                 else error_message
             ),
-            file=importlib.import_module("sys").stderr,
         )
         logger = logging.getLogger(__name__)
         logger.exception(
@@ -226,7 +225,7 @@ def init(namespace: Namespace) -> None:
             extra={
                 "command": called_process_error.cmd,
                 "return_code": called_process_error.returncode,
-                "stderr": called_process_error.stderr.strip(),
+                "stderr": called_process_error.stderr.strip().splitlines(),
             },
         )
         PosixExitCode.GENERAL_ERROR.exit(called_process_error)

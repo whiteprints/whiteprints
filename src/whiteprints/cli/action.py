@@ -71,7 +71,6 @@ class Completion(CompleterAction):
         )
         robust_print(
             f"[red]{error_message}[/]" if has_extra("rich") else error_message,
-            file=importlib.import_module("sys").stderr,
         )
         PosixExitCode.SERVICE_UNAVAILABLE.exit()
 

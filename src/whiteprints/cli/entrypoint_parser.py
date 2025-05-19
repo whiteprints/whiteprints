@@ -50,7 +50,7 @@ class ArgumentParserExUsage(ArgumentParser):
         Args:
             message: The error message.
         """
-        self.print_usage(sys.stderr)
+        self.print_usage()
         self.exit(
             importlib.import_module("os").EX_USAGE,
             _("{}: error: {}\n").format(self.prog, message),
