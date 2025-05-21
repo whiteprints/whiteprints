@@ -49,7 +49,7 @@ dynamic = [
 ]
 dependencies = [
     "typing-extensions==4.13.2; python_full_version<'3.13.0'",
-    "uv==0.7.3",
+    "uv==0.7.6",
 ]
 optional-dependencies.autocompletion = [
     "argcomplete==3.6.2",
@@ -117,7 +117,7 @@ build-documentation = [
 ]
 tests = [
     "beartype==0.20.2",
-    "hypothesis==6.131.15",
+    "hypothesis==6.131.20",
     "pytest==8.3.5",
     "pytest-cov==6.1.1",
     "pytest-html==4.1.1",
@@ -162,7 +162,7 @@ keep_full_version = true
 max_supported_python = "3.13"
 
 [tool.uv]
-required-version = ">=0.7.3"
+required-version = ">=0.7.6"
 cache-keys = [
     { git = { commit = true, tags = true } },
     { file = "src/**/*.py" },

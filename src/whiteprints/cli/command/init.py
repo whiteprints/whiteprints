@@ -217,6 +217,7 @@ def init(namespace: Namespace) -> None:
                 if has_extra("rich")
                 else error_message
             ),
+            file=importlib.import_module("sys").stderr,
         )
         logger = logging.getLogger(__name__)
         logger.exception(
