@@ -6,7 +6,9 @@
 
 """Top-level executable."""
 
-from whiteprints.cli.entrypoint import entrypoint
+import sys
+
+from whiteprints.cli.cli_entrypoint import entrypoint
 
 
-entrypoint()
+sys.exit(entrypoint())

@@ -4,23 +4,19 @@
 
 """Initialize a project using pure logic for testable copy operations."""
 
-import importlib
-import logging
-from argparse import Namespace
-from collections.abc import Iterable
-from subprocess import CalledProcessError  # nosec
-from typing import Final, NamedTuple
+from argparse import ArgumentParser, Namespace
+from typing import Final, NamedTuple, NoReturn, cast
 
-from whiteprints import _, has_extra
-from whiteprints.cli import PosixExitCode, robust_print
+from copier.errors import CopierAnswersInterrupt, CopierError
+
+from whiteprints.exit_codes import ExitCode
+from whiteprints.lazy_gettext import _
+from whiteprints.lazy_import import import_lazy, import_lazy_project
 
 
 __all__: Final = ["init"]
 """Public module attributes."""
 
-
-WHITEPRINTS_TEMPLATE_CONTEXT_VERSION: Final = "0.6.0"
-"""The whiteprints-template-context version pin."""
 
 _GITHUB_EXTRAS: Final = {
     "pypi": "gh:whiteprints/template-github-publish-pypi.git",
@@ -38,8 +34,6 @@ class _CopierOperation(NamedTuple):
 
     repo: str
     dest: str
-    args: Iterable[str]
-    context: Iterable[str]
     trust: bool
 
 
@@ -61,17 +55,13 @@ def _requires_github_integration(namespace: Namespace) -> bool:
 
 def _build_github_operation(
     project_directory: str,
-    copier_args: Iterable[str],
     namespace: Namespace,
-    context: Iterable[str],
 ) -> list[_CopierOperation]:
     """Build copy operations for GitHub core and feature extras.
 
     Args:
         project_directory: target directory
-        copier_args: extra args for copier
         namespace: flags for github, github_all, extras.
-        context: the shared context list
 
     Returns:
         _CopierOperation list for GitHub actions
@@ -100,8 +90,6 @@ def _build_github_operation(
             _CopierOperation(
                 repo="gh:whiteprints/template-github.git",
                 dest=project_directory,
-                args=copier_args,
-                context=context,
                 trust=True,
             )
         )
@@ -113,8 +101,6 @@ def _build_github_operation(
                 _CopierOperation(
                     repo=repo,
                     dest=project_directory,
-                    args=copier_args,
-                    context=context,
                     trust=True,
                 )
             )
@@ -123,14 +109,12 @@ def _build_github_operation(
 
 def _build_copier_operation(
     project_directory: str,
-    copier_args: Iterable[str],
     namespace: Namespace,
 ) -> list[_CopierOperation]:
     """Build a list of _CopierOperation instances based on feature flags.
 
     Args:
         project_directory: target directory for templates
-        copier_args: extra arguments to forward to copier
         namespace: boolean flags for each feature
 
     Returns:
@@ -155,17 +139,12 @@ def _build_copier_operation(
         [..., 'gh:whiteprints/template-rich-click.git']
     """
     ops: list[_CopierOperation] = []
-    context = [
-        f"whiteprints-template-context=={WHITEPRINTS_TEMPLATE_CONTEXT_VERSION}"
-    ]
 
     # Base Python template
     ops.append(
         _CopierOperation(
             repo="gh:whiteprints/template-python.git",
             dest=project_directory,
-            args=copier_args,
-            context=context,
             trust=True,
         )
     )
@@ -176,8 +155,6 @@ def _build_copier_operation(
             _CopierOperation(
                 repo="gh:whiteprints/template-rich-click.git",
                 dest=project_directory,
-                args=copier_args,
-                context=context,
                 trust=True,
             )
         )
@@ -186,47 +163,74 @@ def _build_copier_operation(
     ops.extend(
         _build_github_operation(
             project_directory,
-            copier_args,
             namespace,
-            context,
         )
     )
     return ops
 
 
-def init(namespace: Namespace) -> None:
-    """Initialize a python project by executing all copy operations."""
-    project_directory = str(namespace.project_directory)
+def _exit_on_error(error: CopierError) -> NoReturn:
+    logger = import_lazy_project("cli.logs").LOGGING.get_logger()
+    exceptions = import_lazy_project("logs.logs_exceptions")
+    logger.critical(
+        str(error),
+        **(
+            exceptions.LogTraceConfig(
+                stack_info=True,
+                exc_info=error,
+            )
+            if logger.isEnabledFor(10)
+            else exceptions.LogTraceConfig(stack_info=False, exc_info=None)
+        ),
+    )
+    cast(
+        "ExitCode", import_lazy_project("exit_codes").INTERNAL_SOFTWARE_ERROR
+    ).log(logger).exit(error)
 
+
+def _exit_on_copier_interrupt(
+    copier_answers_interrupt: CopierAnswersInterrupt,
+) -> NoReturn:
+    logger = import_lazy_project("cli.logs").LOGGING.get_logger()
+    exceptions = import_lazy_project("logs.logs_exceptions")
+    logger.error(
+        _("%s caught while running Copier"),
+        type(copier_answers_interrupt).__name__,
+        **(
+            exceptions.LogTraceConfig(
+                stack_info=True,
+                exc_info=copier_answers_interrupt,
+            )
+            if logger.isEnabledFor(10)
+            else exceptions.LogTraceConfig(stack_info=False, exc_info=None)
+        ),
+    )
+    logger.info(_("Execution interrupted by user (KeyboardInterrupt)."))
+    cast("ExitCode", import_lazy_project("exit_codes").SIG_INT).log(
+        logger
+    ).exit(copier_answers_interrupt)
+
+
+def init(_parser: ArgumentParser, namespace: Namespace) -> None:
+    """Initialize a python project by executing all copy operations."""
+    copier_errors = import_lazy("copier.errors")
+    plumbum_errors = import_lazy("plumbum.commands.processes")
+    main = import_lazy("copier.main")
     try:
         for op in _build_copier_operation(
-            project_directory,
-            namespace.copier_args,
+            namespace.project_directory.reveal,
             namespace,
         ):
-            importlib.import_module("whiteprints.libuv.copier").copy(
-                [op.repo, op.dest, *op.args],
-                context=op.context,
-                trust=op.trust,
-            )
-    except CalledProcessError as called_process_error:
-        error_message = _("Project creation failed")
-        robust_print(
-            (
-                f"[red]{error_message}[/]"
-                if has_extra("rich")
-                else error_message
-            ),
-            file=importlib.import_module("sys").stderr,
-        )
-        logger = logging.getLogger(__name__)
-        logger.exception(
-            "CalledProcessError caught while running Copier",
-            stack_info=True,
-            extra={
-                "command": called_process_error.cmd,
-                "return_code": called_process_error.returncode,
-                "stderr": called_process_error.stderr.strip().splitlines(),
-            },
-        )
-        PosixExitCode.GENERAL_ERROR.exit(called_process_error)
+            with main.Worker(
+                src_path=op.repo,
+                dst_path=op.dest,
+                unsafe=op.trust,
+            ) as worker:
+                worker.run_copy()
+    except copier_errors.CopierAnswersInterrupt as copier_answers_interrupt:
+        _exit_on_copier_interrupt(copier_answers_interrupt)
+    except (
+        copier_errors.CopierError,
+        plumbum_errors.ProcessExecutionError,
+    ) as copier_error:
+        _exit_on_error(copier_error)

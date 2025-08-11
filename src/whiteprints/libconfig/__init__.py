@@ -2,4 +2,4 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""UV and UV managed applications."""
+"""Utilities to safely load configuration files."""

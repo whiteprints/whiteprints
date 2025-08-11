@@ -4,8 +4,6 @@
 
 """Defines CLI actions."""
 
-import importlib
-import sys
 from argparse import (
     Action,
     ArgumentParser,
@@ -17,16 +15,14 @@ from typing import (
     ClassVar,
     Final,
     NoReturn,
+    cast,
+    override,
 )
 
-from whiteprints import _, has_extra
-from whiteprints.cli import PosixExitCode, robust_print
-
-
-if sys.version_info >= (3, 12):
-    from typing import override
-else:
-    from typing_extensions import override
+from whiteprints.cli import robust_print, robust_print_json
+from whiteprints.exit_codes import ExitCode
+from whiteprints.lazy_gettext import _
+from whiteprints.lazy_import import import_lazy, import_lazy_project
 
 
 __all__: Final = [
@@ -34,6 +30,8 @@ __all__: Final = [
     "Completion",
     "Copyright",
     "License",
+    "LicenseText",
+    "Reuse",
     "Version",
 ]
 """Public module attributes."""
@@ -69,11 +67,12 @@ class Completion(CompleterAction):
             "Failed to auto-detect your shell. "
             "Run `whiteprints --autocompletion-script <shell_name>` instead."
         )
-        robust_print(
-            f"[red]{error_message}[/]" if has_extra("rich") else error_message,
-            file=importlib.import_module("sys").stderr,
-        )
-        PosixExitCode.SERVICE_UNAVAILABLE.exit()
+
+        logger = import_lazy_project("cli.logs").LOGGING.get_logger()
+        logger.critical(error_message)
+        cast(
+            "ExitCode", import_lazy_project("exit_codes").SERVICE_UNAVAILABLE
+        ).log(logger).exit()
 
     @classmethod
     def autodetect_shell(
@@ -108,7 +107,7 @@ class Completion(CompleterAction):
 
         try:
             shell = shell_detection_function()
-        except importlib.import_module("shellingham").ShellDetectionFailure:
+        except import_lazy("shellingham").ShellDetectionFailure:
             cls._abort_shell_detection()
 
         return shell[0] if shell else shell
@@ -131,17 +130,17 @@ class Completion(CompleterAction):
         # boolean. More importantly it is not related to a subprocess
         # execution simply the shell choice for completion.
         robust_print(
-            importlib.import_module("argcomplete.shell_integration")
+            import_lazy("argcomplete.shell_integration")
             .shellcode(
                 [parser.prog],
                 shell=self.autodetect_shell(  # nosec
                     args[0],
-                    importlib.import_module("shellingham").detect_shell,
+                    import_lazy("shellingham").detect_shell,
                 ),
             )
             .strip()
         )
-        PosixExitCode.SUCCESS.exit()
+        cast("ExitCode", import_lazy_project("exit_codes").SUCCESS).exit()
 
 
 class Copyright(CompleterAction):
@@ -167,11 +166,11 @@ class Copyright(CompleterAction):
                 " <whiteprints@pm.me>."
             )
         )
-        PosixExitCode.SUCCESS.exit()
+        cast("ExitCode", import_lazy_project("exit_codes").SUCCESS).exit()
 
 
 class Version(CompleterAction):
-    """Print the code licenses information."""
+    """Print the program version."""
 
     @override
     def __call__(
@@ -188,44 +187,110 @@ class Version(CompleterAction):
             args: the arguments passed to the parser.
         """
         robust_print(
-            importlib.import_module(
-                "whiteprints.metadata",
-            ).extract_field("Version")
+            import_lazy_project("fast_distinfo_reader").extract_field(
+                "Version"
+            )
         )
-        PosixExitCode.SUCCESS.exit()
+        cast("ExitCode", import_lazy_project("exit_codes").SUCCESS).exit()
 
 
 class License(CompleterAction):
-    """Print the code licenses information."""
+    """Print the code licenses."""
+
+    @override
+    def __call__(
+        self,
+        parser: ArgumentParser,
+        namespace: Namespace,
+        *args: Sequence[str] | str | None,
+    ) -> NoReturn:
+        """The action callback.
+
+        Args:
+            parser: the argument parser.
+            namespace: the arguments namespace.
+            args: the arguments passed to the parser.
+        """
+        robust_print(
+            import_lazy_project("fast_distinfo_reader").extract_field(
+                "License-Expression"
+            )
+        )
+        cast("ExitCode", import_lazy_project("exit_codes").SUCCESS).exit()
+
+
+class Reuse(CompleterAction):
+    """Print the code licenses."""
+
+    @override
+    def __call__(
+        self,
+        parser: ArgumentParser,
+        namespace: Namespace,
+        *args: Sequence[str] | str | None,
+    ) -> NoReturn:
+        """The action callback.
+
+        Args:
+            parser: the argument parser.
+            namespace: the arguments namespace.
+            args: the arguments passed to the parser.
+        """
+        license_expression = import_lazy_project(
+            "fast_distinfo_reader"
+        ).extract_field("License-Expression")
+        robust_print_json(
+            data={
+                "SPDX-License-Identifier": license_expression,
+                "DISCLAIMER": _(
+                    "This project is REUSE compliant."
+                    " Check the SPDX header of each"
+                    " individual source code file"
+                    " for detailed licensing information."
+                ).format(),
+                "source_code_location": str(
+                    (os := import_lazy("os")).path.dirname(
+                        os.path.dirname(__file__)
+                    )
+                ),
+                "REUSE": "https://reuse.software/",
+            },
+            indent=None,
+        )
+        cast("ExitCode", import_lazy_project("exit_codes").SUCCESS).exit()
+
+
+class LicenseText(CompleterAction):
+    """Print the code licenses text."""
 
     @staticmethod
-    def _print_license_text(args: Sequence[str] | str | None) -> None:
+    def _print(args: Sequence[str] | str | None) -> None:
         """Print the license text.
 
         Args:
             args: the license name to print.
 
         Example:
-            >>> from whiteprints.metadata import extract_fields
+            >>> from whiteprints.fast_distinfo_reader import extract_fields
             >>>
             >>> license_file = next(iter(extract_fields("License-File")))
-            >>> License._print_license_text(license_file)
+            >>> LicenseText._print(license_file)
             ...
-            >>> License._print_license_text([license_file])
+            >>> LicenseText._print([license_file])
             ...
-            >>> License._print_license_text(None)
+            >>> LicenseText._print(None)
             ...
-            >>> License._print_license_text("")
+            >>> LicenseText._print("")
             ...
-            >>> License._print_license_text([""])
+            >>> LicenseText._print([""])
             ...
         """
-        license_paths = importlib.import_module(
-            "whiteprints.metadata",
+        license_paths = import_lazy_project(
+            "fast_distinfo_reader"
         ).extract_fields("License-File")
-        licenses_directory = (os := importlib.import_module("os")).path.join(
-            importlib.import_module(
-                "whiteprints.metadata"
+        licenses_directory = (os := import_lazy("os")).path.join(
+            import_lazy_project(
+                "fast_distinfo_reader"
             ).locate_dist_info_directory(),
             "licenses",
         )
@@ -234,7 +299,7 @@ class License(CompleterAction):
         if not args or isinstance(args, str):
             with open(
                 os.path.join(licenses_directory, next(iter(license_paths))),
-                encoding="utf-8",
+                encoding="UTF-8",
             ) as license_file:
                 text = license_file.read()
 
@@ -250,7 +315,7 @@ class License(CompleterAction):
                         licenses_directory,
                         license_path,
                     ),
-                    encoding="utf-8",
+                    encoding="UTF-8",
                 ) as license_file:
                     text = license_file.read()
 
@@ -266,18 +331,10 @@ class License(CompleterAction):
     ) -> NoReturn:
         """The action callback.
 
-        If the arguments values is empty, there is only a signle license to
-        print, the one defined in the package.
-
-        If the arguments is a sequence it means that the package have multiple
-        licenses. Then the arguments should contains a single element,
-        which correspond to the requested license to print among the licenses
-        present in the package.
-
         Args:
             parser: the argument parser.
             namespace: the arguments namespace.
             args: the arguments passed to the parser.
         """
-        self._print_license_text(args[0])
-        PosixExitCode.SUCCESS.exit()
+        self._print(args[0])
+        cast("ExitCode", import_lazy_project("exit_codes").SUCCESS).exit()

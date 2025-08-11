@@ -60,3 +60,4 @@ SBOM/
 
 # profiling
 *.prof
+functiontrace.*

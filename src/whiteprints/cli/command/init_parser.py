@@ -4,12 +4,12 @@
 
 """The 'init' subcommand."""
 
-import importlib
 from argparse import ArgumentParser
 from typing import Final, cast
 
-from whiteprints import _, import_extra
-from whiteprints.cli.action import CompleterAction
+from whiteprints.cli.entrypoint_parser_action import CompleterAction
+from whiteprints.lazy_gettext import _
+from whiteprints.lazy_import import import_extra, import_lazy
 
 
 __all__: Final = ["setup_init_parser"]
@@ -20,7 +20,6 @@ def setup_init_parser(parser: ArgumentParser) -> None:
     """Add a subparser to initialize a Python project.
 
     Args:
-        subparser: the subparser to attach to
         parser: the main parser use to forward the `formatter_class`.
 
     Example:
@@ -99,7 +98,7 @@ def setup_init_parser(parser: ArgumentParser) -> None:
         "CompleterAction",
         parser.add_argument(
             "project_directory",
-            default=importlib.import_module("os").getcwd(),
+            default=import_lazy("os").getcwd(),
             nargs="?",
             help=_("Directory in which to initialize the Python project."),
             metavar="PROJECT_DIRECTORY",
@@ -107,16 +106,3 @@ def setup_init_parser(parser: ArgumentParser) -> None:
     )
     if (argcomplete := import_extra("argcomplete")) is not None:
         project_directory_arg.completer = argcomplete.DirectoriesCompleter()
-
-    project_directory_arg = cast(
-        "CompleterAction",
-        parser.add_argument(
-            "copier_args",
-            default=[],
-            nargs=importlib.import_module("argparse").REMAINDER,
-            help=_(
-                "Additional arguments forwarded to each Copier invocations."
-            ),
-            metavar="COPIER_ARGS",
-        ),
-    )

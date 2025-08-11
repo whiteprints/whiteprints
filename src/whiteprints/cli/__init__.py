@@ -1,21 +1,62 @@
-# SPDX-FileCopyrightText: © 2024 The "Whiteprints" contributors <whiteprints@pm.me>
+# SPDX-FileCopyrightText: © 2025 The "Whiteprints" contributors <whiteprints@pm.me>
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""Everything related to the command line interface."""
+"""CLI bootstrap scaffolding.
+
+This module initializes all environment- and signal-related facilities
+required for a predictable, fork-safe command-line interface.
+
+Responsibilities:
+- Lazily constructs and memoizes the global `ENV` singleton.
+- Installs SIGINT and SIGTERM handlers to exit gracefully with structured logs.
+- Provides `robust_print` and `robust_print_json` that degrade cleanly
+  when `rich` is not installed.
+- Localizes argparse (and CLI help strings) via gettext bindings.
+- Centralizes exception formatting via `format_exception_chain`.
+
+Design Notes:
+- Logging is initialized *after* this module is imported — signal handlers
+  rely on the `cli.logs` project but do not themselves emit logging config.
+- The `ENV` singleton is deliberately lazy and recreated per process —
+  avoid using it from within subprocess targets.
+
+Usage Pattern:
+This module is designed to be implicitly loaded by CLI entrypoints.
+
+Avoid using whiteprints.cli.ENV inside subprocess targets.
+The import is fine — but ENV is lazy and re-parses config from disk,
+which can cause divergence or security leakage. Always pass down ENV-derived
+values explicitly.
+"""
 
 import gettext
-import importlib
 from collections.abc import Callable
-from types import FrameType, SimpleNamespace
-from typing import Final, NoReturn
+from functools import cache
+from threading import Lock
+from types import FrameType
+from typing import TYPE_CHECKING, Final, Literal, NoReturn, cast
 
-from whiteprints import _, has_extra, import_extra
+from whiteprints.concurrency import is_main_process, is_main_thread
+from whiteprints.custom_exceptions import format_exception_chain
+from whiteprints.exit_codes import ExitCode
+from whiteprints.layered_env import Environment
+from whiteprints.lazy_gettext import _
+from whiteprints.lazy_import import (
+    import_extra,
+    import_lazy,
+    import_lazy_project,
+)
+from whiteprints.libconfig.config_exceptions import ConfigLoaderError
+from whiteprints.package_constants import DISTRIBUTION_NAME
+from whiteprints.signals_handler import DelaySignals
 
 
 __all__: Final = [
-    "ExitCode",
-    "PosixExitCode",
+    "ConfigLoaderError",
+    "exit_gracefully_on_signal",
+    "format_exception_chain",
+    "is_main_process",
     "robust_print",
     "robust_print_json",
 ]
@@ -23,166 +64,7 @@ __all__: Final = [
 
 
 robust_print = print if (rich := import_extra("rich")) is None else rich.print
-
-
-class ExitCode(int):
-    """POSIX, Linux, and signal-based exit status codes.
-
-    Includes:
-        - Shell-reserved statuses (0-2, 126-255)
-        - BSD/GNU `sysexits.h` codes (64-78)
-        - Signal-based terminations (128+SIGNAL)
-    """
-
-    def exit(self, source: Exception | None = None) -> NoReturn:
-        """Exit with a given posix exit code.
-
-        Raises:
-            SystemExit: exit the programe with the enum exit code.
-        """
-        raise SystemExit(self) from source
-
-
-class PosixExitCode(SimpleNamespace):
-    """POSIX, Linux, and signal-based exit status codes.
-
-    Includes:
-        - Shell-reserved statuses (0-2, 126-255)
-        - BSD/GNU `sysexits.h` codes (64-78)
-        - Signal-based terminations (128+SIGNAL)
-    """
-
-    SUCCESS = ExitCode(0)
-    """Successful termination."""
-    GENERAL_ERROR = ExitCode(1)
-    """Catchall for general errors."""
-    MISUSE_OF_SHELL_BUILTINS = ExitCode(2)
-    """Misuse of shell builtins."""
-    INVALID_ARGUMENT = ExitCode(3)
-    """Miscellaneous invalid argument."""
-    INPUT_OUTPUT_ERROR = ExitCode(5)
-    """Input/output error (alternate)."""
-    NO_SUCH_DEVICE_OR_ADDRESS = ExitCode(6)
-    """No such device or address."""
-
-    # BSD/GNU "sysexits.h" codes
-    COMMAND_LINE_USAGE_ERROR = ExitCode(64)
-    """Command line usage error (sysexits.h EX_USAGE)."""
-    DATA_FORMAT_ERROR = ExitCode(65)
-    """Data format error (sysexits.h EX_DATAERR)."""
-    CANNOT_OPEN_INPUT = ExitCode(66)
-    """Cannot open input (sysexits.h EX_NOINPUT)."""
-    ADDRESSEE_UNKNOWN = ExitCode(67)
-    """Addressee unknown (sysexits.h EX_NOUSER)."""
-    HOST_NAME_UNKNOWN = ExitCode(68)
-    """Host name unknown (sysexits.h EX_NOHOST)."""
-    SERVICE_UNAVAILABLE = ExitCode(69)
-    """Service unavailable (sysexits.h EX_UNAVAILABLE)."""
-    INTERNAL_SOFTWARE_ERROR = ExitCode(70)
-    """Internal software error (sysexits.h EX_SOFTWARE)."""
-    SYSTEM_ERROR = ExitCode(71)
-    """System error (sysexits.h EX_OSERR)."""
-    CRITICAL_OS_FILE_MISSING = ExitCode(72)
-    """Critical OS file missing (sysexits.h EX_OSFILE)."""
-    CANNOT_CREATE = ExitCode(73)
-    """Cannot create output file (sysexits.h EX_CANTCREAT)."""
-    IO_ERROR = ExitCode(74)
-    """Input/output error (sysexits.h EX_IOERR)."""
-    TEMPORARY_FAILURE = ExitCode(75)
-    """Temporary failure (sysexits.h EX_TEMPFAIL)."""
-    REMOTE_PROTOCOL_ERROR = ExitCode(76)
-    """Remote protocol error (sysexits.h EX_PROTOCOL)."""
-    PERMISSION_DENIED = ExitCode(77)
-    """Permission denied (sysexits.h EX_NOPERM)."""
-    CONFIGURATION_ERROR = ExitCode(78)
-    """Configuration error (sysexits.h EX_CONFIG)."""
-
-    # Commands and invalid exit argument
-    COMMAND_CANNOT_EXECUTE = ExitCode(126)
-    """Command invoked cannot execute."""
-    COMMAND_NOT_FOUND = ExitCode(127)
-    """Command not found."""
-    INVALID_EXIT_ARGUMENT = ExitCode(128)
-    """Invalid argument to exit."""
-
-    # Signal-based exit codes
-    EXIT_SIG_HUP = ExitCode(129)
-    """Hangup detected on controlling terminal (SIGHUP)."""
-    EXIT_SIG_INT = ExitCode(130)
-    """Interrupt from keyboard (SIGINT)."""
-    EXIT_SIG_QUIT = ExitCode(131)
-    """Quit from keyboard (SIGQUIT)."""
-    EXIT_SIG_ILL = ExitCode(132)
-    """Illegal instruction (SIGILL)."""
-    EXIT_SIG_TRAP = ExitCode(133)
-    """Trace/breakpoint trap (SIGTRAP)."""
-    EXIT_SIG_ABRT = ExitCode(134)
-    """Abort signal from abort(3) (SIGABRT)."""
-    EXIT_SIG_BUS = ExitCode(135)
-    """Bus error (SIGBUS)."""
-    EXIT_SIG_FPE = ExitCode(136)
-    """Floating point exception (SIGFPE)."""
-    EXIT_SIG_KILL = ExitCode(137)
-    """Kill signal (SIGKILL)."""
-    EXIT_SIG_USR1 = ExitCode(138)
-    """User-defined signal 1 (SIGUSR1)."""
-    EXIT_SIG_SEGV = ExitCode(139)
-    """Segmentation fault (SIGSEGV)."""
-    EXIT_SIG_USR2 = ExitCode(140)
-    """User-defined signal 2 (SIGUSR2)."""
-    EXIT_SIG_PIPE = ExitCode(141)
-    """Broken pipe (SIGPIPE)."""
-    EXIT_SIG_ALRM = ExitCode(142)
-    """Timer signal (SIGALRM)."""
-    EXIT_SIG_TERM = ExitCode(143)
-    """Termination signal (SIGTERM)."""
-    EXIT_SIG_STKFLT = ExitCode(144)
-    """Stack fault (SIGSTKFLT)."""
-    EXIT_SIG_CHLD = ExitCode(145)
-    """Child stopped or terminated (SIGCHLD)."""
-    EXIT_SIG_CONT = ExitCode(146)
-    """Continue if stopped (SIGCONT)."""
-    EXIT_SIG_STOP = ExitCode(147)
-    """Stop process (SIGSTOP)."""
-    EXIT_SIG_TSTP = ExitCode(148)
-    """Stop typed at terminal (SIGTSTP)."""
-    EXIT_SIG_TTIN = ExitCode(149)
-    """Terminal input for background process (SIGTTIN)."""
-    EXIT_SIG_TTOU = ExitCode(150)
-    """Terminal output for background process (SIGTTOU)."""
-    EXIT_SIG_URG = ExitCode(151)
-    """Urgent condition on socket (SIGURG)."""
-    EXIT_SIG_XCPU = ExitCode(152)
-    """CPU time limit exceeded (SIGXCPU)."""
-    EXIT_SIG_XFSZ = ExitCode(153)
-    """File size limit exceeded (SIGXFSZ)."""
-    EXIT_SIG_VTALRM = ExitCode(154)
-    """Virtual alarm clock (SIGVTALRM)."""
-    EXIT_SIG_PROF = ExitCode(155)
-    """Profiling timer expired (SIGPROF)."""
-    EXIT_SIG_WINCH = ExitCode(156)
-    """Window resize signal (SIGWINCH)."""
-    EXIT_SIG_POLL = ExitCode(157)
-    """Pollable event (SIGIO)."""
-    EXIT_SIG_PWR = ExitCode(158)
-    """Power failure (SIGPWR)."""
-    EXIT_SIG_SYS = ExitCode(159)
-    """Bad system call (SIGSYS)."""
-
-    # Invalid exit status
-    EXIT_STATUS_OUT_OF_RANGE = ExitCode(255)
-    """Exit status out of range (greater than 255)."""
-
-    @classmethod
-    def from_signal(cls, signal_number: int) -> ExitCode:
-        """Create a posix exit code from a signal number.
-
-        The posix exit code is obtained by adding 128 to the signal number.
-
-        Returns:
-            A PosixExitCode corresponding to the given Python signal.
-        """
-        return ExitCode(128 + signal_number)
+"""A rich print function with fallback on Python print if rich is not found."""
 
 
 def robust_print_json(  # noqa: PLR0913
@@ -228,9 +110,9 @@ def robust_print_json(  # noqa: PLR0913
             or raise a TypeError. If None (the default), TypeError is raised.
     """
     if (rich := import_extra("rich")) is None:
-        importlib.import_module("json").dump(
+        import_lazy("json").dump(
             data,
-            importlib.import_module("sys").stdout,
+            import_lazy("sys").stdout,
             indent=indent,
             skipkeys=skip_keys,
             ensure_ascii=ensure_ascii,
@@ -239,7 +121,7 @@ def robust_print_json(  # noqa: PLR0913
             sort_keys=sort_keys,
             default=default,
         )
-        importlib.import_module("sys").stdout.write("\n")
+        import_lazy("sys").stdout.write("\n")
     else:
         rich.print_json(
             data=data,
@@ -252,58 +134,118 @@ def robust_print_json(  # noqa: PLR0913
         )
 
 
-def _exit_gracefully_action(signalnum: int, frame: FrameType) -> NoReturn:
+def _resolve_path(path: str) -> str:
+    os = import_lazy("os")
+    return os.path.normcase(os.path.abspath(os.path.expanduser(path)))
+
+
+def _resolve_stream(stream: str) -> str:
+    stream = stream.lower()
+    if stream in {"stdout", "stderr"}:
+        return f"ext://sys.{stream}"
+
+    return stream
+
+
+def _get_env() -> Environment:
+    """Retrive the environement variables.
+
+    Returns:
+        The current environment variables from os.environ and files.
+    """
+    distribution_name = DISTRIBUTION_NAME.upper()
+    path_redactor = import_lazy_project("redactor").PathRedactor()
+    return import_lazy_project("layered_env").Environment(
+        environment_variables={
+            "VIRTUAL_ENV",
+            f"{distribution_name}_LOG_LEVEL",
+            f"{distribution_name}_LOG_STRUCT",
+            f"{distribution_name}_LOG_STREAM",
+            f"{distribution_name}_LOG_MODE_TRACEBACK",
+            f"{distribution_name}_LOG_MODE_STACKTRACE",
+            f"{distribution_name}_LOG_CONFIG",
+        },
+        environment_variables_regex=set(),
+        sensitive_variables={
+            "VIRTUAL_ENV": path_redactor,
+            f"{distribution_name}_LOG_CONFIG": path_redactor,
+        },
+        secret_variables=set(),
+        transform_variables={
+            f"{distribution_name}_LOG_LEVEL": str.upper,
+            f"{distribution_name}_LOG_STRUCT": str.lower,
+            f"{distribution_name}_LOG_STREAM": _resolve_stream,
+            f"{distribution_name}_LOG_MODE_TRACEBACK": str.lower,
+            f"{distribution_name}_LOG_MODE_STACKTRACE": str.lower,
+            f"{distribution_name}_LOG_CONFIG": _resolve_path,
+        },
+    )
+
+
+def _exit_gracefully_action(signalnum: int, _frame: FrameType) -> NoReturn:
     """Exit gracefully when a signal is caught.
 
     The programs exit with the error code being the signal number.
 
     Args:
         signalnum: the signal number.
-        frame: the stack frame.
+        _frame: the stack frame.
     """
-    error_message = _("Execution stopped by user")
-    robust_print(
-        f"[red]{error_message}[/]" if has_extra("rich") else error_message,
-        file=importlib.import_module("sys").stderr,
-    )
-
-    logger = importlib.import_module("logging").getLogger(__name__)
-    logger.info(
-        "%s received, exiting program.",
-        importlib.import_module("signal").Signals(signalnum).name,
-        extra={
-            "stack": importlib.import_module("traceback").format_stack(frame),
-        },
-    )
-    PosixExitCode.from_signal(signalnum).exit()
+    print("SIGNAL INTERCEPTED", import_lazy("os").getpid())
+    cast(
+        "ExitCode",
+        import_lazy_project("exit_codes").from_signal(signalnum),
+    ).exit()
 
 
-def _exit_gracefully_on_sigint() -> None:
-    """Register a sigint signal handler.
-
-    Example:
-        >>> import signal
-        >>> import os
-        >>>
-        >>> _exit_gracefully_on_sigint()
-        >>>
-        >>> try:
-        >>>     os.kill(os.getpid(), signal.SIGINT)
-        >>> except SystemExit:
-        >>>     print("Bye")
-        Bye
-
-    When sigint is caught, the event is logged and the program exits with the
-    SIGINT error code.
-    """
-    signal = importlib.import_module("signal")
-    signal.signal(signal.SIGINT, _exit_gracefully_action)
+_SIGNAL_LOCK: Final = Lock()
 
 
-_exit_gracefully_on_sigint()
+def exit_gracefully_on_signal() -> None:
+    """Register SIGINT and SIGTERM handlers exactly once in main process."""
+    with DelaySignals(), _SIGNAL_LOCK:
+        if is_main_thread():
+            signal = import_lazy("signal")
+            signal.signal(signal.SIGINT, _exit_gracefully_action)
+            signal.signal(signal.SIGTERM, _exit_gracefully_action)
+
+
+exit_gracefully_on_signal()
 
 gettext.bindtextdomain(
     "argparse",
     _.locale_directory,
 )
 gettext.textdomain("argparse")
+
+
+@cache
+def __getattr__(name: Literal["ENV"]) -> Environment:
+    """Lazily resolve the top-level ENV singleton.
+
+    The Environment instance is lazily created on first access in each
+    process or interpreter. This means that accessing `ENV` in a subprocess
+    (via import or direct use) will recreate and re-parse the environment
+    layers independently.
+
+    To avoid redundant file I/O and maintain consistency, users should
+    resolve required values from `ENV` in the parent process and pass them
+    explicitly to child processes or subprocesses at initialization.
+
+    Args:
+        name: Must be the string "ENV".
+
+    Returns:
+        The singleton Environment instance.
+
+    Raises:
+        AttributeError: If `name` is not "ENV".
+    """
+    if name == "ENV":
+        return _get_env()
+
+    raise AttributeError(name)
+
+
+if TYPE_CHECKING:
+    ENV: Environment

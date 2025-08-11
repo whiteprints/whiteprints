@@ -26,7 +26,7 @@ maintainers = [
 authors = [
     { name = "Romain Brault", email = "whiteprints@pm.me" },
 ]
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.12,<4.0"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Environment :: Console",
@@ -37,8 +37,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
@@ -48,25 +46,25 @@ dynamic = [
     "version",
 ]
 dependencies = [
-    "typing-extensions==4.13.2; python_full_version<'3.13.0'",
-    "uv==0.7.6",
+    "copier==9.9.0",
+    "typing-extensions==4.14.1; python_full_version<'3.13.0'",
+    "whiteprints-template-context==0.6.0",
 ]
 optional-dependencies.autocompletion = [
     "argcomplete==3.6.2",
 ]
 optional-dependencies.color = [
-    "rich==14.0.0",
-    "rich-argparse-plus==0.3.1.4",
+    "rich==14.1.0",
+    "rich-argparse==1.7.1",
 ]
 optional-dependencies.debug = [
-    "beartype==0.20.2",
+    "beartype==0.21.0",
 ]
 optional-dependencies.environment = [
     "platformdirs==4.3.8",
-    "python-dotenv==1.1.0",
 ]
 optional-dependencies.profile = [
-    "functiontrace==0.4.0",
+    "functiontrace==0.5.0",
 ]
 optional-dependencies.qol = [
     "whiteprints[autocompletion]",
@@ -85,9 +83,8 @@ urls.integration = "https://github.com/whiteprints/whiteprints/actions"
 urls.issues = "https://github.com/whiteprints/whiteprints/issues"
 urls.pypi = "https://pypi.org/project/whiteprints"
 urls.repository = "https://github.com/whiteprints/whiteprints"
-scripts.functiontrace = "functiontrace:main"
 
-scripts.whiteprints = "whiteprints.cli.entrypoint:entrypoint"
+scripts.whiteprints = "whiteprints.cli.cli_entrypoint:entrypoint"
 
 [dependency-groups]
 dev = [
@@ -107,7 +104,7 @@ dev = [
 build-documentation = [
     "myst-parser[linkify]==4.0.1",
     "pydata-sphinx-theme==0.16.1",
-    "sphinx==8.1.3",
+    "sphinx==8.2.3",
     "sphinx-argparse==0.5.2",
     "sphinx-autoapi==3.6.0",
     "sphinx-copybutton==0.5.2",
@@ -116,21 +113,21 @@ build-documentation = [
     "stdlib-list>=0.11.1",
 ]
 tests = [
-    "beartype==0.20.2",
-    "hypothesis==6.131.20",
-    "pytest==8.3.5",
-    "pytest-cov==6.1.1",
+    "beartype==0.21.0",
+    "hypothesis==6.135.14",
+    "pytest==8.4.1",
+    "pytest-cov==6.2.1",
     "pytest-html==4.1.1",
     "pytest-md-report==0.7.0",
     "pytest-randomly==3.16.0",
-    "pytest-xdist==3.6.1",
+    "pytest-xdist==3.7.0",
     "xdoctest[colors]==1.2.0",
 ]
 editor = [
     "pynvim==0.5.2",
 ]
 coverage = [
-    "coverage==7.8.0",
+    "coverage==7.9.1",
 ]
 audit-vulnerabilities = [
     "pip-audit==2.9.0",
@@ -145,7 +142,7 @@ check-maintainability = [
     "xenon==0.9.3",
 ]
 check-vulnerabilities = [
-    "bandit==1.8.3",
+    "bandit==1.8.5",
 ]
 serve-documentation = [
     "sphinx-autobuild==2024.10.3",
@@ -162,7 +159,7 @@ keep_full_version = true
 max_supported_python = "3.13"
 
 [tool.uv]
-required-version = ">=0.7.6"
+required-version = ">=0.8.4"
 cache-keys = [
     { git = { commit = true, tags = true } },
     { file = "src/**/*.py" },
