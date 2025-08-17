@@ -2,7 +2,6 @@ import threading
 import time
 import queue
 import timeit
-from whiteprints.libqueue.queue_condition_thread_com import ThreadConditionCommunication
 from whiteprints.libqueue.queue_condition import ConditionQueue
 
 TOTAL_MESSAGES = 1_000_000  # Total number of messages for each test run
@@ -13,6 +12,7 @@ write_count = Counter()
 read_count = Counter()
 count_lock = threading.Lock()
 
+
 def benchmark_queue(QueueType, queue_name, num_readers, num_writers, bound):
     num_messages_per_writer = TOTAL_MESSAGES // num_writers
     num_messages_per_reader = TOTAL_MESSAGES // num_readers
@@ -20,27 +20,41 @@ def benchmark_queue(QueueType, queue_name, num_readers, num_writers, bound):
     if QueueType == "stdlib":
         q = queue.Queue(bound)
     elif QueueType == "whiteprints":
-        q = ConditionQueue(com=ThreadConditionCommunication(bound or None))
+        q = ConditionQueue(bound or None)
     else:
         raise ValueError("Unknown queue type")
 
     start_barrier = threading.Barrier(num_readers + num_writers)
     done_event = threading.Event()
 
-    def writer():
-        start_barrier.wait()
-        for i in range(num_messages_per_writer):
-            q.put(42)
-            #  with count_lock:
-                #  write_count["total"] += 1
+    if QueueType == "stdlib":
 
-    def reader():
-        start_barrier.wait()
-        for i in range(num_messages_per_reader):
-            val = q.get()
-            #  assert val == 42, f"Invalid value from queue: {val}"
-            #  with count_lock:
-                #  read_count["total"] += 1
+        def writer():
+            start_barrier.wait()
+            for i in range(num_messages_per_writer):
+                q.put(42)
+
+        def reader():
+            start_barrier.wait()
+            for i in range(num_messages_per_reader):
+                val = q.get()
+
+    elif QueueType == "whiteprints":
+
+        def writer():
+            with q.producer():
+                start_barrier.wait()
+                for i in range(num_messages_per_writer):
+                    q.put(42)
+
+        def reader():
+            cm = q.receiver()
+            with cm:
+                start_barrier.wait()
+                for i in range(num_messages_per_reader):
+                    val = q.get()
+    else:
+        raise ValueError("Unknown queue type")
 
     threads = []
     for _ in range(num_writers):
@@ -51,8 +65,10 @@ def benchmark_queue(QueueType, queue_name, num_readers, num_writers, bound):
     start = time.perf_counter()
     for t in threads:
         t.start()
+
     for t in threads:
         t.join()
+
     end = time.perf_counter()
 
     duration = end - start
@@ -61,6 +77,7 @@ def benchmark_queue(QueueType, queue_name, num_readers, num_writers, bound):
         f"{TOTAL_MESSAGES:,} msgs | {duration:.4f} sec"
     )
     return duration
+
 
 def run_all_benchmarks():
     patterns = [
@@ -74,7 +91,7 @@ def run_all_benchmarks():
     print("-" * 60)
 
     #  for bound in [0, 1, 1000, 1_000_000]:
-    for bound in [10, 100, 1_000, 10_000]:
+    for bound in [1, 10, 100, 1_000, 10_000, 0]:
         print(f"Bound: {bound or 'UNBOUNDED'}")
         for name in ("whiteprints", "stdlib"):
             for readers, writers in patterns:

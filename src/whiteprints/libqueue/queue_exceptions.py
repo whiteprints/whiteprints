@@ -9,7 +9,6 @@ errors. All exceptions inherit from QueueError and apply uniformly across
 thread- and process-based queue backends.
 """
 
-from collections.abc import Iterable
 from typing import Final
 
 from whiteprints.custom_exceptions import WhiteprintsError

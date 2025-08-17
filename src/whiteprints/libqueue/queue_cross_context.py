@@ -28,7 +28,6 @@ __all__ = [
 
 @final
 class TrueCondition(ConditionLike):
-
     __slots__ = ("acquire", "release")
 
     @override
@@ -51,8 +50,8 @@ class TrueCondition(ConditionLike):
         self.release()
 
     @override
-    def wait(self, timeout: float | None = None) -> None:
-        return
+    def wait(self, timeout: float | None = None) -> bool:
+        return True
 
     @override
     def wait_for(
@@ -73,7 +72,6 @@ class TrueCondition(ConditionLike):
 
 @final
 class NoSemaphore(SemaphoreLike):
-
     __slots__ = ()
 
     @override
@@ -114,7 +112,6 @@ class CrossSemaphoreContext(CrossContext):
         "exit_except",
         "exit_noexcept",
         "release",
-        "rollback_on_error",
     )
 
     @override
@@ -122,20 +119,16 @@ class CrossSemaphoreContext(CrossContext):
         self,
         acquire: SemaphoreLike,
         release: SemaphoreLike,
-        *,
-        rollback_on_error: bool = False,
     ) -> None:
         """Bind input/output semaphores and exit strategies.
 
         Args:
             acquire: Semaphore acquired on entry.
             release: Semaphore released on success.
-            rollback_on_error: Re-acquire input on exception if True.
         """
         # hot-path direct binds
         self.acquire = acquire.acquire
         self.release = release.release
-        self.rollback_on_error = rollback_on_error
 
         # context manager entry is the input semaphore's enter
         self.__enter__ = acquire.__enter__
@@ -144,12 +137,8 @@ class CrossSemaphoreContext(CrossContext):
         self.exit_noexcept = self.release
 
         # exception-path exit (used by your fast path's except block)
-        if rollback_on_error:
-            self.exit_except = self._exit_except_rollback
-            self.__exit__ = self._exit_except_rollback
-        else:
-            self.exit_except = self._exit_except
-            self.__exit__ = self._exit_except
+        self.exit_except = self._exit_except
+        self.__exit__ = self._exit_except
 
     def _exit_except(
         self,
@@ -158,22 +147,8 @@ class CrossSemaphoreContext(CrossContext):
         _exc_tb: TracebackType | None,
         /,
     ) -> None:
-        """Exception path without rollback (no-op)."""
-        if exc_type is None:
-            self.release()
-
-    def _exit_except_rollback(
-        self,
-        exc_type: type[BaseException] | None,
-        _exc_val: BaseException | None,
-        _exc_tb: TracebackType | None,
-        /,
-    ) -> None:
-        """Exception path with rollback: re-acquire input."""
-        if exc_type is None:
-            self.release()
-        else:
-            self.acquire()
+        """Exception path."""
+        self.release()
 
 
 @final
@@ -181,7 +156,6 @@ class CrossConditionContext(CrossContext):
     """Final context manager for coordinating two semaphores.
 
     Acquires one semaphore on enter, releases another on exit.
-    Supports rollback (re-acquire) if an error occurs inside the context.
 
     Attributes:
         acquire(): Manually acquire the input semaphore.
@@ -202,7 +176,6 @@ class CrossConditionContext(CrossContext):
         "exit_noexcept",
         "predicate",
         "release",
-        "rollback_on_error",
     )
 
     @override
@@ -211,8 +184,6 @@ class CrossConditionContext(CrossContext):
         acquire: ConditionLike,
         release: ConditionLike,
         predicate: Callable[[], bool],
-        *,
-        rollback_on_error: bool = False,
     ) -> None:
         self._acquire_lock = acquire
         self._acquire = acquire.acquire
@@ -221,15 +192,14 @@ class CrossConditionContext(CrossContext):
         self._notify = release.notify
         self._wait = acquire.wait
         self.predicate = predicate
-        self.rollback_on_error = rollback_on_error
-        if isinstance(acquire, TrueCondition):
+        if isinstance(acquire, TrueCondition | NoSemaphore):
             self.acquire = acquire.acquire
             self.__enter__ = acquire.acquire
         else:
             self.acquire = self._acquire_wait
             self.__enter__ = self._acquire_wait
 
-        if isinstance(release, TrueCondition):
+        if isinstance(release, TrueCondition | NoSemaphore):
             self.release = acquire.release
             self.exit_noexcept = acquire.release
             self.exit_except = self._exit_except
@@ -237,12 +207,8 @@ class CrossConditionContext(CrossContext):
         else:
             self.release = acquire.release  # <-- direct bind, no wrapper
             self.exit_noexcept = self._exit_notify_noexcept
-            if self.rollback_on_error:
-                self.exit_except = self._exit_except  # no notify, rollback
-                self.__exit__ = self._exit_except
-            else:
-                self.exit_except = self._exit_notify_except
-                self.__exit__ = self._exit_notify_except
+            self.exit_except = self._exit_notify_except
+            self.__exit__ = self._exit_notify_except
 
     def _acquire_wait(self, /, *args: Any, **kwargs: Any) -> bool:
         """Acquires the lock.
@@ -269,7 +235,7 @@ class CrossConditionContext(CrossContext):
         _exc_type: type[BaseException] | None,
         _exc_val: BaseException | None,
         _exc_tb: TracebackType | None,
-        /
+        /,
     ) -> None:
         self._release()
 
@@ -278,7 +244,7 @@ class CrossConditionContext(CrossContext):
         _exc_type: type[BaseException] | None,
         _exc_val: BaseException | None,
         _exc_tb: TracebackType | None,
-        /
+        /,
     ) -> None:
         self._notify()
         self._release()

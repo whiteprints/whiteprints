@@ -239,18 +239,15 @@ class SemaphoreLike(AbstractContextManager[object], Protocol):
 
 @runtime_checkable
 class CrossContext(SemaphoreLike, Protocol):
-
     def exit_except(
         self,
         exc_type: type[BaseException] | None,
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
         /,
-    ) -> None:
-        ...
+    ) -> None: ...
 
-    def exit_noexcept(self) -> None:
-        ...
+    def exit_noexcept(self) -> None: ...
 
 
 @runtime_checkable
@@ -314,6 +311,7 @@ class QueueCommunicationBackend[U](Protocol):
             associated with this queue backend. Used to coordinate access
             across threads.
     """
+
     max_slots: int | None
     locks: QueueLockBackend
 
@@ -326,6 +324,16 @@ class QueueCommunicationBackend[U](Protocol):
                 - If None, the queue is unbounded.
         """
         ...
+
+    def bind_methods(
+        self,
+        max_slots: int | None,
+        *,
+        put_block: bool,
+        put_timeout: float | None,
+        get_block: bool,
+        get_timeout: float | None,
+    ) -> None: ...
 
     def put(self, item: U | BaseSentinel) -> None:
         """Inserts an item or sentinel into the queue.
@@ -388,250 +396,6 @@ class QueueCommunicationBackend[U](Protocol):
 
 
 @runtime_checkable
-class QueueHook[Q, T, U, R](Protocol):
-    """Lifecycle and instrumentation hooks for queue operations.
-
-    This protocol enables injection of custom logic at key points in the
-    lifecycle of a queue instance — including initialization, shutdown,
-    enqueue (`put`), dequeue (`get`), and sentinel handling.
-
-    Hook methods are structured to distinguish between:
-
-      - Stateless transformations (e.g., `prepare_put`, `finalize_put`,
-        `finalize_get`), which operate outside of any lock and should avoid
-        mutating the queue.
-      - In-lock instrumentation (`inlock_pre_put`, `inlock_post_put`,
-        `inlock_pre_get`, `inlock_post_get`), which operate under the queue's
-        synchronization lock and are intended for coordination logic that
-        requires mutual exclusion.
-      - Lifecycle methods (`after_init`, `after_shutdown`, `before_shutdown`),
-        which provide points for setup and teardown behavior around the queue's
-        usage.
-
-    Type parameters:
-        Q: The queue type this hook is bound to.
-        T: The type accepted by the public `put()` method.
-        U: The internal representation stored in the queue (output of
-           `prepare_put()`).
-        R: The type returned by the public `get()` method (output of
-           `finalize_get()`).
-
-    Usage guidance for in-lock hooks:
-        The `inlock_*` methods are intended for lightweight, lock-safe
-        operations. It is strongly recommended that these methods avoid:
-
-            1. Acquiring other locks held by the queue (especially non-
-               reentrant locks).
-            2. Performing heavy computations or I/O.
-            3. Mutating the queue itself or its internal coordination
-               structures.
-
-        Violating these constraints may lead to deadlocks or degraded
-        throughput under concurrency.
-
-        These recommendations are not enforced — experienced developers who
-        fully understand the queue's locking model may safely apply more
-        advanced patterns when needed. However, careful design is required to
-        avoid introducing contention or subtle bugs.
-
-        When in doubt, use `prepare_*` and `finalize_*` for non-critical
-        transformations, and reserve `inlock_*` for synchronization-aware
-        instrumentation only.
-    """
-
-    def after_init(self, queue: Q) -> None:
-        """Called after the queue and hook are fully initialized.
-
-        Args:
-            queue: the hooked queue.
-        """
-        ...
-
-    def before_shutdown(self, queue: Q) -> None:
-        """Called before queue shutdown begins.
-
-        Args:
-            queue: the hooked queue.
-        """
-        ...
-
-    def after_shutdown(self, queue: Q) -> None:
-        """Called after queue shutdown completes.
-
-        Args:
-            queue: the hooked queue.
-        """
-        ...
-
-    def prepare_put(
-        self, queue: Q, item: T | BaseSentinel,
-    ) -> U | BaseSentinel:
-        """Called before an item is enqueued.
-
-        Use this to convert the external input into an internal queue
-        representation. Should be pure and stateless.
-
-        Example uses:
-            - Serialization
-            - Wrapping with metadata
-            - Priority tagging
-
-        Note:
-            This operates outside of any lock.
-
-        Args:
-            queue: the hooked queue.
-            item: The original item or sentinel to enqueue.
-
-        Returns:
-            The item to pass to the queue (may be transformed).
-        """
-        ...
-
-    def inlock_pre_put(
-        self, queue: Q, item: U | BaseSentinel
-    ) -> None:
-        """Called before an item is enqueued and after it's prepared.
-
-        Use this to update queue-owned state based on the item or
-        coordinate inter-thread/process logic.
-
-        Example uses:
-            - Reference counting
-            - In-place state updates
-            - Instrumentation
-
-        Note:
-            This operates in a lock.
-
-        Args:
-            queue: the hooked queue.
-            item: The original item or sentinel to enqueue.
-
-        Returns:
-            The item to pass to the queue (may be transformed).
-        """
-        ...
-
-    def inlock_post_put(
-        self, queue: Q, item: U | BaseSentinel
-    ) -> None:
-        """Postprocess an item after it is successfully enqueued.
-
-        Used to perform post-enqueue adjustments that must be atomic
-        with queue state.
-
-        Example uses:
-            - Coherent metrics update
-            - Condition signaling refinement
-
-        Note:
-            This operates in a lock.
-
-        Args:
-            queue: the hooked queue.
-            item: The item or sentinel that was added.
-
-        Returns:
-            The item added to the queue (may be transformed).
-        """
-        ...
-
-    def finalize_put(self, queue: Q, item: U | BaseSentinel) -> None:
-        """Called after an item is successfully enqueued.
-
-        Use this for logging, metrics, or external signaling.
-
-        Note:
-            This operates outside of any lock.
-
-        Args:
-            queue: the hooked queue.
-            item: The item or sentinel that was added.
-        """
-        ...
-
-    def prepare_get(self, queue: Q) -> None:
-        """Called before an item is retrieved.
-
-        Use this to prepare external state or apply sampling logic.
-
-        Note:
-            This operates outside of any lock.
-
-        Args:
-            queue: the hooked queue.
-        """
-        ...
-
-    def inlock_pre_get(self, queue: Q) -> None:
-        """Called before an item is retrieved.
-
-        Used to coordinate access or inspect internal state.
-
-        Note:
-            This operates in a lock.
-
-        Args:
-            queue: the hooked queue.
-        """
-        ...
-
-    def inlock_post_get(self, queue: Q) -> None:
-        """Called after an item is retrieved.
-
-        Use this for bookkeeping that must be consistent with queue state.
-
-        Note:
-            This operates in a lock.
-
-        Args:
-            queue: the hooked queue.
-        """
-        ...
-
-    def finalize_get(self, queue: Q, item: U) -> R:
-        """Transforms the retrieved item into its final output.
-
-        Example uses:
-            - Deserialization
-            - Reference release
-            - Result unwrapping
-
-        Note:
-            This operates outside of any lock.
-
-        Args:
-            queue: the hooked queue.
-            item: The dequeued item.
-
-        Returns:
-            The item to return to the consumer (may be transformed).
-        """
-        ...
-
-    def on_get_sentinel(
-        self,
-        queue: Q,
-        sentinel: BaseSentinel,
-        exception: Exception | None = None,
-    ) -> Exception:
-        """Converts a sentinel into an exception to raise.
-
-        Called when a sentinel is dequeued and not handled internally.
-
-        Args:
-            queue: The hooked queue instance.
-            sentinel: The retrieved sentinel object.
-            exception: Optional inner exception (e.g., from prior hooks).
-
-        Returns:
-            The exception to raise from `get()`.
-        """
-        ...
-
-
-@runtime_checkable
 class QueueSyncOps[T, U, R](
     Iterable[R],
     Protocol,
@@ -668,7 +432,7 @@ class QueueSyncOps[T, U, R](
         etc.).
     """
 
-    hooks: QueueHook["QueueInterface[T, U, R]", T, U, R]
+    hooks: "QueueHook[T, U, R]"
     com: QueueCommunicationBackend[U] | None
 
     put: Callable[[T | BaseSentinel], None]
@@ -676,8 +440,13 @@ class QueueSyncOps[T, U, R](
 
     def __init__(
         self,
-        hooks: QueueHook[object, T, U, R] | None,
+        hooks: "QueueHook[T, U, R] | None",
         com: QueueCommunicationBackend[U] | None,
+        *,
+        put_block: bool = True,
+        put_timeout: float | None = None,
+        get_block: bool = True,
+        get_timeout: float | None = None,
     ) -> None:
         """Initializes the queue and attaches the given hook type.
 
@@ -695,8 +464,7 @@ class QueueSyncOps[T, U, R](
         ...
 
     @property
-    def locks(self) -> QueueLockBackend:
-        ...
+    def locks(self) -> QueueLockBackend: ...
 
     @property
     def full(self) -> bool:
@@ -888,3 +656,279 @@ class QueueInterface[T, U, R](
     This protocol is typically implemented by concrete backends like
     ThreadBackend or ProcessBackend.
     """
+
+
+@runtime_checkable
+class QueueHook[T, U, R](Protocol):
+    """Lifecycle and instrumentation hooks for queue operations.
+
+    This protocol enables injection of custom logic at key points in the
+    lifecycle of a queue instance — including initialization, shutdown,
+    enqueue (`put`), dequeue (`get`), and sentinel handling.
+
+    Hook methods are structured to distinguish between:
+
+      - Stateless transformations (e.g., `prepare_put`, `finalize_put`,
+        `finalize_get`), which operate outside of any lock and should avoid
+        mutating the queue.
+      - In-lock instrumentation (`inlock_pre_put`, `inlock_post_put`,
+        `inlock_pre_get`, `inlock_post_get`), which operate under the queue's
+        synchronization lock and are intended for coordination logic that
+        requires mutual exclusion.
+      - Lifecycle methods (`after_init`, `after_shutdown`, `before_shutdown`),
+        which provide points for setup and teardown behavior around the queue's
+        usage.
+
+    Type parameters:
+        Q: The queue type this hook is bound to.
+        T: The type accepted by the public `put()` method.
+        U: The internal representation stored in the queue (output of
+           `prepare_put()`).
+        R: The type returned by the public `get()` method (output of
+           `finalize_get()`).
+
+    Usage guidance for in-lock hooks:
+        The `inlock_*` methods are intended for lightweight, lock-safe
+        operations. It is strongly recommended that these methods avoid:
+
+            1. Acquiring other locks held by the queue (especially non-
+               reentrant locks).
+            2. Performing heavy computations or I/O.
+            3. Mutating the queue itself or its internal coordination
+               structures.
+
+        Violating these constraints may lead to deadlocks or degraded
+        throughput under concurrency.
+
+        These recommendations are not enforced — experienced developers who
+        fully understand the queue's locking model may safely apply more
+        advanced patterns when needed. However, careful design is required to
+        avoid introducing contention or subtle bugs.
+
+        When in doubt, use `prepare_*` and `finalize_*` for non-critical
+        transformations, and reserve `inlock_*` for synchronization-aware
+        instrumentation only.
+    """
+
+    def after_init[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+    ) -> None:
+        """Called after the queue and hook are fully initialized.
+
+        Args:
+            queue: the hooked queue.
+        """
+        ...
+
+    def before_shutdown[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+    ) -> None:
+        """Called before queue shutdown begins.
+
+        Args:
+            queue: the hooked queue.
+        """
+        ...
+
+    def after_shutdown[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+    ) -> None:
+        """Called after queue shutdown completes.
+
+        Args:
+            queue: the hooked queue.
+        """
+        ...
+
+    def prepare_put[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+        item: T | BaseSentinel,
+    ) -> U | BaseSentinel:
+        """Called before an item is enqueued.
+
+        Use this to convert the external input into an internal queue
+        representation. Should be pure and stateless.
+
+        Example uses:
+            - Serialization
+            - Wrapping with metadata
+            - Priority tagging
+
+        Note:
+            This operates outside of any lock.
+
+        Args:
+            queue: the hooked queue.
+            item: The original item or sentinel to enqueue.
+
+        Returns:
+            The item to pass to the queue (may be transformed).
+        """
+        ...
+
+    def inlock_pre_put[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+        item: U | BaseSentinel,
+    ) -> None:
+        """Called before an item is enqueued and after it's prepared.
+
+        Use this to update queue-owned state based on the item or
+        coordinate inter-thread/process logic.
+
+        Example uses:
+            - Reference counting
+            - In-place state updates
+            - Instrumentation
+
+        Note:
+            This operates in a lock.
+
+        Args:
+            queue: the hooked queue.
+            item: The original item or sentinel to enqueue.
+
+        Returns:
+            The item to pass to the queue (may be transformed).
+        """
+        ...
+
+    def inlock_post_put[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+        item: U | BaseSentinel,
+    ) -> None:
+        """Postprocess an item after it is successfully enqueued.
+
+        Used to perform post-enqueue adjustments that must be atomic
+        with queue state.
+
+        Example uses:
+            - Coherent metrics update
+            - Condition signaling refinement
+
+        Note:
+            This operates in a lock.
+
+        Args:
+            queue: the hooked queue.
+            item: The item or sentinel that was added.
+
+        Returns:
+            The item added to the queue (may be transformed).
+        """
+        ...
+
+    def finalize_put[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+        item: U | BaseSentinel,
+    ) -> None:
+        """Called after an item is successfully enqueued.
+
+        Use this for logging, metrics, or external signaling.
+
+        Note:
+            This operates outside of any lock.
+
+        Args:
+            queue: the hooked queue.
+            item: The item or sentinel that was added.
+        """
+        ...
+
+    def prepare_get[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+    ) -> None:
+        """Called before an item is retrieved.
+
+        Use this to prepare external state or apply sampling logic.
+
+        Note:
+            This operates outside of any lock.
+
+        Args:
+            queue: the hooked queue.
+        """
+        ...
+
+    def inlock_pre_get[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+    ) -> None:
+        """Called before an item is retrieved.
+
+        Used to coordinate access or inspect internal state.
+
+        Note:
+            This operates in a lock.
+
+        Args:
+            queue: the hooked queue.
+        """
+        ...
+
+    def inlock_post_get[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+    ) -> None:
+        """Called after an item is retrieved.
+
+        Use this for bookkeeping that must be consistent with queue state.
+
+        Note:
+            This operates in a lock.
+
+        Args:
+            queue: the hooked queue.
+        """
+        ...
+
+    def finalize_get[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+        item: U,
+    ) -> R:
+        """Transforms the retrieved item into its final output.
+
+        Example uses:
+            - Deserialization
+            - Reference release
+            - Result unwrapping
+
+        Note:
+            This operates outside of any lock.
+
+        Args:
+            queue: the hooked queue.
+            item: The dequeued item.
+
+        Returns:
+            The item to return to the consumer (may be transformed).
+        """
+        ...
+
+    def on_get_sentinel[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+        sentinel: BaseSentinel,
+        exception: Exception | None = None,
+    ) -> Exception:
+        """Converts a sentinel into an exception to raise.
+
+        Called when a sentinel is dequeued and not handled internally.
+
+        Args:
+            queue: The hooked queue instance.
+            sentinel: The retrieved sentinel object.
+            exception: Optional inner exception (e.g., from prior hooks).
+
+        Returns:
+            The exception to raise from `get()`.
+        """
+        ...

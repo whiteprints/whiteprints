@@ -167,7 +167,11 @@ def is_noop(func: Callable[..., Any]) -> bool:
     Returns:
         True if the function is considered a no-op, False otherwise.
     """
-    bytecode = _normalize_function(func)
+    try:
+        bytecode = _normalize_function(func)
+    except TypeError:
+        return False
+
     return bytecode in _known_noop()
 
 

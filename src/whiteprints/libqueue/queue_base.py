@@ -13,8 +13,8 @@ from collections.abc import (
     Callable,
     Iterator,
     Mapping,
-    Sized,
 )
+from contextlib import AbstractContextManager
 from types import TracebackType
 from typing import (
     Any,
@@ -82,8 +82,14 @@ class QueueSyncOpsBase[T, U, R](QueueSyncOps[T, U, R]):
     @override
     def __init__(
         self,
-        hooks: QueueHook[QueueInterface[T, U, R], T, U, R] | None = None,
+        max_slots: int | None,
+        hooks: QueueHook[T, U, R] | None = None,
         com: QueueCommunicationBackend[U] | None = None,
+        *,
+        put_block: bool = True,
+        put_timeout: float | None = None,
+        get_block: bool = True,
+        get_timeout: float | None = None,
     ) -> None:
         """Initializes the queue and attaches the given hook type.
 
@@ -98,10 +104,21 @@ class QueueSyncOpsBase[T, U, R](QueueSyncOps[T, U, R]):
                 like `lambda q: LoggingHook(q, arg)` to inject parameters.
             com: Implementation of the communication protocol.
         """
+        self.max_slots = max_slots
         self.hooks = hooks or NoQueueHook[T, U, R]()
-        self.com = com_ = com or import_lazy_project(
-            "libqueue.queue_condition"
-        ).ThreadConditionCommunication[U](0)
+        self.com = com_ = (
+            com
+            or import_lazy_project(
+                "libqueue.queue_condition_thread_com"
+            ).ThreadConditionCommunication[U]()
+        )
+        com_.bind_methods(
+            max_slots=max_slots,
+            put_block=put_block,
+            put_timeout=put_timeout,
+            get_block=get_block,
+            get_timeout=get_timeout,
+        )
         self._locks = com_.locks
 
     @property
@@ -176,6 +193,18 @@ class QueueLifecycleBase[T, U, R](QueueLifecycle[T, U, R]):
         self.finalizer = import_lazy("weakref").finalize(
             self, self._finalize_queue
         )
+
+    def producer(self) -> AbstractContextManager[None]:
+        if (com := getattr(self, "com", None)) is None:
+            raise ShutDownError
+
+        return com.producer()
+
+    def receiver(self) -> AbstractContextManager[None]:
+        if (com := getattr(self, "com", None)) is None:
+            raise ShutDownError
+
+        return com.receiver()
 
     @property
     @override
@@ -305,8 +334,23 @@ class QueueBackend[T, U, R](
 
     def __init__(
         self,
-        hooks: QueueHook[QueueInterface[T, U, R], T, U, R] | None = None,
+        max_slots: int | None = None,
+        hooks: QueueHook[T, U, R] | None = None,
         com: QueueCommunicationBackend[U] | None = None,
+        *,
+        put_block: bool = True,
+        put_timeout: float | None = None,
+        get_block: bool = True,
+        get_timeout: float | None = None,
     ) -> None:
-        QueueSyncOpsBase[T, U, R].__init__(self, hooks, com)
+        QueueSyncOpsBase[T, U, R].__init__(
+            self,
+            max_slots,
+            hooks,
+            com,
+            put_block=put_block,
+            put_timeout=put_timeout,
+            get_block=get_block,
+            get_timeout=get_timeout,
+        )
         QueueLifecycleBase[T, U, R].__init__(self)

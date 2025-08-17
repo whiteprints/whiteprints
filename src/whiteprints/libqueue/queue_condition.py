@@ -10,20 +10,19 @@ shutdown with sentinel-based signaling.
 The implementation ensure shutdown and predictable task completion.
 """
 
-from collections.abc import Container
-from contextlib import AbstractContextManager
+from collections.abc import Callable, Container
 from textwrap import dedent, indent
-from types import FunctionType, TracebackType
+from types import FunctionType
 from typing import (
+    Any,
     ClassVar,
     Final,
-    Protocol,
+    NoReturn,
     TypedDict,
+    cast,
     override,
-    runtime_checkable,
 )
 
-from whiteprints.lazy_import import import_lazy
 from whiteprints.libqueue import (
     SHUTDOWN,
     BaseSentinel,
@@ -35,17 +34,12 @@ from whiteprints.libqueue.queue_exceptions import (
     FullError,
     NotOwningError,
     ShutDownError,
-    TaskDoneOverflowError,
 )
 from whiteprints.libqueue.queue_hook import (
-    BaseQueueHook,
     QueueHook,
 )
 from whiteprints.libqueue.queue_interface import (
-    ConditionLike,
-    LockLike,
     QueueCommunicationBackend,
-    QueueInterface,
 )
 
 
@@ -57,11 +51,12 @@ _PUT_SRC_TEMPLATE = dedent("""
         {not_full_acquire}
         try:{inlock_pre_put}
             self._put(item)
-        except BaseException as error:
+        except BaseException as base_error:
+            error = self.com.process_error(base_error)
             if not self._not_full_exit_except(
                 type(error), error, error.__traceback__
             ):
-                raise
+                raise error from None
         {not_full_release}
 """)
 
@@ -70,12 +65,14 @@ _GET_SRC_TEMPLATE = dedent("""
         {not_empty_acquire}
         try:{inlock_pre_get}
             {sentinel_get}
-        except BaseException as error:
+        except BaseException as base_error:
+            error = self.com.process_error(base_error)
             if not self._not_empty_exit_except(
                 type(error), error, error.__traceback__
             ):
-                raise
+                raise error from None
         {not_empty_release}
+
         return item
 """)
 
@@ -92,7 +89,8 @@ class _ConditionQueueState[T, U, R](TypedDict):
                       synchronization, and internal queue mechanics.
     """
 
-    hooks: QueueHook[QueueInterface[T, U, R], T, U, R] | None
+    max_slots: int | None
+    hooks: QueueHook[T, U, R] | None
     com: QueueCommunicationBackend[U] | None
 
 
@@ -123,7 +121,7 @@ class ConditionQueue[T, U, R](QueueBackend[T, U, R]):
         _wlock: Internal lock guarding write shared queue state.
     """
 
-    hooks: QueueHook[QueueInterface[T, U, R], T, U, R]
+    hooks: QueueHook[T, U, R]
 
     FULL_ERROR: ClassVar[FullError] = FullError()
     EMPTY_ERROR: ClassVar[EmptyError] = EmptyError()
@@ -142,19 +140,29 @@ class ConditionQueue[T, U, R](QueueBackend[T, U, R]):
         "_size",
         "com",
         "get",
+        "get_block",
+        "get_timeout",
         "hooks",
         "put",
+        "put_block",
+        "put_timeout",
         "sentinels",
     )
 
     @override
     def __init__(
         self,
-        hooks: QueueHook[QueueInterface[T, U, R], T, U, R] | None = None,
+        max_slots: int | None = None,
+        hooks: QueueHook[T, U, R] | None = None,
         com: QueueCommunicationBackend[U] | None = None,
         sentinels: (
             BaseSentinel | type[BaseSentinel] | Container[BaseSentinel] | None
         ) = SHUTDOWN,
+        *,
+        put_block: bool = True,
+        put_timeout: float | None = None,
+        get_block: bool = True,
+        get_timeout: float | None = None,
     ) -> None:
         """Initializes a thread-safe queue backend using condition variables.
 
@@ -173,7 +181,19 @@ class ConditionQueue[T, U, R](QueueBackend[T, U, R]):
             Only the thread that creates the queue is allowed to shut it down.
             Ownership can be transferred or revoked using provided methods.
         """
-        super().__init__(hooks, com)
+        super().__init__(
+            max_slots,
+            hooks,
+            com,
+            put_block=put_block,
+            put_timeout=put_timeout,
+            get_block=get_block,
+            get_timeout=get_timeout,
+        )
+        self.put_timeout = put_timeout
+        self.get_timeout = get_timeout
+        self.put_block = put_block
+        self.get_block = get_block
         self.sentinels = sentinels
         self._bind_put_get_primitives()
         self._bind_put()
@@ -189,23 +209,38 @@ class ConditionQueue[T, U, R](QueueBackend[T, U, R]):
         no_release = is_noop(self._not_full_exit_noexcept)
 
         if (
-            no_prepare_put
+            (self.put_timeout is None or self.put_timeout < 0)
+            and self.put_block
+            and no_prepare_put
             and no_inlock_pre_put
             and no_inlock_post_put
             and no_finalize_put
             and no_acquire
             and no_release
         ):
-            self.put = self._put
+            self.put = cast("Callable[[T | BaseSentinel], None]", self._put)
             return
 
         if no_acquire:
             not_full_acquire = ""
+        elif not self.put_block or self.put_timeout == 0:
+            not_full_acquire = dedent(
+                """
+                if not self._not_full_acquire(False):
+                    raise FullError
+                """
+            )
+        elif self.put_timeout is None or self.put_timeout < 0:
+            not_full_acquire = dedent(
+                """
+                self._not_full_acquire()
+                """
+            )
         else:
             not_full_acquire = dedent(
                 """
-                if not self._not_full_acquire():
-                    raise TimeoutError("put timed out")
+                if not self._not_full_acquire(True, self.put_timeout):
+                    raise FullError
                 """
             )
 
@@ -219,31 +254,29 @@ class ConditionQueue[T, U, R](QueueBackend[T, U, R]):
                 """.format(
                     inlock_post_put=(
                         ""
-                        if no_inlock_post_put else
-                        "\n"
+                        if no_inlock_post_put
+                        else "\n"
                         "    item = self.hooks.inlock_post_put(self, item)"
                     ),
                     finalize_put=(
                         ""
-                        if no_finalize_put else
-                        "\n"
-                        "self.hooks.finalize_put(self, item)"
-                    )
+                        if no_finalize_put
+                        else "\nself.hooks.finalize_put(self, item)"
+                    ),
                 )
             )
 
         put_src = _PUT_SRC_TEMPLATE.format(
             prepare_put=(
                 ""
-                if no_prepare_put else
-                "\n"
-                "        item = self.hooks.prepare_put(self, item)"
+                if no_prepare_put
+                else "\n        item = self.hooks.prepare_put(self, item)"
             ),
             not_full_acquire=indent(not_full_acquire, " " * 4),
             inlock_pre_put=(
                 ""
-                if no_inlock_pre_put else
-                "\n"
+                if no_inlock_pre_put
+                else "\n"
                 "           item = self.hooks.inlock_pre_put(self, item)"
             ),
             not_full_release=indent(not_full_release, " " * 4),
@@ -253,26 +286,8 @@ class ConditionQueue[T, U, R](QueueBackend[T, U, R]):
         exec(put_src, globals(), local_ns)
         self.put = local_ns["put"].__get__(self, self.__class__)
 
-    def _bind_get(self) -> None:
-        prepare_get = not is_noop(self.hooks.prepare_get)
-        inlock_pre_get = not is_noop(self.hooks.inlock_pre_get)
-        inlock_post_get = not is_noop(self.hooks.inlock_post_get)
-        finalize_get = not is_noop(self.hooks.finalize_get)
-        noop_acquire = is_noop(self._not_empty_acquire)
-        noop_release = is_noop(self._not_empty_exit_noexcept)
-
+    def _generate_sentinel_code(self) -> str:
         if self.sentinels is None:
-            if (
-                not prepare_get
-                and not inlock_pre_get
-                and not inlock_post_get
-                and not finalize_get
-                and noop_acquire
-                and noop_release
-            ):
-                self.get = self._get
-                return
-
             sentinel_get = "item = self._get()"
         elif isinstance(self.sentinels, BaseSentinel):
             sentinel_get = dedent(
@@ -296,17 +311,55 @@ class ConditionQueue[T, U, R](QueueBackend[T, U, R]):
                 """
             )
 
-        if noop_acquire:
+        return sentinel_get
+
+    def _bind_get(self) -> None:
+        no_prepare_get = is_noop(self.hooks.prepare_get)
+        no_inlock_pre_get = is_noop(self.hooks.inlock_pre_get)
+        no_inlock_post_get = is_noop(self.hooks.inlock_post_get)
+        no_finalize_get = is_noop(self.hooks.finalize_get)
+        no_acquire = is_noop(self._not_empty_acquire)
+        no_release = is_noop(self._not_empty_exit_noexcept)
+
+        if (
+            (self.get_timeout is None or self.get_timeout < 0)
+            and self.get_block
+            and self.sentinels is None
+            and no_prepare_get
+            and no_inlock_pre_get
+            and no_inlock_post_get
+            and no_finalize_get
+            and no_acquire
+            and no_release
+        ):
+            self.get = cast("Callable[[], R]", self._get)
+            return
+
+        sentinel_get = self._generate_sentinel_code()
+        if no_acquire:
             not_empty_acquire = ""
+        elif not self.get_block or self.get_timeout == 0:
+            not_empty_acquire = dedent(
+                """
+                if not self._not_empty_acquire(False):
+                    raise self.EMPTY_ERROR
+                """
+            )
+        elif self.get_timeout is None or self.get_timeout < -1:
+            not_empty_acquire = dedent(
+                """
+                self._not_empty_acquire()
+                """
+            )
         else:
             not_empty_acquire = dedent(
                 """
-                if not self._not_empty_acquire():
-                    raise TimeoutError("get timed out")
+                if not self._not_empty_acquire(True, self.get_timeout):
+                    raise self.EMPTY_ERROR
                 """
             )
 
-        if noop_release:
+        if no_release:
             not_empty_release = ""
         else:
             not_empty_release = dedent(
@@ -315,28 +368,29 @@ class ConditionQueue[T, U, R](QueueBackend[T, U, R]):
                     self._not_empty_exit_noexcept(){finalize_get}
                 """.format(
                     inlock_post_get=(
-                        "\n"
-                        "    item = self.hooks.inlock_post_get(self)"
-                        if inlock_post_get else ""
+                        ""
+                        if no_inlock_post_get
+                        else "\n    item = self.hooks.inlock_post_get(self)"
                     ),
                     finalize_get=(
-                        "\n"
-                        "item = self.hooks.finalize_get(self, item)"
-                        if finalize_get else ""
-                    )
+                        ""
+                        if no_finalize_get
+                        else "\nitem = self.hooks.finalize_get(self, item)"
+                    ),
                 )
             )
 
         get_src = _GET_SRC_TEMPLATE.format(
             prepare_get=(
-                "\n            self.hooks.prepare_get(self)"
-                if prepare_get else ""
+                ""
+                if no_prepare_get
+                else "\n            self.hooks.prepare_get(self)"
             ),
             not_empty_acquire=indent(not_empty_acquire, " " * 4),
             inlock_pre_get=(
-                "\n"
-                "           item = self.hooks.inlock_pre_get(self)"
-                if inlock_pre_get else ""
+                ""
+                if no_inlock_pre_get
+                else "\n           item = self.hooks.inlock_pre_get(self)"
             ),
             sentinel_get=indent(sentinel_get, " " * 8),
             not_empty_release=indent(not_empty_release, " " * 4),
@@ -358,24 +412,7 @@ class ConditionQueue[T, U, R](QueueBackend[T, U, R]):
         self._not_empty = self.locks.not_empty
         self._not_empty_acquire = self._not_empty.acquire
         self._not_empty_exit_noexcept = self._not_empty.exit_noexcept
-        self._not_empty_except = self._not_empty.exit_except
-
-    @property
-    def timeout(self) -> float | None:
-        """Gets the timeout for blocking operations. -1 if unset."""
-        return getattr(self, "_timeout", -1)
-
-    @timeout.setter
-    def timeout(self, value: float | None) -> None:
-        """Sets the global timeout (seconds) for all blocking operations.
-
-        Updates the internal wait dispatch method for best performance.
-        Per-call timeouts are not supported. Use only if really needed.
-
-        Args:
-            value: Seconds to block, or None for no timeout.
-        """
-        self._timeout = value or -1
+        self._not_empty_exit_except = self._not_empty.exit_except
 
     @property
     @override
@@ -387,36 +424,8 @@ class ConditionQueue[T, U, R](QueueBackend[T, U, R]):
         """
         return self.com is None
 
-    @staticmethod
-    def _time() -> float:
-        """Returns the current monotonic time in seconds.
-
-        This is used for deadline calculations in timeouts. It avoids issues
-        with system clock changes.
-        """
-        return import_lazy("time").monotonic()
-
-    def _fail_if_shutdown(self) -> None:
-        """Raises ShutDownError if the queue has been shut down.
-
-        No-op otherwise.
-
-        Raises:
-            ShutDownError: the queue has been shut down.
-        """
-        if self.com is None:
-            raise ShutDownError
-
-    def _fail_if_shutdown_and_empty(self) -> None:
-        """Raises ShutDownError if the queue is shut down and empty.
-
-        No-op otherwise.
-
-        Raises:
-            ShutDownError: the queue has been shut down.
-        """
-        if self.com is None and self._size() < 1:
-            raise ShutDownError
+    def _shutdown(self, /, *args: Any, **kwargs: Any) -> NoReturn:
+        raise ShutDownError
 
     @override
     def shutdown(self) -> None:
@@ -441,17 +450,45 @@ class ConditionQueue[T, U, R](QueueBackend[T, U, R]):
             NotOwningError:
                 when shutdown is attempted by a non-owning worker.
         """
+        if not self.owning:
+            raise NotOwningError
+
+        if self.com is None:
+            return
+
+        open_put = self.put
+        self.hooks.before_shutdown(self)
+
+        # Wake any waiters cleanly (hold each cond just for notify).
+        with self.com.producer_null:
+            self.com.producer_null.notify_all()
+
+        with self.com.receiver_null:
+            self.com.receiver_null.notify_all()
+
+        with self.com.has_receivers:
+            self.com.has_receivers.notify_all()
+
+        # Flip callables atomically under owner_lock if you want,
+        # but don't call wait_* while holding it.
         with self.locks.owner_lock:
-            if self.com is None:
-                return
+            self.producer = self._shutdown
+            self.put = self._shutdown
+            self.receiver = self._shutdown
 
-            if not self.com.owning:
-                raise NotOwningError
+        self.com.wait_no_producers()
 
-            self.hooks.before_shutdown(self)
+        for _tid in list(self.com.receivers):
+            open_put(SHUTDOWN)
+
+        self.com.wait_no_receivers()
+
+        with self.locks.owner_lock:
+            self.get = self._shutdown
             self.com.shutdown()
-            self.hooks.after_shutdown(self)
             self.com = None
+
+        self.hooks.after_shutdown(self)
 
     def __getstate__(self) -> _ConditionQueueState[T, U, R]:
         """Serializes queue state for persistence or transfer.
@@ -462,6 +499,7 @@ class ConditionQueue[T, U, R](QueueBackend[T, U, R]):
             A dictionary containing `hooks` and `com`.
         """
         return _ConditionQueueState(
+            max_slots=self.max_slots,
             hooks=self.hooks,
             com=self.com,
         )
@@ -477,164 +515,7 @@ class ConditionQueue[T, U, R](QueueBackend[T, U, R]):
                    typically returned by `__getstate__()`.
         """
         self.__init__(
+            state["max_slots"],
             state["hooks"],
             state["com"],
         )
-
-
-################################################################################
-# MOVE ME
-################################################################################
-
-
-@runtime_checkable
-class _HasQLock(Protocol):
-    def qlock(self) -> LockLike: ...
-
-
-class ThreadTaskTracker[T]:
-    """Tracks unfinished queue tasks and supports blocking joins."""
-
-    __slots__ = ("_cond", "_unfinished", "ack")
-
-    def __init__(self, lock: LockLike) -> None:
-        """Initializes a task tracker using the provided lock.
-
-        Args:
-            lock: The reentrant lock guarding queue size or state.
-        """
-        self._cond = import_lazy("threading").Condition(lock)
-        self._unfinished = 0
-        self.ack = self.task_done
-
-    def new_task(self, item: T | BaseSentinel) -> None:
-        if isinstance(item, BaseSentinel):
-            return
-
-        with self._cond:
-            self._unfinished += 1
-
-    def task_done(self) -> None:
-        """Marks a task as completed.
-
-        Decrements the unfinished counter and notifies any waiting joiners
-        if all tasks are done.
-
-        Raises:
-            TaskDoneOverflowError: If ack() is called too many times.
-        """
-        with self._cond:
-            self._unfinished -= 1
-            if self._unfinished < 0:
-                raise TaskDoneOverflowError
-
-            if self._unfinished == 0:
-                self._cond.notify_all()
-
-    def join(self) -> None:
-        """Blocks until all tracked tasks have been marked as done.
-
-        This method is reentrant and safe to call multiple times.
-        """
-        with self._cond:
-            while self._unfinished > 0:
-                self._cond.wait()
-
-    @property
-    def remaining_tasks(self) -> int:
-        """Returns the number of unfinished tasks."""
-        return self._unfinished
-
-    @property
-    def done(self) -> bool:
-        """True if all tasks have been completed."""
-        return self._unfinished == 0
-
-    @property
-    def condition(self) -> ConditionLike:
-        """Returns the internal condition for advanced use (if needed)."""
-        return self._cond
-
-
-class ThreadTaskItem[T](AbstractContextManager[T]):
-    """A context manager that tracks task completion on exit."""
-
-    __slots__ = ("item", "tracker")
-
-    def __init__(self, item: T, tracker: ThreadTaskTracker[T]) -> None:
-        """Initialize the task context.
-
-        Args:
-            item: The queue item being processed.
-            tracker: The hook responsible for tracking task completion.
-        """
-        self.item = item
-        self.tracker = tracker
-
-    def __enter__(self) -> T:
-        """Enter the task context.
-
-        Returns:
-            The wrapped item.
-        """
-        return self.item
-
-    @override
-    def __exit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_val: BaseException | None,
-        exc_tb: TracebackType | None,
-    ) -> None:
-        """Exit the task context and mark the task as done."""
-        self.tracker.task_done()
-
-
-class ThreadTaskTrackingHook[Q: _HasQLock, T](
-    BaseQueueHook[T, T, ThreadTaskItem[T]]
-):
-    """Queue hook that tracks unfinished tasks using TaskItem contexts."""
-
-    __slots__ = ("tracker",)
-
-    @override
-    def __init__(self, queue: Q) -> None:
-        """Initialize the tracking hook and its synchronization state.
-
-        Args:
-            queue: The queue this hook is attached to.
-        """
-        super().__init__()
-        self.tracker = ThreadTaskTracker[T](queue.qlock())
-
-    @override
-    def after_put(self, queue: object, item: T | BaseSentinel) -> None:
-        """Increments unfinished task count after a successful put.
-
-        Args:
-            queue: The queue this hook is attached to.
-            item: The enqueued item or sentinel.
-        """
-        self.tracker.new_task(item)
-
-    @override
-    def after_get(self, queue: object, item: T) -> ThreadTaskItem[T]:
-        """Wraps a dequeued item in a context manager for task tracking.
-
-        Args:
-            queue: The queue this hook is attached to.
-            item: The dequeued item.
-
-        Returns:
-            A TaskItem that manages task completion.
-        """
-        return ThreadTaskItem(item, self.tracker)
-
-    @override
-    def before_shutdown(self, queue: object) -> None:
-        """Blocks shutdown until all unfinished tasks are marked done.
-
-        Args:
-            queue: The queue this hook is attached to.
-        """
-        self.tracker.join()

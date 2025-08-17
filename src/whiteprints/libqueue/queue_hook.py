@@ -46,7 +46,7 @@ from typing import (
 
 from whiteprints.lazy_import import import_lazy
 from whiteprints.libqueue import SHUTDOWN, BaseSentinel
-from whiteprints.libqueue.queue_exceptions import NotOwningError, ShutDownError
+from whiteprints.libqueue.queue_exceptions import ShutDownError
 from whiteprints.libqueue.queue_interface import QueueHook, QueueInterface
 
 
@@ -58,7 +58,7 @@ __all__: Final = [
 """Public module attributes."""
 
 
-class BaseQueueHook[T, U, R](QueueHook[QueueInterface[T, U, R], T, U, R]):
+class BaseQueueHook[T, U, R](QueueHook[T, U, R]):
     """Base class for implementing QueueHook with default no-op behavior.
 
     This class provides a structured foundation for custom queue hook
@@ -78,14 +78,8 @@ class BaseQueueHook[T, U, R](QueueHook[QueueInterface[T, U, R], T, U, R]):
     @classmethod
     def via[V](
         cls,
-        other: (
-            type[QueueHook[QueueInterface[U, V, U], U, V, U]]
-            | Callable[[], QueueHook[QueueInterface[U, V, U], U, V, U]]
-        ),
-    ) -> Callable[
-        [],
-        QueueHook[QueueInterface[T, V, R], T, V, R],
-    ]:
+        other: (type[QueueHook[U, V, U]] | Callable[[], QueueHook[U, V, U]]),
+    ) -> Callable[[], QueueHook[T, V, R]]:
         """Chains this hook with another, returning a composed hook class.
 
         This method enables sequential hook composition using the `+` operator.
@@ -115,10 +109,7 @@ class BaseQueueHook[T, U, R](QueueHook[QueueInterface[T, U, R], T, U, R]):
         """
         return partial(MergedHook, cls(), other())
 
-    def __add__[V](
-        self,
-        other: QueueHook[object, U, V, U],
-    ) -> QueueHook[QueueInterface[T, V, R], T, V, R]:
+    def __add__[V](self, other: QueueHook[U, V, U]) -> QueueHook[T, V, R]:
         """Creates a composed hook by chaining this hook with another.
 
         This method enables sequential hook composition using the `+` operator.
@@ -175,15 +166,9 @@ class BaseQueueHook[T, U, R](QueueHook[QueueInterface[T, U, R], T, U, R]):
         """
 
     @staticmethod
-    def on_shudown_sentinel(
-        queue: QueueInterface[T, U, R],
+    def on_shutdown_sentinel[TQ, UQ, RQ](
         exception: Exception | None = None,
     ) -> ShutDownError:
-        try:
-            queue.shutdown()
-        except NotOwningError:
-            queue.send_shutdown()
-
         new_exception = ShutDownError()
         if exception is not None:
             new_exception.__cause__ = exception
@@ -191,9 +176,9 @@ class BaseQueueHook[T, U, R](QueueHook[QueueInterface[T, U, R], T, U, R]):
         return new_exception
 
     @override
-    def on_get_sentinel(
+    def on_get_sentinel[TQ, UQ, RQ](
         self,
-        queue: QueueInterface[T, U, R],
+        queue: QueueInterface[TQ, UQ, RQ],
         sentinel: BaseSentinel,
         exception: Exception | None = None,
     ) -> Exception:
@@ -211,8 +196,8 @@ class BaseQueueHook[T, U, R](QueueHook[QueueInterface[T, U, R], T, U, R]):
         Returns:
             A new exception, typically wrapping or replacing the input.
         """
-        if sentinel == SHUTDOWN:
-            return self.on_shudown_sentinel(queue, exception)
+        if sentinel is SHUTDOWN:
+            return self.on_shutdown_sentinel(exception)
 
         new_exception = NotImplementedError()
         if exception is not None:
@@ -221,7 +206,7 @@ class BaseQueueHook[T, U, R](QueueHook[QueueInterface[T, U, R], T, U, R]):
         return new_exception
 
 
-class _MergedHookState[Q, T, U, V, R](TypedDict):
+class _MergedHookState[T, U, V, R](TypedDict):
     """Internal pickle state for MergedHook.
 
     This structure captures the serialized state of a MergedHook instance,
@@ -237,11 +222,11 @@ class _MergedHookState[Q, T, U, V, R](TypedDict):
             the intermediate item representation.
     """
 
-    hook: QueueHook[Q, T, U, R]
-    via_hook: QueueHook[Q, U, V, U]
+    hook: QueueHook[T, U, R]
+    via_hook: QueueHook[U, V, U]
 
 
-class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
+class MergedHook[T, U, V, R](QueueHook[T, V, R]):
     """Sequential composition of two queue hooks.
 
     `MergedHook` combines two `QueueHook` instances — one outer and one
@@ -312,8 +297,8 @@ class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
 
     def __init__(
         self,
-        hook: QueueHook[Q, T, U, R],
-        via_hook: QueueHook[Q, U, V, U],
+        hook: QueueHook[T, U, R],
+        via_hook: QueueHook[U, V, U],
     ) -> None:
         """Initializes both inner hooks using the shared queue.
 
@@ -325,7 +310,9 @@ class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
         self.via_hook = via_hook
         self._init_threadlocal()
 
-    def after_init(self, queue: Q) -> None:
+    def after_init[TQ, VQ, RQ](
+        self, queue: QueueInterface[TQ, VQ, RQ]
+    ) -> None:
         """Run both hooks' post-initialization logic.
 
         This is called once after the queue is fully constructed.
@@ -336,7 +323,10 @@ class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
         self.via_hook.after_init(queue)
         self.hook.after_init(queue)
 
-    def before_shutdown(self, queue: Q) -> None:
+    def before_shutdown[TQ, VQ, RQ](
+        self,
+        queue: QueueInterface[TQ, VQ, RQ],
+    ) -> None:
         """Notify both hooks before shutdown begins.
 
         Outer hook is notified first, then inner.
@@ -347,7 +337,10 @@ class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
         self.hook.before_shutdown(queue)
         self.via_hook.before_shutdown(queue)
 
-    def after_shutdown(self, queue: Q) -> None:
+    def after_shutdown[TQ, VQ, RQ](
+        self,
+        queue: QueueInterface[TQ, VQ, RQ],
+    ) -> None:
         """Notify both hooks after shutdown completes.
 
         Inner hook is notified first, then outer.
@@ -358,8 +351,10 @@ class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
         self.via_hook.after_shutdown(queue)
         self.hook.after_shutdown(queue)
 
-    def prepare_put(
-        self, queue: Q, item: T | BaseSentinel
+    def prepare_put[TQ, VQ, RQ](
+        self,
+        queue: QueueInterface[TQ, VQ, RQ],
+        item: T | BaseSentinel,
     ) -> V | BaseSentinel:
         """Transforms the public item before enqueueing.
 
@@ -377,8 +372,8 @@ class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
         self._local.stack.append(intermediate)
         return self.via_hook.prepare_put(queue, intermediate)
 
-    def inlock_pre_put(
-        self, queue: Q, item: V | BaseSentinel
+    def inlock_pre_put[TQ, VQ, RQ](
+        self, queue: QueueInterface[TQ, VQ, RQ], item: V | BaseSentinel
     ) -> None:
         """Runs locked pre-put logic in reverse order.
 
@@ -392,8 +387,10 @@ class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
         self.hook.inlock_pre_put(queue, self._local.stack[-1])
         self.via_hook.inlock_pre_put(queue, item)
 
-    def inlock_post_put(
-        self, queue: Q, item: V | BaseSentinel
+    def inlock_post_put[TQ, VQ, RQ](
+        self,
+        queue: QueueInterface[TQ, VQ, RQ],
+        item: V | BaseSentinel,
     ) -> None:
         """Runs locked post-put logic in reverse order.
 
@@ -406,7 +403,11 @@ class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
         self.via_hook.inlock_post_put(queue, item)
         self.hook.inlock_post_put(queue, self._local.stack[-1])
 
-    def finalize_put(self, queue: Q, item: V | BaseSentinel) -> None:
+    def finalize_put[TQ, VQ, RQ](
+        self,
+        queue: QueueInterface[TQ, VQ, RQ],
+        item: V | BaseSentinel,
+    ) -> None:
         """Completes the enqueue lifecycle in reverse order.
 
         Restores the intermediate item from prepare_put and passes it
@@ -419,7 +420,10 @@ class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
         self.via_hook.finalize_put(queue, item)
         self.hook.finalize_put(queue, self._local.stack.pop())
 
-    def prepare_get(self, queue: Q) -> None:
+    def prepare_get[TQ, VQ, RQ](
+        self,
+        queue: QueueInterface[TQ, VQ, RQ],
+    ) -> None:
         """Calls both hooks' before_get handlers in order.
 
         Args:
@@ -428,7 +432,10 @@ class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
         self.hook.prepare_get(queue)
         self.via_hook.prepare_get(queue)
 
-    def inlock_pre_get(self, queue: Q) -> None:
+    def inlock_pre_get[TQ, VQ, RQ](
+        self,
+        queue: QueueInterface[TQ, VQ, RQ],
+    ) -> None:
         """Runs locked pre-get operations in order.
 
         The outer hook is called first, followed by the inner hook. These
@@ -441,7 +448,10 @@ class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
         self.hook.inlock_pre_get(queue)
         self.via_hook.inlock_pre_get(queue)
 
-    def inlock_post_get(self, queue: Q) -> None:
+    def inlock_post_get[TQ, VQ, RQ](
+        self,
+        queue: QueueInterface[TQ, VQ, RQ],
+    ) -> None:
         """Runs locked post-get operations in reverse order.
 
         The inner hook is called first, followed by the outer hook. These
@@ -455,7 +465,11 @@ class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
         self.via_hook.inlock_post_get(queue)
         self.hook.inlock_post_get(queue)
 
-    def finalize_get(self, queue: Q, item: V) -> R:
+    def finalize_get[TQ, VQ, RQ](
+        self,
+        queue: QueueInterface[TQ, VQ, RQ],
+        item: V,
+    ) -> R:
         """Finalizes the get operation and returns the user-facing value.
 
         Applies `via_hook.finalize_get()` then `hook.finalize_get()`.
@@ -470,9 +484,9 @@ class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
         result = self.via_hook.finalize_get(queue, item)
         return self.hook.finalize_get(queue, result)
 
-    def on_get_sentinel(
+    def on_get_sentinel[TQ, VQ, RQ](
         self,
-        queue: Q,
+        queue: QueueInterface[TQ, VQ, RQ],
         sentinel: BaseSentinel,
         exception: Exception | None = None,
     ) -> Exception:
@@ -499,7 +513,7 @@ class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
             self.via_hook.on_get_sentinel(queue, sentinel, exception),
         )
 
-    def __getstate__(self) -> _MergedHookState[Q, T, U, V, R]:
+    def __getstate__(self) -> _MergedHookState[T, U, V, R]:
         """Serialize internal state for multiprocessing pickling.
 
         This method is required to enable custom serialization of generic
@@ -514,7 +528,7 @@ class MergedHook[Q, T, U, V, R](QueueHook[Q, T, V, R]):
             via_hook=self.via_hook,
         )
 
-    def __setstate__(self, state: _MergedHookState[Q, T, U, V, R]) -> None:
+    def __setstate__(self, state: _MergedHookState[T, U, V, R]) -> None:
         """Restore internal state from a pickled representation.
 
         This reinitializes the merged hook after deserialization,
@@ -542,16 +556,19 @@ class NoQueueHook[T, U, R](BaseQueueHook[T, U, R]):
     """
 
     @override
-    def after_init(self, queue: QueueInterface[T, U, R]) -> None:
+    def after_init[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+    ) -> None:
         """Hook invoked after the queue is fully initialized.
 
         No-op in this implementation.
         """
 
     @override
-    def prepare_put(
+    def prepare_put[TQ, UQ, RQ](
         self,
-        queue: QueueInterface[T, U, R],
+        queue: QueueInterface[TQ, UQ, RQ],
         item: T | BaseSentinel,
     ) -> U | BaseSentinel:
         """Hook invoked immediately before placing an item in the queue.
@@ -568,8 +585,10 @@ class NoQueueHook[T, U, R](BaseQueueHook[T, U, R]):
         return cast("U", item)
 
     @override
-    def inlock_pre_put(
-        self, queue: QueueInterface[T, U, R], item: U | BaseSentinel,
+    def inlock_pre_put[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+        item: U | BaseSentinel,
     ) -> None:
         """Hook invoked immediately after an item is stored in the queue.
 
@@ -581,8 +600,10 @@ class NoQueueHook[T, U, R](BaseQueueHook[T, U, R]):
         """
 
     @override
-    def inlock_post_put(
-        self, queue: QueueInterface[T, U, R], item: U | BaseSentinel,
+    def inlock_post_put[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+        item: U | BaseSentinel,
     ) -> None:
         """Hook invoked immediately after retrieving an item from the queue.
 
@@ -594,8 +615,10 @@ class NoQueueHook[T, U, R](BaseQueueHook[T, U, R]):
         """
 
     @override
-    def finalize_put(
-        self, queue: QueueInterface[T, U, R], item: U | BaseSentinel
+    def finalize_put[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+        item: U | BaseSentinel,
     ) -> None:
         """Hook invoked immediately after an item is stored in the queue.
 
@@ -607,7 +630,10 @@ class NoQueueHook[T, U, R](BaseQueueHook[T, U, R]):
         """
 
     @override
-    def prepare_get(self, queue: QueueInterface[T, U, R]) -> None:
+    def prepare_get[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+    ) -> None:
         """Hook invoked immediately before retrieving an item.
 
         No-op in this implementation.
@@ -617,7 +643,35 @@ class NoQueueHook[T, U, R](BaseQueueHook[T, U, R]):
         """
 
     @override
-    def finalize_get(self, queue: QueueInterface[T, U, R], item: U) -> R:
+    def inlock_pre_get[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+    ) -> None:
+        """Hook invoked immediately before an item is retrieved from the queue.
+
+        No-op in this implementation.
+
+        Args:
+            queue: The associated queue instance.
+        """
+
+    @override
+    def inlock_post_get[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+    ) -> None:
+        """Hook invoked immediately after an item is retrieved from the queue.
+
+        No-op in this implementation.
+
+        Args:
+            queue: The associated queue instance.
+        """
+
+    @override
+    def finalize_get[TQ, UQ, RQ](
+        self, queue: QueueInterface[TQ, UQ, RQ], item: U
+    ) -> R:
         """Hook invoked immediately after retrieving an item from the queue.
 
         In the no-op variant, returns the item unchanged.
@@ -632,7 +686,10 @@ class NoQueueHook[T, U, R](BaseQueueHook[T, U, R]):
         return cast("R", item)
 
     @override
-    def before_shutdown(self, queue: QueueInterface[T, U, R]) -> None:
+    def before_shutdown[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+    ) -> None:
         """Hook invoked before the queue shutdown begins.
 
         No-op in this implementation.
@@ -642,7 +699,10 @@ class NoQueueHook[T, U, R](BaseQueueHook[T, U, R]):
         """
 
     @override
-    def after_shutdown(self, queue: QueueInterface[T, U, R]) -> None:
+    def after_shutdown[TQ, UQ, RQ](
+        self,
+        queue: QueueInterface[TQ, UQ, RQ],
+    ) -> None:
         """Hook invoked after the queue shutdown completes.
 
         No-op in this implementation.
