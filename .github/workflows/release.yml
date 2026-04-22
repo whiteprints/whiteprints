@@ -165,7 +165,7 @@ jobs:
               for f in Path('SBOM').rglob('*'):
                   zipf.write(f, f.relative_to('SBOM'))
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@520d128f165991a6c774bcb264f323e3d70747f4 # v2
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
         with:
           subject-path: SBOM.zip*
       - name: Upload SBOM as Release Asset
