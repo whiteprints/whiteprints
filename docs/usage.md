@@ -8,9 +8,10 @@ SPDX-License-Identifier: CC-BY-NC-SA-4.0
 
 ```{eval-rst}
 
-.. click:: whiteprints.cli.entrypoint:whiteprints
-    :prog: whiteprint
-    :nested: full
+.. argparse::
+   :module: whiteprints.cli.entrypoint
+   :func: create_parser
+   :prog: whiteprints
 ```
 
 ```{toctree}

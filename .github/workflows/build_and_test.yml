@@ -211,7 +211,6 @@ jobs:
       matrix:
         receipt:
           - pre-commit
-          - lint
           - check-vulnerabilities
           - check-exceptions
           - check-code-maintainability

@@ -128,6 +128,14 @@ The _[Python]_ **code** of this project is distributed under license [GPL-3.0-or
 
 In case of doubt, please check the [SPDX] header of each individual source code file.
 
+By making a contribution to this project, you (the contributor) certify
+that:
+
+- Any contribution intentionally submitted for inclusion in this project by me shall be licensed under the license and copyright of the file(s) modified or created, without any additional terms or conditions.
+- You represents and warrants, on behalf of your employer or other principal **if** you are acting within the scope of your employment or otherwise as the agent of a legal entity, that you have the right and authority to make your contribution under the license of the file(s) modified or created.
+- The contribution was created in whole or in part by you and you have the right to submit it under the license of the file(s) modified or created; **or**
+- The contribution is based upon previous work that, to the best of my knowledge, is covered under an appropriate open source license and you have the right under that license to submit that work with modifications, whether created in whole or in part by you, under the license of the file(s) modified or created.
+
 [Python]: https://www.python.org/
 [SPDX]: https://spdx.dev/
 [REUSE]: https://reuse.software/

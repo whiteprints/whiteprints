@@ -17,7 +17,7 @@ hidden:
 Home <self>
 Guide <guide>
 Command Line <usage>
-Reference <autoapi/index>
+API Reference <autoapi/index>
 Licensing <licensing_index>
 Releases <https://github.com/whiteprints/whiteprints/releases>
 Contributing <contributing_index>

@@ -17,7 +17,7 @@ project_copyright = (
     '2024 The "Whiteprints" contributors <whiteprints@pm.me> - {}'
 )
 project_copyright = project_copyright.format(
-    "Distributed under license CC-BY-NC-SA-4.0"
+    "Documentation distributed under license CC-BY-NC-SA-4.0"
 )
 release = metadata.version("whiteprints")
 version = ".".join(release.split(".")[:3])
@@ -25,13 +25,13 @@ language = "en"
 myst_heading_anchors = 3
 extensions = [
     "myst_parser",
-    "sphinx_click",
+    "sphinxarg.ext",
     "sphinx_copybutton",
     "sphinx.ext.autosummary",
-    "sphinx.ext.viewcode",
     "autoapi.extension",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
 ]
 autoapi_type = "python"
 autoapi_dirs = ["../src"]
@@ -39,7 +39,6 @@ autoapi_template_dir = "_autoapi_templates"
 autoapi_options = [
     "members",
     "undoc-members",
-    "inherited-members",
     "special-members",
     "show-inheritance",
     "show-module-summary",
@@ -88,7 +87,6 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable", None),
     "pandas": ("https://pandas.pydata.org/docs", None),
     "scipy": ("https://docs.scipy.org/doc/scipy", None),
-    "click": ("https://click.palletsprojects.com/en/8.1.x/", None),
     "beartype": ("https://beartype.readthedocs.io/en/latest/", None),
 }
 myst_enable_extensions = [

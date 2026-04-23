@@ -57,3 +57,7 @@ SBOM/
 
 # IDE
 .vscode
+
+# profiling
+*.prof
+functiontrace.*

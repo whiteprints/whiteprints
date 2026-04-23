@@ -13,19 +13,20 @@ from hatchling.builders.config import BuilderConfigBound
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 
 
-if sys.version_info < (3, 12):
-    from typing_extensions import override
-else:
+if sys.version_info >= (3, 12):
     from typing import override
+else:
+    from typing_extensions import override
 
 
-def _compile(locale_path: Path) -> None:
+def _compile(locale_path: Path, domain: str) -> None:
     """Compile a localization file."""
     cmd = compile_catalog()
     cmd.initialize_options()
     # Hatchling's typing sucks. We ignore this warning.
     cmd.directory = locale_path  # pyright: ignore [reportAttributeAccessIssue]
     cmd.use_fuzzy = True
+    cmd.domain = domain
     cmd.finalize_options()
     try:
         cmd.run()
@@ -51,4 +52,5 @@ class CustomBuildHook(BuildHookInterface[BuilderConfigBound]):
             ),
         ):
             if locale_path.is_dir():
-                _compile(locale_path)
+                for domain in ["whiteprints", "argparse"]:
+                    _compile(locale_path, domain)

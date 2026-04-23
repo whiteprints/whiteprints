@@ -13,7 +13,7 @@ files. Each file contains licensing information.
 
 :::{attention}
 :name: Whiteprints's Code License
-The _[Python] code_ of this project is distributed under license [CC-BY-NC-SA-4.0](../LICENSES/CC-BY-NC-SA-4.0.txt).
+The _[Python] code_ of this project is distributed under license [GPL-3.0-or-later](../LICENSES/GPL-3.0-or-later.txt).
 :::
 
 In case of doubt, please check the [SPDX] header of each individual source code
@@ -24,6 +24,11 @@ explanations on licenses, expressions and exceptions.
 
 The [Python] code distributed is a subset of the complete codebase.
 
+:::{note}
+:name: Whiteprints's documentation License
+The documentation of this project is distributed under license [CC-BY-NC-SA-4.0](../LICENSES/CC-BY-NC-SA-4.0.txt).
+:::
+
 To simplify license management for both humans and automated systems, we adhere
 to the [REUSE] standard.
 
@@ -33,7 +38,6 @@ the root of the repository. Project metadata comply with [PEP 639].
 The licenses applied to this project are:
 
 {{ licenses }}
-
 
 For detailed information, please refer to the [SPDX] headers in each individual
 source file.

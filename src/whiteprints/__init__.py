@@ -4,14 +4,36 @@
 
 """Top-level module."""
 
+import importlib
+from functools import cache
+from types import ModuleType
 from typing import Final
 
-from whiteprints.environment import ENVIRONMENT_FILE, load_dotenv
-from whiteprints.package_metadata import __version__
 
-
-__all__: Final = ["__version__"]
+__all__: Final = []
 """Public module attributes."""
 
 
-load_dotenv(ENVIRONMENT_FILE)
+@cache
+def _setup_package(
+    *,
+    claw: ModuleType | None = None,
+) -> None:
+    """Setup the package.
+
+    Load beartype if not None.
+
+    Example:
+        >>> _setup_package()
+        None
+    """
+    if claw is not None:
+        claw.beartype_this_package()
+
+
+try:
+    _setup_package(
+        claw=importlib.import_module("beartype.claw"),
+    )
+except ImportError:
+    _setup_package()

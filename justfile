@@ -5,9 +5,14 @@
 
 # Uncomment this to use project local uv cache.
 # export UV_CACHE_DIR := ".just/.cache/uv"
-export UV_NO_PROGRESS := "true"
+#
+export UV_OFFLINE := "0"
+export UV_NO_PROGRESS := "1"
 export PYTHONOPTIMIZE := "0"
 export PYTHONDONTWRITEBYTECODE := "1"
+
+# Comment to parallelize tests with xdist
+export PYTEST_XDIST_AUTO_NUM_WORKERS := "0"
 
 
 # list all receipts
@@ -61,7 +66,6 @@ export PYTHONDONTWRITEBYTECODE := "1"
 # run all tests
 all:
     @just pre-commit
-    @just lint
     @just check-vulnerabilities
     @just check-exceptions
     @just check-code-maintainability
@@ -91,16 +95,17 @@ all:
 
 # Run `uv`
 [private]
+[no-exit-message]
 uv args="":
     uv \
     {{ args }}
 
 # Run `uv run`
 [private]
+[no-exit-message]
 uvr args="":
     @just uv " \
         run \
-        --refresh \
         --isolated \
         --no-dev \
         --no-config \
@@ -112,6 +117,7 @@ uvr args="":
 
 # Run `uv tool run`
 [private]
+[no-exit-message]
 uvx args="":
     @just uv " \
         tool run \
@@ -125,7 +131,6 @@ compile args="":
     @just uv " \
         pip compile \
         --quiet \
-        --refresh \
         --generate-hashes \
         --all-extras \
         {{ args }} \
@@ -218,7 +223,7 @@ clean-all:
 
 # Run a receipt for all Python versions (found in the .python-versions file). Works for all receipt whose first argument is a Python version
 [group("tests")]
-for-all-python receipt args="":
+for-all-python receipt *args:
     for python in $(grep -v '^#' .python-versions); do \
         just {{ receipt }} $python {{ args }}; \
     done
@@ -261,6 +266,7 @@ install-distribution receipt python dist resolution="highest" link_mode="" group
     @[ -z "{{ group }}" ] && \
         touch "$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt" || \
         just requirements-dev " \
+            --all-extras \
             {{ if group == '' { '' } else { '--only-group=' + group } }} \
             --output-file=\"$(just tmp-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")/requirements-dev.txt\" \
             --python=\"$(just venv-path \"{{ receipt }}\" \"{{ python }}\" \"{{ resolution }}\" \"{{ dist }}\")\" \
@@ -284,7 +290,8 @@ pytest-from-venv python-path tmp-path coverage-path tests-results-path:
     env TMPDIR="{{ tmp-path }}" \
     COVERAGE_FILE="{{ coverage-path }}/.coverage.{{ arch() }}-{{ os() }}" \
     "{{ python-path }}" -m pytest \
-        -n="auto" \
+        -m='not no_extras' \
+        --numprocesses='auto' \
         --html="{{ tests-results-path }}/test_report.{{ arch() }}.{{ os() }}.html" \
         --junitxml="{{ tests-results-path }}/junit-{{ arch() }}-{{ os() }}.xml" \
         --md-report-output="{{ tests-results-path }}/test_report_{{ arch() }}_{{ os() }}.md" \
@@ -317,24 +324,51 @@ test-distribution-low-high python dist link_mode="":
 alias test-dist-lh := test-distribution-low-high
 alias tdlh := test-distribution-low-high
 
+[private]
+[no-exit-message]
+@collect-tests *args:
+    just uvr "--group=tests pytest --quiet --no-cov --collect-only -m 'no_extras or extras_and_no_extras' {{ args }}"
+
 # Run the tests with pytest for a given Python
 [group("tests")]
-test-repository python: (venv "test-repository" python)
+test-repository python *args: (venv "test-repository" python)
     @TMPDIR="$(just tmp-path test-repository {{ python }})" \
     COVERAGE_FILE="$(just coverage-path test-repository {{ python }})/.coverage.{{ arch() }}-{{ os() }}" \
     just uvr " \
+        --all-extras \
         --group=tests \
         --python=\"$(just venv-path test-repository {{ python }})\" \
     pytest \
-        -n="auto" \
+        -m='not no_extras' \
+        --numprocesses='auto' \
         --html=\"$(just tests-results-path test-repository {{ python }})/test_report.{{ arch() }}.{{ os() }}.html\" \
         --junitxml=\"$(just tests-results-path test-repository {{ python }})/junit-{{ arch() }}-{{ os() }}.xml\" \
         --md-report-output=\"$(just tests-results-path test-repository {{ python }})/test_report_{{ arch() }}_{{ os() }}.md\" \
         --basetemp=\"$(just tmp-path test-repository {{ python }})\" \
         --cov-config=".coveragerc" \
+        {{ args }} \
         'src' \
         'tests' \
     "
+    @if just collect-tests {{ args }}; then \
+        TMPDIR="$(just tmp-path test-repository {{ python }})" \
+        COVERAGE_FILE="$(just coverage-path test-repository {{ python }})/.coverage.extras.{{ arch() }}-{{ os() }}" \
+        just uvr " \
+            --group=tests \
+            --python=\"$(just venv-path test-repository {{ python }})\" \
+        pytest \
+            -m='no_extras or extras_and_no_extras' \
+            --numprocesses='auto' \
+            --html=\"$(just tests-results-path test-repository {{ python }})/test_report.extras.{{ arch() }}.{{ os() }}.html\" \
+            --junitxml=\"$(just tests-results-path test-repository {{ python }})/junit-extras-{{ arch() }}-{{ os() }}.xml\" \
+            --md-report-output=\"$(just tests-results-path test-repository {{ python }})/test_report_extras_{{ arch() }}_{{ os() }}.md\" \
+            --basetemp=\"$(just tmp-path test-repository {{ python }})\" \
+            --cov-config=".coveragerc" \
+            {{ args }} \
+            'src' \
+            'tests' \
+        "; \
+    fi
     @just uvx "pyclean ."
 
 alias test-repo := test-repository
@@ -380,18 +414,6 @@ pre-commit args="":
         --all-files \
         --show-diff-on-failure \
         {{ args }} \
-    "
-
-# Lint the project with pylint
-[group("repository analysis")]
-lint:
-    @just uvr " \
-        --group=lint \
-    pylint \
-        --rcfile '.pylintrc' \
-        'src' \
-        'tests' \
-        'docs' \
     "
 
 # Run `pyright`
@@ -447,7 +469,7 @@ alias check-types := check-types-repository
 [group("dependencies")]
 print-dependency-tree python: (venv "print-dependency-tree" python)
     uv tree \
-        --python="$(just venv-path check-types-repository {{ python }})" \
+        --python="$(just venv-path print-dependency-tree {{ python }})" \
         --frozen \
         --no-dev
 
@@ -521,7 +543,7 @@ coverage-report receipt="":
 
 # Print coverage
 [group("coverage")]
-coverage receipt="" args="":
+coverage receipt="" *args:
     @[ ! -z "$(find $(just coverage-path {{ receipt }}) -type f -name 'coverage-combined')" ] || \
         just coverage-combine
     @just uvr " \
@@ -535,7 +557,7 @@ coverage receipt="" args="":
 
 # Run `reuse`
 [private]
-reuse args="":
+reuse *args:
     @just uvx " \
         reuse \
         {{ args }} \
@@ -553,7 +575,7 @@ SBOM-licenses:
 
 # Run `pip-audit`
 [private]
-pip-audit args="":
+pip-audit *args:
     @just uvx " \
         pip-audit \
         --disable-pip \
@@ -616,7 +638,7 @@ autofix:
 
 # Run `bandit`
 [private]
-bandit args="":
+bandit *args:
     @just uvx " \
         bandit \
         {{ args }} \
@@ -635,7 +657,7 @@ check-vulnerabilities:
 
 # Run `tryceratops`
 [private]
-tryceratops args="":
+tryceratops *args:
     @just uvr " \
         --group=check-exceptions \
         tryceratops \
@@ -653,7 +675,7 @@ check-exceptions:
 
 # Run `radon`
 [private]
-radon args="":
+radon *args:
     @just uvx " \
         radon \
         {{ args }} \
@@ -671,7 +693,7 @@ audit-code-maintainability:
 
 # Run `xenon`
 [private]
-xenon args="":
+xenon *args:
     @just uvx " \
         xenon \
         {{ args }} \
@@ -715,8 +737,9 @@ check-supply-chain python resolution="lowest": (venv ("check-supply-chain-" + re
 
 # Run `sphinx-build`
 [private]
-sphinx-build args="":
+sphinx-build *args:
     @just uvr " \
+        --all-extras \
         --group=build-documentation \
         sphinx-build \
             --jobs=auto \
@@ -738,13 +761,13 @@ check-documentation-links dest="docs_build":
 
 # Run `sphinx-autobuild`
 [private]
-sphinx-autobuild args="":
+sphinx-autobuild *args:
     @just uvr " \
+            --all-extras \
             --group=serve-documentation \
         sphinx-autobuild \
             --jobs=auto \
             --keep-going \
-            --open-browser \
         docs \
         $(just tmp-path sphinx-autobuild)/docs_build \
         {{ args }} \
@@ -752,12 +775,12 @@ sphinx-autobuild args="":
 
 # Serve the documentation on a given port. If port=0 a random available port is set.
 [group("documentation")]
-serve-documentation port="0":
-    @just sphinx-autobuild "--port={{ port }}"
+serve-documentation port="0" *args:
+    @just sphinx-autobuild --port={{ port }} {{ args }}
 
 # Run `pybabel`
 [private]
-pybabel args="":
+pybabel *args:
     @just uvr " \
         --only-group=localization \
     pybabel \
@@ -768,11 +791,19 @@ pybabel args="":
 # Extract the translation from the Python source files
 [group("localization")]
 translation-extract:
+    @just sync
     @just pybabel " \
         extract \
             --omit-header \
             --sort-by-file \
-            --output 'src/whiteprints/locale/base.pot' \
+            --output 'src/whiteprints/locale/argparse.pot' \
+            $(find $(uv python dir) -name "argparse.py" | xargs echo) \
+    "
+    @just pybabel " \
+        extract \
+            --omit-header \
+            --sort-by-file \
+            --output 'src/whiteprints/locale/whiteprints.pot' \
             src \
     "
 
@@ -781,7 +812,15 @@ translation-extract:
 translation-init locale:
     @just pybabel " \
         init \
-            --input-file 'src/whiteprints/locale/base.pot' \
+            --domain 'argparse' \
+            --input-file 'src/whiteprints/locale/argparse.pot' \
+            --output-dir 'src/whiteprints/locale' \
+            --locale='{{ locale }}' \
+    "
+    @just pybabel " \
+        init \
+            --domain 'whiteprints' \
+            --input-file 'src/whiteprints/locale/whiteprints.pot' \
             --output-dir 'src/whiteprints/locale' \
             --locale='{{ locale }}' \
     "
@@ -791,8 +830,17 @@ translation-init locale:
 translation-update locale="":
     @just pybabel " \
         update \
+            --domain 'argparse' \
             --omit-header \
-            --input-file 'src/whiteprints/locale/base.pot' \
+            --input-file 'src/whiteprints/locale/argparse.pot' \
+            --output-dir 'src/whiteprints/locale' \
+            --locale='{{ locale }}' \
+    "
+    @just pybabel " \
+        update \
+            --domain 'whiteprints' \
+            --omit-header \
+            --input-file 'src/whiteprints/locale/whiteprints.pot' \
             --output-dir 'src/whiteprints/locale' \
             --locale='{{ locale }}' \
     "

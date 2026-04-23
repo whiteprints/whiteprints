@@ -4,76 +4,202 @@
 
 """Test the CLI entrypoint."""
 
-from click import testing
+import json
 
-from whiteprints import package_metadata
-from whiteprints.cli import __app_name__, entrypoint
+import pytest
+from pytest import CaptureFixture, MonkeyPatch
+
+from whiteprints.cli import PosixExitCode
+from whiteprints.cli.entrypoint import entrypoint
+from whiteprints.cli.entrypoint_parser import Completion
+from whiteprints.metadata import extract_field
 
 
-class TestCLI:
-    """Test the CLI."""
+def test_help(capsys: CaptureFixture[str]) -> None:
+    """Test wether a help flag exists and works."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--help"])
 
-    @staticmethod
-    def test_version(cli_runner: testing.CliRunner) -> None:
-        """Check if the version printed by the CLI match the API one."""
-        result = cli_runner.invoke(
-            entrypoint.whiteprints,
-            ["--version"],
-        )
-        assert result.exit_code == 0, "The CLI did not exit properly."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
-        version_match = (
-            f"{__app_name__}, version {package_metadata.__version__}"
-            == result.stdout.rstrip()
-        )
-        assert version_match, (
-            "The python version returned by the CLI do not match the API"
-            " version (given by __version__)."
-        )
+    captured = capsys.readouterr()
+    assert captured.out, "Could not print application help message"
 
-    @staticmethod
-    def test_debug_info(cli_runner: testing.CliRunner) -> None:
-        """Check if the debug-info flag exists."""
-        result = cli_runner.invoke(
-            entrypoint.whiteprints,
-            ["--debug-info"],
-        )
-        assert result.exit_code == 0, "The CLI did not exit properly."
 
-    @staticmethod
-    def test_copyright(cli_runner: testing.CliRunner) -> None:
-        """Check if the copyright flag exists."""
-        result = cli_runner.invoke(
-            entrypoint.whiteprints,
-            ["--copyright"],
-        )
-        assert result.exit_code == 0, "The CLI did not exit properly."
+def test_no_args_is_help(capsys: CaptureFixture[str]) -> None:
+    """Test wether no args prints help."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint([])
 
-    @staticmethod
-    def test_license(cli_runner: testing.CliRunner) -> None:
-        """Check if the license flag exists."""
-        result = cli_runner.invoke(
-            entrypoint.whiteprints,
-            ["--license"],
-        )
-        assert result.exit_code == 0, "The CLI did not exit properly."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
 
-    @staticmethod
-    def test_help_flag_exists(cli_runner: testing.CliRunner) -> None:
-        """Check if the version printed by the CLI match the API one."""
-        result = cli_runner.invoke(
-            entrypoint.whiteprints,
-            ["--help"],
-        )
-        assert result.exit_code == 0, "The CLI did not exit properly."
+    captured_1 = capsys.readouterr()
 
-    @staticmethod
-    def test_default(cli_runner: testing.CliRunner) -> None:
-        """Check if the CLI called with default arguments return prpperly.
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--help"])
 
-        Args:
-            cli_runner: the CLI test runner provided by typer.testing or a
-                fixture.
-        """
-        result = cli_runner.invoke(entrypoint.whiteprints)
-        assert result.exit_code == 0, "The CLI did not exit properly."
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
+
+    captured_2 = capsys.readouterr()
+    assert captured_1.out == captured_2.out, "no args output should match help"
+
+
+def test_help_wrong_theme(
+    capsys: CaptureFixture[str],
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Test wether a help flag exists and works."""
+    monkeypatch.setenv("WHITEPRINTS_THEME", "this-theme-does-not-exists")
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--help"])
+
+    assert ext.value.code == PosixExitCode.COMMAND_LINE_USAGE_ERROR, (
+        "Unexpected exit code."
+    )
+
+    captured = capsys.readouterr()
+    assert captured.out, "Application should fail on invalid theme selection"
+
+
+def test_wrong_usage(capsys: CaptureFixture[str]) -> None:
+    """Test wether the app handles properly wrong usage."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--this-flag-does-not-exists"])
+
+    assert ext.value.code == PosixExitCode.COMMAND_LINE_USAGE_ERROR, (
+        "Unexpected exit code."
+    )
+
+    captured = capsys.readouterr()
+    assert "error" in captured.err, "Could not print application help message"
+
+
+def test_version(capsys: CaptureFixture[str]) -> None:
+    """Test wether a version flag exists and works."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--version"])
+
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
+
+    captured = capsys.readouterr()
+    assert captured.out.rstrip() == extract_field("Version"), (
+        "Printed version does not match library version"
+    )
+
+
+@pytest.mark.no_extras
+def test_platform(capsys: CaptureFixture[str]) -> None:
+    """Test wether a platform flag exists and works."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--platform"])
+
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
+
+    captured = capsys.readouterr()
+    assert json.loads(captured.out), (
+        "Could not print application debug informations"
+    )
+
+
+@pytest.mark.no_extras
+def test_platform_full(capsys: CaptureFixture[str]) -> None:
+    """Test wether a platform flag exists and works."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--platform", "--platform"])
+
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
+
+    captured = capsys.readouterr()
+    assert json.loads(captured.out), (
+        "Could not print application debug informations"
+    )
+
+
+def test_copyright(capsys: CaptureFixture[str]) -> None:
+    """Test wether a copyright flag exists and works."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--copyright"])
+
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
+
+    captured = capsys.readouterr()
+    assert captured.out, "Could not print application copyright message"
+
+
+def test_license_simple(capsys: CaptureFixture[str]) -> None:
+    """Test wether a license flag exists and works."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--license"])
+
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
+
+    captured = capsys.readouterr()
+    assert captured.out, "Could not print application license informations"
+
+
+def test_license_full(capsys: CaptureFixture[str]) -> None:
+    """Test wether a license flag exists and works."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--license", "--license"])
+
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
+
+    captured = capsys.readouterr()
+    assert json.loads(captured.out), (
+        "Could not print application license informations"
+    )
+
+
+def test_license_valid(capsys: CaptureFixture[str]) -> None:
+    """Test wether a license text flag exists and works."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--license-text"])
+
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
+
+    captured = capsys.readouterr()
+    assert captured.out, "There should be a license text displayed"
+
+
+@pytest.mark.no_extras
+def test_shell_autocompletion_fail_when_no_extras(
+    capsys: CaptureFixture[str],
+) -> None:
+    """Test that autocompletion flag is unavailable when no extras."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--autocompletion-script"])
+
+    assert ext.value.code == PosixExitCode.COMMAND_LINE_USAGE_ERROR, (
+        "Unexpected exit code."
+    )
+
+    captured = capsys.readouterr()
+    assert "error" in captured.err.lower(), (
+        "There should be an error when trying to get an autocompletion script"
+        " when extra `qol` is not installed"
+    )
+
+
+def test_shell_autocompletion(
+    capsys: CaptureFixture[str],
+) -> None:
+    """Test wether an autocompletion-script flag exists and works."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--autocompletion-script", Completion.SUPPORTED_SHELLS[0]])
+
+    assert ext.value.code == PosixExitCode.SUCCESS, "Unexpected exit code."
+
+    captured = capsys.readouterr()
+    assert captured.out, "There should be a shell autocompletion displayed"
+
+
+def test_shell_autocompletion_auto() -> None:
+    """Test wether an autocompletion-script flag exists and works."""
+    with pytest.raises(SystemExit) as ext:
+        entrypoint(["--autocompletion-script"])
+
+    assert ext.value.code in {
+        PosixExitCode.SUCCESS,
+        PosixExitCode.COMMAND_LINE_USAGE_ERROR,
+        PosixExitCode.SERVICE_UNAVAILABLE,
+    }, "Unexpected exit code."
