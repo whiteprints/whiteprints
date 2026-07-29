@@ -192,7 +192,7 @@ jobs:
       # Publish to TestPyPI for pre-releases (alpha, beta, pre-alpha, planning)
       - name: Publish to TestPyPI
         if: "contains(github.ref_name, '-alpha') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-pre-alpha') || contains(github.ref_name, '-planning')"
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
         with:
           repository-url: 'https://test.pypi.org/legacy/'
           attestations: true
@@ -201,7 +201,7 @@ jobs:
       # post-releases
       - name: Publish to PyPI
         if: "!contains(github.ref_name, '-alpha') && !contains(github.ref_name, '-beta') && !contains(github.ref_name, '-pre-alpha') && !contains(github.ref_name, '-planning')"
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
         with:
           repository-url: 'https://upload.pypi.org/legacy/'
           attestations: true
