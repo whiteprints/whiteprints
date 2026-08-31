@@ -5,7 +5,7 @@
 fail_fast: true
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
       - id: check-merge-conflict
@@ -17,19 +17,19 @@ repos:
       - id: detect-private-key
       - id: trailing-whitespace
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.5.0
+    rev: v2.29.0
     hooks:
       - id: pyproject-fmt
         args: ["--column-width", "79", "--indent", "4", "--no-print-diff"]
   - repo: https://github.com/fsfe/reuse-tool
-    rev: v5.0.2
+    rev: v6.2.0
     hooks:
       - id: reuse-lint-file
         name: reuse
         entry: reuse
         description: "[License] Lint the chand file for compliance with the REUSE Specification"
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.6
+    rev: v0.16.5
     hooks:
       - id: ruff-format
         name: "ruff format"
